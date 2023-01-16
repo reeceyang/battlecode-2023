@@ -64,7 +64,7 @@ public strictfp class RobotPlayer {
         rc.setIndicatorString("Hello world!");
         rng = new Random(rc.getID());
         isRightHanded = rng.nextBoolean();
-        System.out.println(isRightHanded);
+//        System.out.println(isRightHanded);
 
         while (true) {
             // This code runs during the entire lifespan of the robot, which is why it is in an infinite

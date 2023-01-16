@@ -1,4 +1,4 @@
-package examplefuncsplayer;
+package lectureplayer;
 
 import battlecode.common.*;
 
@@ -55,7 +55,7 @@ public strictfp class RobotPlayer {
 
         // Hello world! Standard output is very useful for debugging.
         // Everything you say here will be directly viewable in your terminal when you run a match!
-        System.out.println("I'm a " + rc.getType() + " and I just got created! I have health " + rc.getHealth());
+//        System.out.println("I'm a " + rc.getType() + " and I just got created! I have health " + rc.getHealth());
 
         // You can also use indicators to save debug notes in replays.
         rc.setIndicatorString("Hello world!");
@@ -75,7 +75,7 @@ public strictfp class RobotPlayer {
                 // this into a different control structure!
                 switch (rc.getType()) {
                     case HEADQUARTERS:     runHeadquarters(rc);  break;
-                    case CARRIER:      CarrierStrategy.runCarrier(rc);   break;
+                    case CARRIER: CarrierStrategy.runCarrier(rc);   break;
                     case LAUNCHER: LauncherStrategy.runLauncher(rc); break;
                     case BOOSTER: // Examplefuncsplayer doesn't use any of these robot types below.
                     case DESTABILIZER: // You might want to give them a try!
@@ -114,10 +114,15 @@ public strictfp class RobotPlayer {
         // Pick a direction to build in.
         Direction dir = directions[rng.nextInt(directions.length)];
         MapLocation newLoc = rc.getLocation().add(dir);
-        if (rc.canBuildAnchor(Anchor.STANDARD)) {
+        if (turnCount == 1) {
+            Communication.addHeadquarter(rc);
+        } else if (turnCount == 2) {
+            Communication.updateHeadquarterInfo(rc);
+        }
+        if (rc.canBuildAnchor(Anchor.STANDARD) && rc.getResourceAmount(ResourceType.ADAMANTIUM) > 100) {
             // If we can build an anchor do it!
             rc.buildAnchor(Anchor.STANDARD);
-            rc.setIndicatorString("Building anchor! " + rc.getAnchor());
+            rc.setIndicatorString("Building anchor! " + rc.getNumAnchors(Anchor.STANDARD));
         }
         if (rng.nextBoolean()) {
             // Let's try to build a carrier.
@@ -132,5 +137,19 @@ public strictfp class RobotPlayer {
                 rc.buildRobot(RobotType.LAUNCHER, newLoc);
             }
         }
+        Communication.tryWriteMessages(rc);
+
     }
+
+    static void moveRandom(RobotController rc) throws GameActionException {
+        Direction dir = directions[rng.nextInt(directions.length)];
+        if(rc.canMove(dir)) rc.move(dir);
+    }
+
+    static void moveTowards(RobotController rc, MapLocation loc) throws GameActionException{
+        Direction dir = rc.getLocation().directionTo(loc);
+        if(rc.canMove(dir)) rc.move(dir);
+        else moveRandom(rc);
+    }
+
 }
