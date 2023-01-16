@@ -1,4 +1,4 @@
-package examplefuncsplayer;
+package hognoseplayer;
 
 import battlecode.common.*;
 
@@ -17,21 +17,12 @@ import java.util.Set;
 public strictfp class RobotPlayer {
 
     /**
-     * We will use this variable to count the number of turns this robot has been alive.
-     * You can use static variables like this to save any information you want. Keep in mind that even though
-     * these variables are static, in Battlecode they aren't actually shared between your robots.
+     * Keep in mind that even though these variables are static, in Battlecode they aren't actually shared between your robots.
      */
     static int turnCount = 0;
 
-    /**
-     * A random number generator.
-     * We will use this RNG to make some random moves. The Random class is provided by the java.util.Random
-     * import at the top of this file. Here, we *seed* the RNG with a constant number (6147); this makes sure
-     * we get the same sequence of numbers every time this code is run. This is very useful for debugging!
-     */
     static final Random rng = new Random(6147);
 
-    /** Array containing all the possible movement directions. */
     static final Direction[] directions = {
         Direction.NORTH,
         Direction.NORTHEAST,
@@ -74,11 +65,11 @@ public strictfp class RobotPlayer {
                 // use different strategies on different robots. If you wish, you are free to rewrite
                 // this into a different control structure!
                 switch (rc.getType()) {
-                    case HEADQUARTERS:     runHeadquarters(rc);  break;
-                    case CARRIER:      CarrierStrategy.runCarrier(rc);   break;
+                    case HEADQUARTERS:     HQStrategy.runHeadquarters(rc);  break;
+                    case CARRIER: CarrierStrategy.runCarrier(rc);   break;
                     case LAUNCHER: LauncherStrategy.runLauncher(rc); break;
-                    case BOOSTER: // Examplefuncsplayer doesn't use any of these robot types below.
-                    case DESTABILIZER: // You might want to give them a try!
+                    case BOOSTER: 
+                    case DESTABILIZER:
                     case AMPLIFIER:       break;
                 }
 
@@ -106,31 +97,11 @@ public strictfp class RobotPlayer {
         // Your code should never reach here (unless it's intentional)! Self-destruction imminent...
     }
 
-    /**
-     * Run a single turn for a Headquarters.
-     * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
-     */
-    static void runHeadquarters(RobotController rc) throws GameActionException {
-        // Pick a direction to build in.
+    // Common methods
+
+    static void moveRandom(RobotController rc) throws GameActionException {
         Direction dir = directions[rng.nextInt(directions.length)];
-        MapLocation newLoc = rc.getLocation().add(dir);
-        if (rc.canBuildAnchor(Anchor.STANDARD)) {
-            // If we can build an anchor do it!
-            rc.buildAnchor(Anchor.STANDARD);
-            rc.setIndicatorString("Building anchor! " + rc.getAnchor());
-        }
-        if (rng.nextBoolean()) {
-            // Let's try to build a carrier.
-            rc.setIndicatorString("Trying to build a carrier");
-            if (rc.canBuildRobot(RobotType.CARRIER, newLoc)) {
-                rc.buildRobot(RobotType.CARRIER, newLoc);
-            }
-        } else {
-            // Let's try to build a launcher.
-            rc.setIndicatorString("Trying to build a launcher");
-            if (rc.canBuildRobot(RobotType.LAUNCHER, newLoc)) {
-                rc.buildRobot(RobotType.LAUNCHER, newLoc);
-            }
-        }
+        if(rc.canMove(dir)) rc.move(dir);
     }
+
 }
