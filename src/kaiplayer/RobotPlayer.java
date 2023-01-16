@@ -113,17 +113,27 @@ public strictfp class RobotPlayer {
     }
 
     static int xReflect(RobotController rc, MapLocation loc) {
-        MapLocation newloc = new MapLocation(rc.getMapWidth() - loc.x, loc.y);
+        MapLocation newloc = new MapLocation(rc.getMapWidth() - loc.x - 1, loc.y);
         return Communication.locationToInt(rc, newloc);
+    }
+
+    static MapLocation xReflectLoc(RobotController rc, int loc) {
+        MapLocation newloc = new MapLocation(rc.getMapWidth() - Communication.intToLocation(rc, loc).x - 1, Communication.intToLocation(rc, loc).y);
+        return newloc;
     }
 
     static int yReflect(RobotController rc, MapLocation loc) {
-        MapLocation newloc = new MapLocation(loc.x, rc.getMapHeight() - loc.y);
+        MapLocation newloc = new MapLocation(loc.x, rc.getMapHeight() - loc.y - 1);
         return Communication.locationToInt(rc, newloc);
     }
 
+    static MapLocation yReflectLoc(RobotController rc, int loc) {
+        MapLocation newloc = new MapLocation(Communication.intToLocation(rc, loc).x, rc.getMapHeight() - Communication.intToLocation(rc, loc).y - 1);
+        return newloc;
+    }
+
     static int diagReflect(RobotController rc, MapLocation loc) {
-        MapLocation newloc = new MapLocation(rc.getMapWidth() - loc.x, rc.getMapHeight() - loc.y);
+        MapLocation newloc = new MapLocation(rc.getMapWidth() - loc.x - 1, rc.getMapHeight() - loc.y - 1);
         return Communication.locationToInt(rc, newloc);
     }
 

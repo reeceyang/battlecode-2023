@@ -5,9 +5,8 @@ import battlecode.common.*;
 import java.util.Map;
 
 public class LauncherStrategy {
+    static MapLocation hq = null;
     static void runLauncher(RobotController rc) throws GameActionException {
-
-        MapLocation hq = null;
 
         if (RobotPlayer.turnCount == 1) {
             int[] hqLoc = new int[]{rc.readSharedArray(1), rc.readSharedArray(2), rc.readSharedArray(3), rc.readSharedArray(4)};
@@ -20,17 +19,19 @@ public class LauncherStrategy {
             }
         }
 
-        int targetHQ = 1; // CHANGE THIS TO TARGET 0 - ONLY 1 FOR BUILD PURPOSES
+        int targetHQ = 0; // CHANGE THIS TO TARGET 0 - ONLY 1 FOR BUILD PURPOSES
 
         if (Communication.readHQStatus(rc, "nx") == 1) {
             if (Communication.readHQStatus(rc, "ny") == 1) {
                 targetHQ = RobotPlayer.diagReflect(rc, hq);
             } else {
-                // TODO: pick a "y" that hasn't been verified; if all have been verified, pick closest "y"
+                // TODO: pick a "y" that hasn't been verified out of HQs that exist; if all have been verified, pick closest "y"
+                targetHQ = RobotPlayer.yReflect(rc, Communication.intToLocation(rc, rc.readSharedArray(1)));
                 System.out.println("I'm tired");
             }
         } else {
-            // TODO: pick an "x" that hasn't been verified; if all have been verified, pick closest "x"
+            // TODO: pick an "x" that hasn't been verified out of HQs that exist; if all have been verified, pick closest "x"
+            targetHQ = RobotPlayer.xReflect(rc, Communication.intToLocation(rc, rc.readSharedArray(1)));
             System.out.println("I'm even more tired");
         }
 
