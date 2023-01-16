@@ -1,4 +1,4 @@
-package examplefuncsplayer;
+package reeceplayer;
 
 import battlecode.common.*;
 
@@ -29,18 +29,21 @@ public strictfp class RobotPlayer {
      * import at the top of this file. Here, we *seed* the RNG with a constant number (6147); this makes sure
      * we get the same sequence of numbers every time this code is run. This is very useful for debugging!
      */
-    static final Random rng = new Random(6147);
+//    static final Random rng = new Random(6147);
+    static Random rng = null;
+
+    static boolean isRightHanded;
 
     /** Array containing all the possible movement directions. */
     static final Direction[] directions = {
-        Direction.NORTH,
-        Direction.NORTHEAST,
-        Direction.EAST,
-        Direction.SOUTHEAST,
-        Direction.SOUTH,
-        Direction.SOUTHWEST,
-        Direction.WEST,
-        Direction.NORTHWEST,
+            Direction.NORTH,
+            Direction.NORTHEAST,
+            Direction.EAST,
+            Direction.SOUTHEAST,
+            Direction.SOUTH,
+            Direction.SOUTHWEST,
+            Direction.WEST,
+            Direction.NORTHWEST,
     };
 
     /**
@@ -55,10 +58,13 @@ public strictfp class RobotPlayer {
 
         // Hello world! Standard output is very useful for debugging.
         // Everything you say here will be directly viewable in your terminal when you run a match!
-        System.out.println("I'm a " + rc.getType() + " and I just got created! I have health " + rc.getHealth());
+//        System.out.println("I'm a " + rc.getType() + " and I just got created! I have health " + rc.getHealth());
 
         // You can also use indicators to save debug notes in replays.
         rc.setIndicatorString("Hello world!");
+        rng = new Random(rc.getID());
+        isRightHanded = rng.nextBoolean();
+        System.out.println(isRightHanded);
 
         while (true) {
             // This code runs during the entire lifespan of the robot, which is why it is in an infinite
@@ -75,7 +81,7 @@ public strictfp class RobotPlayer {
                 // this into a different control structure!
                 switch (rc.getType()) {
                     case HEADQUARTERS:     runHeadquarters(rc);  break;
-                    case CARRIER:      CarrierStrategy.runCarrier(rc);   break;
+                    case CARRIER: CarrierStrategy.runCarrier(rc);   break;
                     case LAUNCHER: LauncherStrategy.runLauncher(rc); break;
                     case BOOSTER: // Examplefuncsplayer doesn't use any of these robot types below.
                     case DESTABILIZER: // You might want to give them a try!
@@ -114,10 +120,15 @@ public strictfp class RobotPlayer {
         // Pick a direction to build in.
         Direction dir = directions[rng.nextInt(directions.length)];
         MapLocation newLoc = rc.getLocation().add(dir);
-        if (rc.canBuildAnchor(Anchor.STANDARD)) {
+        if (turnCount == 1) {
+            Communication.addHeadquarter(rc);
+        } else if (turnCount == 2) {
+            Communication.updateHeadquarterInfo(rc);
+        }
+        if (false && rc.canBuildAnchor(Anchor.STANDARD) && rc.getResourceAmount(ResourceType.ADAMANTIUM) > 100) {
             // If we can build an anchor do it!
             rc.buildAnchor(Anchor.STANDARD);
-            rc.setIndicatorString("Building anchor! " + rc.getAnchor());
+            rc.setIndicatorString("Building anchor! " + rc.getNumAnchors(Anchor.STANDARD));
         }
         if (rng.nextBoolean()) {
             // Let's try to build a carrier.
@@ -132,5 +143,31 @@ public strictfp class RobotPlayer {
                 rc.buildRobot(RobotType.LAUNCHER, newLoc);
             }
         }
+        Communication.tryWriteMessages(rc);
+
     }
+
+    static final int MAGIC_NUMBER = 5;
+    static void moveRandom(RobotController rc) throws GameActionException {
+        rc.setIndicatorString("trying to move randomly");
+        // only change direction every so often
+        if (turnCount % MAGIC_NUMBER == 0 || Pathing.line == null) {
+            Direction dir = directions[rng.nextInt(directions.length)];
+            MapLocation target = new MapLocation(rc.getLocation().x + MAGIC_NUMBER * dir.dx, rc.getLocation().y + MAGIC_NUMBER * dir.dy);
+            Pathing.moveTowards(rc, target);
+        } else {
+            Pathing.moveTowards(rc, Pathing.line.target);
+        }
+    }
+
+    static void moveTowards(RobotController rc, MapLocation loc) throws GameActionException{
+        if (loc != null) {
+            Pathing.moveTowards(rc, loc);
+        }
+        else {
+            rc.setIndicatorString("loc null");
+            moveRandom(rc);
+        }
+    }
+
 }
