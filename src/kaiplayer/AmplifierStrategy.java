@@ -8,9 +8,10 @@ public class AmplifierStrategy {
 
     static void runAmplifier(RobotController rc) throws GameActionException {
         Direction dir = Direction.CENTER;
+
         Team enemyTeam = rc.getTeam().opponent();
 
-        int[] hqLoc = new int[]{rc.readSharedArray(1), rc.readSharedArray(2), rc.readSharedArray(3), rc.readSharedArray(4)};
+        int[] hqLoc = new int[]{Communication.readHQLoc(rc, 1), Communication.readHQLoc(rc, 2), Communication.readHQLoc(rc, 3), Communication.readHQLoc(rc, 4)};
 
         if (RobotPlayer.turnCount == 1) {
             // identify the closest launcher by ID, set it to targetLauncher
@@ -21,29 +22,78 @@ public class AmplifierStrategy {
                     break;
                 }
             }
-        }
 
+            // set all enemy HQs to needing launchers at the start
+            Communication.updateNeedsLauncher(rc, 1);
+            Communication.updateNeedsLauncher(rc, 2);
+            Communication.updateNeedsLauncher(rc, 3);
+            Communication.updateNeedsLauncher(rc, 4);
+
+        }
+        int target=0;
         if (rc.canSenseRobot(targetLauncher)) {
             Pathing.moveTowards(rc, rc.senseRobot(targetLauncher).location); // follow launcher
         } else {
-            RobotPlayer.moveRandom(rc);
+            RobotPlayer.moveRandom(rc); // TODO: have it move towards closest(?) potential enemy HQ
+            int[] dists = new int[]{3600, 3600, 3600, 3600};
+            if (Communication.readHQStatus(rc, "nx") == 1) {
+                if (Communication.readHQStatus(rc, "ny") == 1) {
+                    // Go to closest verified enemy HQ location
+
+                    for (int i=1; i<5; i++) {
+                        if (Communication.readHQLoc(rc, i) != 0) { //  && Communication.readNeedsLauncher(rc, i)==1
+                            dists[i-1] = RobotPlayer.distSquaredLoc(rc.getLocation(), Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, Communication.intToLocation(rc, Communication.readHQLoc(rc, i)))));
+                        }
+                    }
+
+                    int min1 = Math.min(dists[0], dists[1]);
+                    int min2 = Math.min(dists[2], dists[3]);
+                    int min = Math.min(min1, min2);
+
+                    int targetId = 0;
+                    if (min != 3600) {
+                        for (int i = 0; i < 4; i++) {
+                            if (min == dists[i]) {
+                                target = RobotPlayer.diagReflect(rc, Communication.intToLocation(rc, Communication.readHQLoc(rc, i+1)));
+                                targetId = i;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    // TODO: unexplored potential enemy HQ location - if it gets within range to see that there is no HQ there, go to new unexplored enemy HQ location (in case of amplifier death)
+                    target = RobotPlayer.yReflect(rc, Communication.intToLocation(rc, Communication.readHQLoc(rc, 1)));
+                }
+            } else {
+                // TODO: closest unexplored potential enemy HQ location
+                target = RobotPlayer.xReflect(rc, Communication.intToLocation(rc, Communication.readHQLoc(rc, 1)));
+            }
+            Pathing.moveTowards(rc, Communication.intToLocation(rc, target));
         }
 
         RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(-1, enemyTeam);
         for (RobotInfo bot : nearbyEnemies) {
             if (bot.getType() == RobotType.HEADQUARTERS) {
 
+                int hqId = 0;
+
+                // report its location to array
+
                 if (RobotPlayer.xReflect(rc, bot.location) == hqLoc[0]) {
                     rc.setIndicatorString("x1");
+                    hqId = 1;
                     Communication.updateHQStatus(rc, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 } else if (hqLoc[1] != 0 && RobotPlayer.xReflect(rc, bot.location) == hqLoc[1]) {
                     rc.setIndicatorString("x2");
+                    hqId = 2;
                     Communication.updateHQStatus(rc, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0);
                 } else if (hqLoc[2] != 0 && RobotPlayer.xReflect(rc, bot.location) == hqLoc[2]) {
                     rc.setIndicatorString("x3");
+                    hqId = 3;
                     Communication.updateHQStatus(rc, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
                 } else if (hqLoc[3] != 0 && RobotPlayer.xReflect(rc, bot.location) == hqLoc[3]) {
                     rc.setIndicatorString("x4");
+                    hqId = 4;
                     Communication.updateHQStatus(rc, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0);
                 } else {
                     rc.setIndicatorString("nx");
@@ -52,19 +102,40 @@ public class AmplifierStrategy {
 
                 if (RobotPlayer.yReflect(rc, bot.location) == hqLoc[0]) {
                     rc.setIndicatorString("y1");
+                    hqId = 1;
                     Communication.updateHQStatus(rc, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0);
                 } else if (hqLoc[1] != 0 && RobotPlayer.yReflect(rc, bot.location) == hqLoc[1]) {
                     rc.setIndicatorString("y2");
+                    hqId = 2;
                     Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0);
                 } else if (hqLoc[2] != 0 && RobotPlayer.yReflect(rc, bot.location) == hqLoc[2]) {
                     rc.setIndicatorString("y3");
+                    hqId = 3;
                     Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);
                 } else if (hqLoc[3] != 0 && RobotPlayer.yReflect(rc, bot.location) == hqLoc[3]) {
                     rc.setIndicatorString("y4");
+                    hqId = 4;
                     Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
                 } else {
                     rc.setIndicatorString("ny");
                     Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                }
+
+                if (hqId == 0) {
+                    int hqInt = RobotPlayer.diagReflect(rc, bot.location);
+                    for (int i = 1; i < 5; i ++) {
+                        if (hqInt == Communication.readHQLoc(rc, i)) {
+                            hqId = i;
+                            break;
+                        }
+                    }
+                }
+
+                // report whether the enemy HQ has a sufficient amount of home launchers around it
+                if (rc.senseNearbyRobots(-1, rc.getTeam()).length < 5) {
+                    Communication.updateNeedsLauncher(rc, hqId);
+                } else {
+                    Communication.updateDoesntNeedLauncher(rc, hqId);
                 }
 
             }
