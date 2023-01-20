@@ -15,7 +15,7 @@ public class LauncherStrategy {
         // Scan enemies
         Team opponent = rc.getTeam().opponent();
         RobotInfo[] enemies = rc.senseNearbyRobots(16, opponent);
-        int lowestHealth = 100;
+        int lowestHealth = 1000;
         int smallestDistance = 100;
         RobotInfo target = null;
         
