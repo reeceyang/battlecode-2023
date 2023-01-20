@@ -23,14 +23,16 @@ class Communication {
     private static final int AREA_RADIUS = RobotType.CARRIER.visionRadiusSquared;
 
     // Maybe you want to change this based on exact amounts which you can get on turn 1
-    static final int STARTING_ISLAND_IDX = GameConstants.MAX_STARTING_HEADQUARTERS;
-    private static final int STARTING_ENEMY_IDX = GameConstants.MAX_NUMBER_ISLANDS + GameConstants.MAX_STARTING_HEADQUARTERS;
+    static final int STARTING_ISLAND_IDX = GameConstants.MAX_STARTING_HEADQUARTERS + 1;
+    private static final int STARTING_ENEMY_IDX = GameConstants.MAX_NUMBER_ISLANDS + GameConstants.MAX_STARTING_HEADQUARTERS + 1;
 
     private static final int TOTAL_BITS = 16;
     private static final int MAPLOC_BITS = 12;
     private static final int TEAM_BITS = 1;
     private static final int HEALTH_BITS = 3;
     private static final int HEALTH_SIZE = (int) Math.ceil(Anchor.ACCELERATING.totalHealth / 8.0);
+    private static final int HQ_COUNT_BITS = 2;
+    private static final int ENEMY_HQ_BITS = 4;
     public static int headquarterCount = 0;
 
 
@@ -39,21 +41,30 @@ class Communication {
 
 
 
-    static void increaseHeadquarterCount(RobotController rc) throws GameActionException {
+    static int increaseHeadquarterCount(RobotController rc) throws GameActionException {
         headquarterCount = rc.readSharedArray(0) + 1;
         rc.writeSharedArray(0, headquarterCount);
+        return headquarterCount;
+    }
+
+    static int readHeadquarterCount(RobotController rc) throws GameActionException {
+        return rc.readSharedArray(0) & 0b11;
     }
 
     static void addHeadquarter(RobotController rc, int loc) throws GameActionException {
         if (rc.readSharedArray(headquarterCount) == 0) {
-            rc.writeSharedArray(headquarterCount, loc);
+            rc.writeSharedArray(headquarterCount, loc << 4);
         }
+    }
+
+    static int readHQLoc(RobotController rc, int hqId) throws GameActionException {
+        return rc.readSharedArray(hqId) >> 4;
     }
 
     static void updateHeadquarterInfo(RobotController rc) throws GameActionException {
         if (RobotPlayer.turnCount == 2) {
-            for (int i = 0; i < GameConstants.MAX_STARTING_HEADQUARTERS; i++) {
-                headquarterLocs[i] = (intToLocation(rc, rc.readSharedArray(i)));
+            for (int i = 1; i < GameConstants.MAX_STARTING_HEADQUARTERS + 1; i++) {
+                headquarterLocs[i-1] = (intToLocation(rc, readHQLoc(rc, i)));
                 if (rc.readSharedArray(i) == 0) {
                     break;
                 }
@@ -115,7 +126,7 @@ class Communication {
 
     static void updateHQStatus(RobotController rc, int x1, int x2, int x3, int x4, int y1, int y2, int y3, int y4, int nx, int ny) {
         try {
-            int val = (x1*0b1000000000 + x2*0b100000000 + x3*0b10000000 + x4*0b1000000 + y1*0b100000 + y2*0b10000 + y3*0b1000 + y4*0b100 + nx*0b10 + ny*0b1) << 2 | rc.readSharedArray(0);
+            int val = (x1*0b1000000000 + x2*0b100000000 + x3*0b10000000 + x4*0b1000000 + y1*0b100000 + y2*0b10000 + y3*0b1000 + y4*0b100 + nx*0b10 + ny*0b1) << (HQ_COUNT_BITS + ENEMY_HQ_BITS) | rc.readSharedArray(0);
             rc.writeSharedArray(0, val);
         } catch (GameActionException e) {}
     }
@@ -123,21 +134,73 @@ class Communication {
     static int readHQStatus(RobotController rc, String j) {
         try {
             switch (j) {
-                case "x1": return (rc.readSharedArray(0) >> 11);
-                case "x2": return (rc.readSharedArray(0) >> 10) % 0b10;
-                case "x3": return (rc.readSharedArray(0) >> 9) % 0b10;
-                case "x4": return (rc.readSharedArray(0) >> 8) % 0b10;
-                case "y1": return (rc.readSharedArray(0) >> 7) % 0b10;
-                case "y2": return (rc.readSharedArray(0) >> 6) % 0b10;
-                case "y3": return (rc.readSharedArray(0) >> 5) % 0b10;
-                case "y4": return (rc.readSharedArray(0) >> 4) % 0b10;
-                case "nx": return (rc.readSharedArray(0) >> 3) % 0b10;
-                case "ny": return (rc.readSharedArray(0) >> 2) % 0b10;
+                case "x1": return (rc.readSharedArray(0) >> (HQ_COUNT_BITS + ENEMY_HQ_BITS + 9));
+                case "x2": return (rc.readSharedArray(0) >> (HQ_COUNT_BITS + ENEMY_HQ_BITS + 8)) % 0b10;
+                case "x3": return (rc.readSharedArray(0) >> (HQ_COUNT_BITS + ENEMY_HQ_BITS + 7)) % 0b10;
+                case "x4": return (rc.readSharedArray(0) >> (HQ_COUNT_BITS + ENEMY_HQ_BITS + 6)) % 0b10;
+                case "y1": return (rc.readSharedArray(0) >> (HQ_COUNT_BITS + ENEMY_HQ_BITS + 5)) % 0b10;
+                case "y2": return (rc.readSharedArray(0) >> (HQ_COUNT_BITS + ENEMY_HQ_BITS + 4)) % 0b10;
+                case "y3": return (rc.readSharedArray(0) >> (HQ_COUNT_BITS + ENEMY_HQ_BITS + 3)) % 0b10;
+                case "y4": return (rc.readSharedArray(0) >> (HQ_COUNT_BITS + ENEMY_HQ_BITS + 2)) % 0b10;
+                case "nx": return (rc.readSharedArray(0) >> (HQ_COUNT_BITS + ENEMY_HQ_BITS + 1)) % 0b10;
+                case "ny": return (rc.readSharedArray(0) >> (HQ_COUNT_BITS + ENEMY_HQ_BITS)) % 0b10;
             }
             return 2;
         } catch (GameActionException e) {
             return 2;
         }
+    }
+
+    static void updateNeedsLauncher(RobotController rc, int hqId) {
+        int val = 0;
+        try {
+            switch (hqId) {
+                case 1: val = 0b1; break;
+                case 2: val = 0b10; break;
+                case 3: val = 0b100; break;
+                case 4: val = 0b1000; break;
+            }
+            if (readNeedsLauncher(rc, hqId) == 0) {
+                rc.writeSharedArray(0, val + rc.readSharedArray(0));
+            }
+        } catch (GameActionException e) {}
+    }
+
+    static void updateDoesntNeedLauncher(RobotController rc, int hqId) {
+        int val = 0;
+        try {
+            switch (hqId) {
+                case 1: val = 0b1; break;
+                case 2: val = 0b10; break;
+                case 3: val = 0b100; break;
+                case 4: val = 0b1000; break;
+            }
+            if (readNeedsLauncher(rc, hqId) == 1) {
+                rc.writeSharedArray(0, rc.readSharedArray(0) - val);
+            }
+        } catch (GameActionException e) {}
+    }
+
+    static int readNeedsLauncher(RobotController rc, int hqId) {
+        try {
+            return (rc.readSharedArray(0) >> (hqId-1)) & 0b1;
+        } catch (GameActionException e) {
+            return 2;
+        }
+    }
+
+    static void reportHQEnemy(RobotController rc, int b, int hqId) throws GameActionException {
+        if ((rc.readSharedArray(hqId) & 0b1) != b) {
+            if (b==1) {
+                rc.writeSharedArray(hqId, rc.readSharedArray(hqId)+1);
+            } else {
+                rc.writeSharedArray(hqId, rc.readSharedArray(hqId)-1);
+            }
+        }
+    }
+
+    static int getHQEnemies(RobotController rc, int hqId) throws GameActionException {
+        return rc.readSharedArray(hqId) & 0b1;
     }
 
     static Team readTeamHoldingIsland(RobotController rc, int islandId) {
@@ -146,7 +209,7 @@ class Communication {
             int islandInt = rc.readSharedArray(islandId);
             int healthMask = 0b111;
             int health = islandInt & healthMask;
-            int team = (islandInt >> HEALTH_BITS) % 0b1;
+            int team = (islandInt >> HEALTH_BITS) % 0b1; // wtf is going on here
             if (health > 0) {
                 return Team.values()[team];
             }

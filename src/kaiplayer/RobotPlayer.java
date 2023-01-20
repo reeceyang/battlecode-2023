@@ -50,7 +50,7 @@ public strictfp class RobotPlayer {
 
         // Hello world! Standard output is very useful for debugging.
         // Everything you say here will be directly viewable in your terminal when you run a match!
-        System.out.println("I'm a " + rc.getType() + " and I just got created! I have health " + rc.getHealth());
+//        System.out.println("I'm a " + rc.getType() + " and I just got created! I have health " + rc.getHealth());
 
         // You can also use indicators to save debug notes in replays.
         rc.setIndicatorString("Hello world!");
@@ -135,6 +135,16 @@ public strictfp class RobotPlayer {
     static int diagReflect(RobotController rc, MapLocation loc) {
         MapLocation newloc = new MapLocation(rc.getMapWidth() - loc.x - 1, rc.getMapHeight() - loc.y - 1);
         return Communication.locationToInt(rc, newloc);
+    }
+
+    static int distSquaredLoc(MapLocation loc1, MapLocation loc2) {
+        return (loc1.x - loc2.x) * (loc1.x - loc2.x) + (loc1.y - loc2.y) * (loc1.y - loc2.y);
+    }
+
+    static int distSquaredInt(RobotController rc, int loc1, int loc2) {
+        MapLocation new_loc1 = Communication.intToLocation(rc, loc1);
+        MapLocation new_loc2 = Communication.intToLocation(rc, loc2);
+        return (new_loc1.x - new_loc2.x) * (new_loc1.x - new_loc2.x) + (new_loc1.y - new_loc2.y) * (new_loc1.y - new_loc2.y);
     }
 
 }

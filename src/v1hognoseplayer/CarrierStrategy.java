@@ -47,7 +47,7 @@ public class CarrierStrategy {
         Team opponent = rc.getTeam().opponent();
         RobotInfo[] enemies = rc.senseNearbyRobots(radius, opponent);
         Communication.clearObsoleteEnemies(rc);
-        int lowestHealth = 100;
+        int lowestHealth = 1000;
         int smallestDistance = 100;
         RobotInfo target = null;
         if (enemies.length > 0) {
