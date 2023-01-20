@@ -9,22 +9,21 @@ public class HQStrategy {
     static MapLocation enemyLocVert;
     static MapLocation enemyLocHor;
     static MapLocation carrierSpawn;
+    static int hqId=0;
+    static final int OPPONENT_THRESHOLD = 5;
 
     static void runHeadquarters(RobotController rc) throws GameActionException {
         for (int i=1; i<5; i++) {
             if (rc.readSharedArray(i) != 0) {
-                rc.setIndicatorDot(RobotPlayer.xReflectLoc(rc, rc.readSharedArray(i)), 255*((rc.getTeam()==Team.A) ? 1 : 0), 0, 255*((rc.getTeam()==Team.B) ? 1 : 0));
-                rc.setIndicatorDot(RobotPlayer.yReflectLoc(rc, rc.readSharedArray(i)), 255*((rc.getTeam()==Team.A) ? 1 : 0), 0, 255*((rc.getTeam()==Team.B) ? 1 : 0));
+                rc.setIndicatorDot(RobotPlayer.xReflectLoc(rc, Communication.readHQLoc(rc, i)), 255*((rc.getTeam()==Team.A) ? 1 : 0), 0, 255*((rc.getTeam()==Team.B) ? 1 : 0));
+                rc.setIndicatorDot(RobotPlayer.yReflectLoc(rc, Communication.readHQLoc(rc, i)), 255*((rc.getTeam()==Team.A) ? 1 : 0), 0, 255*((rc.getTeam()==Team.B) ? 1 : 0));
             }
         }
         if (turnCount == 1) {
-            Communication.increaseHeadquarterCount(rc); // add 1 to 0th index of shared array to get number of headquarters currently created
+            hqId = Communication.increaseHeadquarterCount(rc); // add 1 to 0th index of shared array to get number of headquarters currently created
             Communication.addHeadquarter(rc, Communication.locationToInt(rc, rc.getLocation())); // add bitpacked hq loc to shared array
             enemyLocVert = new MapLocation(rc.getLocation().x, rc.getMapHeight() - rc.getLocation().y);
             enemyLocHor = new MapLocation(rc.getMapWidth() - rc.getLocation().x, rc.getLocation().y);
-            WellInfo[] wells = rc.senseNearbyWells();
-            Direction carrierDir = rc.getLocation().directionTo(wells[0].getMapLocation());
-            carrierSpawn = rc.getLocation().add(carrierDir);
         }
         // TODO: since directions are known here, see if there are any obstructions directly adjacent to hq first, to eliminate those dirs
 
@@ -47,12 +46,28 @@ public class HQStrategy {
 //            rc.buildAnchor(Anchor.STANDARD);
 //            rc.setIndicatorString("Building anchor! " + rc.getAnchor());
 //        }
+
+        WellInfo[] wells = rc.senseNearbyWells();
+        if (wells.length > 0) {
+            Direction carrierDir = rc.getLocation().directionTo(wells[0].getMapLocation());
+            carrierSpawn = rc.getLocation().add(carrierDir);
+        } else {
+            Direction dir = RobotPlayer.directions[RobotPlayer.rng.nextInt(RobotPlayer.directions.length)];
+            carrierSpawn = rc.getLocation().add(dir);
+        }
+
         if (turnCount == 1 || turnCount == 2) {
             // Build carriers first
             rc.setIndicatorString("Trying to build a carrier");
             if (rc.canBuildRobot(RobotType.CARRIER, carrierSpawn)) {
                 rc.buildRobot(RobotType.CARRIER, carrierSpawn);
-            } // TODO: else build carrier in random direction
+            } else {
+                Direction dir = RobotPlayer.directions[RobotPlayer.rng.nextInt(RobotPlayer.directions.length)];
+                carrierSpawn = rc.getLocation().add(dir);
+                if (rc.canBuildRobot(RobotType.CARRIER, carrierSpawn)) {
+                    rc.buildRobot(RobotType.CARRIER, carrierSpawn);
+                }
+            }
         } else if (turnCount == 3) {
             // Build launchers next
             rc.setIndicatorString("Trying to build a launcher");
@@ -71,13 +86,32 @@ public class HQStrategy {
                 rc.buildRobot(RobotType.AMPLIFIER, launcherSpawn);
             }
         } else {
-            // TODO: randomly generate either carrier or launcher
-            if (rc.canBuildRobot(RobotType.CARRIER, carrierSpawn)) {
-                rc.buildRobot(RobotType.CARRIER, carrierSpawn);
+            if (RobotPlayer.rng.nextBoolean()) {
+                rc.setIndicatorString("Trying to build a carrier");
+                if (rc.canBuildRobot(RobotType.CARRIER, carrierSpawn)) {
+                    rc.buildRobot(RobotType.CARRIER, carrierSpawn);
+                } else {
+                    Direction dir = RobotPlayer.directions[RobotPlayer.rng.nextInt(RobotPlayer.directions.length)];
+                    carrierSpawn = rc.getLocation().add(dir);
+                    if (rc.canBuildRobot(RobotType.CARRIER, carrierSpawn)) {
+                        rc.buildRobot(RobotType.CARRIER, carrierSpawn);
+                    }
+                }
+            } else {
+                rc.setIndicatorString("Trying to build a launcher");
+                if (rc.canBuildRobot(RobotType.LAUNCHER, launcherSpawn)) {
+                    rc.buildRobot(RobotType.LAUNCHER, launcherSpawn);
+                }
             }
         }
 
-        if (turnCount==200) {
+        if (rc.senseNearbyRobots(25, rc.getTeam().opponent()).length > OPPONENT_THRESHOLD) {
+            Communication.reportHQEnemy(rc, 1, hqId);
+        } else {
+            Communication.reportHQEnemy(rc, 0, hqId);
+        }
+
+        if (false && turnCount==200) {
             System.out.println("x1: "+Communication.readHQStatus(rc, "x1"));
             System.out.println("x2: "+Communication.readHQStatus(rc, "x2"));
             System.out.println("x3: "+Communication.readHQStatus(rc, "x3"));
@@ -88,7 +122,6 @@ public class HQStrategy {
             System.out.println("y4: "+Communication.readHQStatus(rc, "y4"));
             System.out.println("nx: "+Communication.readHQStatus(rc, "nx"));
             System.out.println("ny: "+Communication.readHQStatus(rc, "ny"));
-            rc.resign();
         }
 
     }
