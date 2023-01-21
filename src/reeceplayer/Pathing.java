@@ -2,6 +2,8 @@ package reeceplayer;
 
 import battlecode.common.*;
 
+import static reeceplayer.BellmanFord.doBellmanFord;
+
 public class Pathing {
     // Basic bug nav - Bug 0
 
@@ -79,9 +81,11 @@ public class Pathing {
         progressCountdown = TIME_LIMIT;
     }
 
-    private static void doBellmanFord(RobotController rc, MapLocation target) throws GameActionException {
+    private static void doNotBellmanFord(RobotController rc, MapLocation target) throws GameActionException {
         // build graph
-        boolean[][][] graph = new boolean[5][5][RobotPlayer.directions.length];
+//        boolean[][][] graph = new boolean[5][5][RobotPlayer.directions.length];
+        boolean[][] open = new boolean[5][5];
+        Direction[][] current = new Direction[5][5];
         int[][] costs = new int[5][5];
         MapLocation bot = rc.getLocation();
         for (int dx = -2; dx <= 2; dx++) {
@@ -94,22 +98,42 @@ public class Pathing {
                     // if pos is not the bot's current location, then it must be on the map
                     // if pos is not sensible, then we assume that it's accessible
                     // if pos is sensible, then it must not be occupied or non-passable to be accessible
-                if (pos.equals(bot) || (rc.onTheMap(pos) && (!rc.canSenseLocation(pos) || (!rc.isLocationOccupied(pos) && rc.sensePassability(pos))))) {
-                    // add all the neighbors
-                    for (int i = 0; i < RobotPlayer.directions.length; i++) {
-                        Direction dir = RobotPlayer.directions[i];
-                        int neighborX = graphX + dir.dx, neighborY = graphY + dir.dy;
-                        MapLocation newPos = pos.add(dir);
-                        if (neighborX < 5 && neighborX >= 0 && neighborY < 5 && neighborY >= 0
-                                && (newPos.equals(bot) || (rc.onTheMap(newPos) && (!rc.canSenseLocation(newPos) || (!rc.isLocationOccupied(newPos) && rc.sensePassability(newPos))))))
-                        {
-                            // neighbor is accessible
-//                            System.out.println(pos + " " + dir + " accessible");
-                            graph[graphX][graphY][i] = true;
+                    if (pos.equals(bot)) {
+                        open[graphX][graphY] = true;
+                        Direction currentDir = rc.senseMapInfo(pos).getCurrentDirection();
+                        costs[graphX][graphY] = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                        current[graphX][graphY] = currentDir;
+                    } else if (rc.onTheMap(pos)) {
+                        if (rc.canSenseLocation(pos)) {
+                            if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
+                                open[graphX][graphY] = true;
+                                Direction currentDir = rc.senseMapInfo(pos).getCurrentDirection();
+                                costs[graphX][graphY] = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                                current[graphX][graphY] = rc.senseMapInfo(pos).getCurrentDirection();
+                            }
+                        } else {
+                            open[graphX][graphY] = true;
+                            costs[graphX][graphY] = 100 * pos.distanceSquaredTo(target);
                         }
                     }
-                    costs[graphX][graphY] = 100 * pos.distanceSquaredTo(target);
-                }} catch (GameActionException e) {
+//                    if (pos.equals(bot) || (rc.onTheMap(pos) && (!rc.canSenseLocation(pos) || (!rc.isLocationOccupied(pos) && rc.sensePassability(pos))))) {
+                        // add all the neighbors
+    //                    for (int i = 0; i < RobotPlayer.directions.length; i++) {
+    //                        Direction dir = RobotPlayer.directions[i];
+    //                        int neighborX = graphX + dir.dx, neighborY = graphY + dir.dy;
+    //                        MapLocation newPos = pos.add(dir);
+    //                        if (neighborX < 5 && neighborX >= 0 && neighborY < 5 && neighborY >= 0
+    //                                && (newPos.equals(bot) || (rc.onTheMap(newPos) && (!rc.canSenseLocation(newPos) || (!rc.isLocationOccupied(newPos) && rc.sensePassability(newPos))))))
+    //                        {
+    //                            // neighbor is accessible
+    ////                            System.out.println(pos + " " + dir + " accessible");
+    //                            graph[graphX][graphY][i] = true;
+    //                        }
+    //                    }
+//                        open[graphX][graphY] = true;
+//                        costs[graphX][graphY] = 100 * pos.distanceSquaredTo(target);
+//                    }
+                } catch (GameActionException e) {
                     System.out.println(bot + " " + pos);
                 }
             }
@@ -121,13 +145,23 @@ public class Pathing {
             for (int x = 0; x < 5; x++) {
                 for (int y = 0; y < 5; y++) {
                     int min_cost = costs[x][y];
-                    for (int dirI = 0; dirI < graph[x][y].length; dirI++) {
-                        if (graph[x][y][dirI]) {
-                            // is actually a neighbor
-                            Direction dir = RobotPlayer.directions[dirI];
-                            min_cost = Math.min(min_cost, costs[x + dir.dx][y + dir.dy] + 1);
+                    for (int dirI = 0; dirI < RobotPlayer.directions.length; dirI++) {
+                        Direction dir = RobotPlayer.directions[dirI];
+                        int neighborX = x + dir.dx, neighborY = x + dir.dy;
+                        if (neighborX < 5 && neighborX >= 0 && neighborY < 5 && neighborY >= 0
+                                && open[neighborX][neighborY]
+                                && (current[neighborX][neighborY] == null || current[neighborX][neighborY] != dir.opposite())  // don't go into an opposing current
+                        ) {
+                            min_cost = Math.min(min_cost, costs[neighborX][neighborY] + 1);
                         }
                     }
+//                    for (int dirI = 0; dirI < graph[x][y].length; dirI++) {
+//                        if (graph[x][y][dirI]) {
+//                            // is actually a neighbor
+//                            Direction dir = RobotPlayer.directions[dirI];
+//                            min_cost = Math.min(min_cost, costs[x + dir.dx][y + dir.dy] + 1);
+//                        }
+//                    }
                     newCosts[x][y] = min_cost;
                 }
             }
@@ -137,10 +171,13 @@ public class Pathing {
         // find the best direction
         Direction bestDir = Direction.CENTER;
         int bestCost = Integer.MAX_VALUE;
-        for (int dirI = 0; dirI < graph[2][2].length; dirI++) {
-            if (graph[2][2][dirI]) {
+        for (int dirI = 0; dirI < RobotPlayer.directions.length; dirI++) {
+            Direction dir = RobotPlayer.directions[dirI];
+            int neighborX = 2 + dir.dx, neighborY = 2 + dir.dy;
+//            if (graph[2][2][dirI]) {
+            if (open[neighborX][neighborY]) {
                 // is actually a neighbor
-                Direction dir = RobotPlayer.directions[dirI];
+//                Direction dir = RobotPlayer.directions[dirI];
                 int neighborCost = costs[2 + dir.dx][2 + dir.dy];
 //                System.out.println(neighborCost + " " + bestCost);
                 if (neighborCost < bestCost) {
