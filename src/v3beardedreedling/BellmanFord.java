@@ -1,4 +1,4 @@
-        package reeceplayer;
+package v3beardedreedling;
 
 import battlecode.common.*;
 

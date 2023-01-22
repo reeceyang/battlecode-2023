@@ -1,4 +1,4 @@
-package v2hognoseplayer;
+package ogv2hognosebellplayer;
 
 import battlecode.common.*;
 
@@ -21,7 +21,7 @@ public strictfp class RobotPlayer {
      */
     static int turnCount = 0;
 
-    static Random rng;
+    static Random rng = null;
 
     static final Direction[] directions = {
         Direction.NORTH,

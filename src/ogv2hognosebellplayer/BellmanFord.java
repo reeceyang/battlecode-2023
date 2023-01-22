@@ -1,4 +1,4 @@
-        package reeceplayer;
+package ogv2hognosebellplayer;
 
 import battlecode.common.*;
 

@@ -1,4 +1,4 @@
-package v2hognoseplayer;
+package ogv2hognosebellplayer;
 
 import battlecode.common.*;
 
@@ -11,6 +11,12 @@ public class Pathing {
 	static final int STUCK_RADIUS_SQ = 16;
 
     static Direction currentDirection = null;
+	static MapLocation previousTarget = null;
+	static final int TIME_LIMIT = 20;
+	static int progressCountdown = TIME_LIMIT;
+	static int closest = Integer.MAX_VALUE;
+	static boolean bugMode = false;
+	static final int BUG_MODE_TIME_LIMIT = 100;
 
     static void moveTowards(RobotController rc, MapLocation target) throws GameActionException {
     	// get turn count and check if we've gotten stuck
@@ -31,37 +37,60 @@ public class Pathing {
         if (!rc.isActionReady()) {
             return;
         }
-        Direction d = rc.getLocation().directionTo(target);
-        if (rc.canMove(d)) {
-            rc.move(d);
-            currentDirection = null; // there is no obstacle we're going around
-        } else {
-            // Going around some obstacle: can't move towards d because there's an obstacle there
-            // Idea: keep the obstacle on our right hand
+		if (target != previousTarget) {
+			previousTarget = target;
+			closest = Integer.MAX_VALUE;
+			bugMode = false;
+			progressCountdown = TIME_LIMIT;
+		}
+		if (!bugMode) {
+			int before = Clock.getBytecodesLeft();
+			BellmanFord.doBellmanFord(rc, target);
+			rc.setIndicatorString("bellman ford used " + (before - Clock.getBytecodesLeft()));
+		} else {
+			rc.setIndicatorString("bug mode " + progressCountdown + " left");
+			Direction d = rc.getLocation().directionTo(target);
+			if (rc.canMove(d)) {
+				rc.move(d);
+				currentDirection = null; // there is no obstacle we're going around
+			} else {
+				// Going around some obstacle: can't move towards d because there's an obstacle there
+				// Idea: keep the obstacle on our right hand
 
-            if (currentDirection == null) {
-                currentDirection = d;
-            }
-            // Try to move in a way that keeps the obstacle on our right or left
-            for (int i = 0; i < 8; i++) {
-                if (rc.canMove(currentDirection)) {
-                    rc.move(currentDirection);
-                    if (leftHanded) {
-                    	currentDirection = currentDirection.rotateRight();
-                    } else {
-                    	currentDirection = currentDirection.rotateLeft();
-                    }
-                    break;
-                } else {
-                	if (leftHanded) {
-                		currentDirection = currentDirection.rotateLeft();
-                	} else {
-                		currentDirection = currentDirection.rotateRight();
-                	}
-                }
-            }
-        }
-    }
+				if (currentDirection == null) {
+					currentDirection = d;
+				}
+				// Try to move in a way that keeps the obstacle on our right or left
+				for (int i = 0; i < 8; i++) {
+					if (rc.canMove(currentDirection)) {
+						rc.move(currentDirection);
+						if (leftHanded) {
+							currentDirection = currentDirection.rotateRight();
+						} else {
+							currentDirection = currentDirection.rotateLeft();
+						}
+						break;
+					} else {
+						if (leftHanded) {
+							currentDirection = currentDirection.rotateLeft();
+						} else {
+							currentDirection = currentDirection.rotateRight();
+						}
+					}
+				}
+			}
+		}
+		int currentDistance = rc.getLocation().distanceSquaredTo(target);
+		if (currentDistance <= closest) {
+			closest = currentDistance;
+		} else {
+			progressCountdown--;
+			if (progressCountdown <= 0) {
+				bugMode = !bugMode;
+				progressCountdown = bugMode ? BUG_MODE_TIME_LIMIT : TIME_LIMIT;
+			}
+		}
+	}
     
     // COMBAT MICRO
     static MapLocation reportAndPlaySafe(RobotController rc, RobotInfo[] robots, int safetyLevel) throws GameActionException {
