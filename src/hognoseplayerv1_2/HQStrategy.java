@@ -1,4 +1,4 @@
-package hognoseplayer;
+package hognoseplayerv1_2;
 
 import battlecode.common.*;
 
@@ -37,6 +37,24 @@ public class HQStrategy {
 		} else if (RobotPlayer.turnCount == 2) {
 			Communication.updateHeadquarterInfo(rc);
 			selfidx = Communication.getIdxHQbyLocation(rc, rc.getLocation());
+		}
+
+		if (RobotPlayer.turnCount == 1400) {
+			if (rc.readSharedArray(Communication.STARTING_WELL_IDX) != 0) System.out.println(Communication.readWellLocation(rc, Communication.STARTING_WELL_IDX));
+			if (rc.readSharedArray(Communication.STARTING_WELL_IDX+1) != 0) System.out.println(Communication.readWellLocation(rc, Communication.STARTING_WELL_IDX+1));
+			if (rc.readSharedArray(Communication.STARTING_WELL_IDX+2) != 0) System.out.println(Communication.readWellLocation(rc, Communication.STARTING_WELL_IDX+2));
+			if (rc.readSharedArray(Communication.STARTING_WELL_IDX+3) != 0) System.out.println(Communication.readWellLocation(rc, Communication.STARTING_WELL_IDX+3));
+			if (rc.readSharedArray(Communication.STARTING_WELL_IDX+4) != 0) System.out.println(Communication.readWellLocation(rc, Communication.STARTING_WELL_IDX+4));
+			System.out.println("amogus");
+		}
+
+//		rc.setIndicatorDot(rc.getLocation(), 0, 255, 0);
+
+		for (int i=2; i<6; i++) {
+			if (rc.getLocation().equals(Communication.readHeadquarterLocation(rc, i))) {
+				rc.setIndicatorDot(rc.getLocation(), 0, i * 50, 0);
+				break;
+			}
 		}
 
 		// TRAFFIC MANAGEMENT
@@ -97,7 +115,9 @@ public class HQStrategy {
 			// Adaptive rest of game
 			if (starving) {
 				// Let's try to build a carrier. We need more income.
-				if (!congested && rc.canBuildRobot(RobotType.CARRIER, newLoc)) {
+				if (RobotPlayer.turnCount % 30 == 1 && (Communication.findSymmetry(rc) == 0 || rc.readSharedArray(GameConstants.SHARED_ARRAY_LENGTH - 1) == 0) && rc.canBuildRobot(RobotType.AMPLIFIER, newLoc)) { // TEMPORARY amplifier spawning to test code
+					rc.buildRobot(RobotType.AMPLIFIER, newLoc);
+				} else if (!congested && rc.canBuildRobot(RobotType.CARRIER, newLoc)) {
 					rc.buildRobot(RobotType.CARRIER, newLoc);
 				} else {
 					if (!superCongested && rc.canBuildRobot(RobotType.LAUNCHER, newLoc)) {

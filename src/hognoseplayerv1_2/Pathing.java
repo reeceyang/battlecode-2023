@@ -1,4 +1,4 @@
-package hognoseplayer;
+package hognoseplayerv1_2;
 
 import battlecode.common.*;
 

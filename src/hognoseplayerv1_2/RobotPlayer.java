@@ -1,13 +1,8 @@
-package hognoseplayer;
+package hognoseplayerv1_2;
 
 import battlecode.common.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * RobotPlayer is the class that describes your main robot strategy.
@@ -21,7 +16,7 @@ public strictfp class RobotPlayer {
      */
     static int turnCount = 0;
 
-    static final Random rng = new Random(6147);
+    static Random rng = null;
 
     static final Direction[] directions = {
         Direction.NORTH,
@@ -43,10 +38,11 @@ public strictfp class RobotPlayer {
      **/
     @SuppressWarnings("unused")
     public static void run(RobotController rc) throws GameActionException {
+        rng = new Random(rc.getID());
 
         // Hello world! Standard output is very useful for debugging.
         // Everything you say here will be directly viewable in your terminal when you run a match!
-        System.out.println("I'm a " + rc.getType() + " and I just got created! I have health " + rc.getHealth());
+        // System.out.println("I'm a " + rc.getType() + " and I just got created! I have health " + rc.getHealth());
 
         // You can also use indicators to save debug notes in replays.
         rc.setIndicatorString("Hello world!");
@@ -70,7 +66,7 @@ public strictfp class RobotPlayer {
                     case LAUNCHER: LauncherStrategy.runLauncher(rc); break;
                     case BOOSTER: 
                     case DESTABILIZER:
-                    case AMPLIFIER:       break;
+                    case AMPLIFIER: AmplifierStrategy.runAmplifier(rc);      break;
                 }
 
             } catch (GameActionException e) {
@@ -102,6 +98,25 @@ public strictfp class RobotPlayer {
     static void moveRandom(RobotController rc) throws GameActionException {
         Direction dir = directions[rng.nextInt(directions.length)];
         if(rc.canMove(dir)) rc.move(dir);
+    }
+
+    static int distSquaredLoc(MapLocation loc1, MapLocation loc2) {
+        return (loc1.x - loc2.x) * (loc1.x - loc2.x) + (loc1.y - loc2.y) * (loc1.y - loc2.y);
+    }
+
+    static int yReflect(RobotController rc, MapLocation loc) {
+        MapLocation newloc = new MapLocation(loc.x, rc.getMapHeight() - loc.y - 1);
+        return Communication.locationToInt(rc, newloc);
+    }
+
+    static int xReflect(RobotController rc, MapLocation loc) {
+        MapLocation newloc = new MapLocation(rc.getMapWidth() - loc.x - 1, loc.y);
+        return Communication.locationToInt(rc, newloc);
+    }
+
+    static int diagReflect(RobotController rc, MapLocation loc) {
+        MapLocation newloc = new MapLocation(rc.getMapWidth() - loc.x - 1, rc.getMapHeight() - loc.y - 1);
+        return Communication.locationToInt(rc, newloc);
     }
 
 }

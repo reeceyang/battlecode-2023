@@ -1,10 +1,12 @@
-package hognoseplayer;
+package hognoseplayerv1_2;
 
 import battlecode.common.*;
+import battlecode.world.Well;
 
 public class CarrierStrategy {
 	
-	static final int WELL_CONGESTION_MAX = 4;
+	static final int WELL_CONGESTION_MAX = 8;
+    static final int TURN_REFRESH = 10;
     
     static MapLocation hqLoc;
     static int hqIdx = -1; // index into shared array
@@ -15,6 +17,10 @@ public class CarrierStrategy {
     static MapLocation nextLoc;
     static boolean anchorMode = false;
 
+    // storing well info
+    static MapLocation[] wellLocs = new MapLocation[]{null, null, null, null, null};
+    static ResourceType[] wellTypes = new ResourceType[]{null, null, null, null, null};
+
     /**
      * Run a single turn for a Carrier.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
@@ -22,7 +28,7 @@ public class CarrierStrategy {
     static void runCarrier(RobotController rc) throws GameActionException {
     	if (hqLoc == null) scanHQ(rc); // get the home hq and set hqIdx
     	else if (hqIdx == -1) { 
-    		hqIdx = Communication.getIdxHQbyLocation(rc, hqLoc); 
+    		hqIdx = Communication.getIdxHQbyLocation(rc, hqLoc);
     		rc.setIndicatorString("Checking HQ"); 
     		// check for what HQ wants once idx is known
         	if (demanded == null) {
@@ -33,13 +39,39 @@ public class CarrierStrategy {
     	    	}
         	}
     	}
-    	
+
+        rc.senseNearbyWells();
+        for (WellInfo well : rc.senseNearbyWells()) {
+            if (!Communication.isWellWritten(rc, well.getMapLocation())) {
+                for (int i=0; i < wellLocs.length; i++) {
+                    if (wellLocs[i] == null) {
+                        wellLocs[i] = well.getMapLocation();
+                        wellTypes[i] = well.getResourceType();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (rc.canWriteSharedArray(0,0)) {
+            for (int j=0; j < wellLocs.length; j++) {
+                if (wellLocs[j] != null) {
+                    Communication.addWell(rc, wellTypes[j], wellLocs[j]);
+                    System.out.println("Added well at "+wellLocs[j]+" to shared array");
+                }
+            }
+            wellLocs = new MapLocation[]{null, null, null, null, null};
+            wellTypes = new ResourceType[]{null, null, null, null, null};
+        }
+
     	// for debugging
     	if (demanded == ResourceType.ADAMANTIUM) {
     		rc.setIndicatorString("Looking for Ad well");
     	} else { rc.setIndicatorString("Looking for Mana well"); }
     	
-        if(wellLoc == null || RobotPlayer.turnCount % 10 == 0) scanWellsSelective(rc, demanded);
+        if(wellLoc == null || RobotPlayer.turnCount % TURN_REFRESH == 0) {
+            scanWellsSelective(rc, demanded);
+        }
         scanIslands(rc);
         
         // Enemies and scouting
@@ -95,7 +127,9 @@ public class CarrierStrategy {
             if(total == 0) {
                 //move towards well or search for well
                 if(wellLoc == null) nextLoc = null;
-                else if(!rc.getLocation().isAdjacentTo(wellLoc)) nextLoc = wellLoc;
+                else if(!rc.getLocation().isAdjacentTo(wellLoc)) {
+                    nextLoc = wellLoc;
+                }
             }
             if(total == GameConstants.CARRIER_CAPACITY) {
                 //move towards HQ
@@ -116,13 +150,14 @@ public class CarrierStrategy {
         if (nextLoc == null) {
         	RobotPlayer.moveRandom(rc);
         } else {
-        	if (getTotalResources(rc) == 0) {
-        		// if not carrying resources, move away from any HQ
-        		Direction overrideDirection = Pathing.avoidVisibleHQ(rc);
-            	if (overrideDirection != Direction.CENTER) {
-            		nextLoc = rc.getLocation().add(overrideDirection).add(overrideDirection);
-            	}
-        	}
+//        	if (getTotalResources(rc) == 0) {
+//        		// if not carrying resources, move away from any HQ
+//        		Direction overrideDirection = Pathing.avoidVisibleHQ(rc);
+//            	if (overrideDirection != Direction.CENTER) {
+//            		nextLoc = rc.getLocation().add(overrideDirection).add(overrideDirection);
+//            	}
+//        	}
+            rc.setIndicatorString("Trying to go to "+nextLoc+" with well location "+wellLoc);
         	Pathing.moveTowards(rc, nextLoc);
         }
     }
@@ -169,6 +204,13 @@ public class CarrierStrategy {
         	}
         }
         wellLoc = best;
+        if (wellLoc == null) {
+            if (demanded != null) {
+                wellLoc = Communication.getNearestWellOfType(rc, demanded);
+            } else {
+                wellLoc = Communication.getNearestWellOfType(rc, ResourceType.MANA);
+            }
+        }
     }
 
     static void depositResource(RobotController rc, ResourceType type) throws GameActionException {
