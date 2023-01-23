@@ -20,7 +20,7 @@ public class LauncherStrategy {
             hqLoc = rc.getLocation();
         }
         if (!RobotPlayer.isSmallMap) {
-            attackmode = RobotPlayer.turnCount > 50;
+            attackmode = rc.getRoundNum() > 50;
         }
         nextLoc = Pathing.reportAndPlaySafe(rc, robots, 0);
         if (RobotPlayer.isSmallMap) {
@@ -75,6 +75,17 @@ public class LauncherStrategy {
 
         if (!attackmode) {
         	// go patrol a nearby well or island
+            int[] ids = rc.senseNearbyIslands();
+            for(int id : ids) {
+                if(rc.senseTeamOccupyingIsland(id) == Team.NEUTRAL) {
+                    MapLocation[] locs = rc.senseNearbyIslandLocations(id);
+//                    if(locs.length > 0) {
+//                        islandLoc = locs[0];
+//                    }
+                }
+                rc.setIndicatorString("sensed " + id);
+                Communication.updateIslandInfo(rc, id);
+            }
             MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
             if (closestIslandLoc != null) {
                 nextLoc = closestIslandLoc;

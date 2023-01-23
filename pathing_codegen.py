@@ -8,6 +8,8 @@ DMIN = -2
 DMAX = 2
 HOME = 2  # center of the grid
 
+MAX_V = 2147483647
+
 DIRS = ["Direction.NORTH",
         "Direction.NORTHEAST",
         "Direction.EAST",
@@ -52,7 +54,7 @@ Direction currentDir;
             array_y = HOME + dy
             s += f"""boolean {OPEN}{array_x}{array_y} = false;
 Direction {CURR}{array_x}{array_y} = null;
-int {COST}{array_x}{array_y} = Integer.MAX_VALUE;
+int {COST}{array_x}{array_y} = {MAX_V};
 pos = new MapLocation(bot.x + {dx}, bot.y + {dy});
 """
             # pre-compute whether pos is the bot's current location
@@ -80,10 +82,10 @@ currentDir = rc.senseMapInfo(pos).getCurrentDirection();
 
 def relax_graph(iterations):
     # reuse these variables
-    s = 'int minCost = Integer.MAX_VALUE;\nDirection dir = null;\n'
+    s = f'int minCost = {MAX_V};\nDirection dir = null;\n'
     for x in range(SIZE):
         for y in range(SIZE):
-            s += f'int new{COST}{x}{y} = Integer.MAX_VALUE;\n'
+            s += f'int new{COST}{x}{y} = {MAX_V};\n'
     for _ in range(iterations):
         for x in range(SIZE):
             for y in range(SIZE):
@@ -107,8 +109,8 @@ def relax_graph(iterations):
     return s
 
 def choose_best_dir():
-    s = """Direction bestDir = Direction.CENTER;
-int bestCost = Integer.MAX_VALUE;
+    s = f"""Direction bestDir = Direction.CENTER;
+int bestCost = {MAX_V};
 """
     for dir in DIRS:
         dx, dy = DIR_TO_D[dir]
@@ -143,4 +145,4 @@ public static void doBellmanFord(RobotController rc, MapLocation target) throws 
 """
 
 
-print(make_method('reeceplayer'))
+print(make_method('v3beardedreedling'))

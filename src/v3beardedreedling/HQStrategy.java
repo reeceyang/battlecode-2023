@@ -2,6 +2,8 @@ package v3beardedreedling;
 
 import battlecode.common.*;
 
+import static v3beardedreedling.Communication.headquarterLocs;
+
 public class HQStrategy {
 	static int selfidx = 0;
 	static boolean starving = true;
@@ -21,7 +23,7 @@ public class HQStrategy {
 	static int manaTarget = 60;
 	static float mapCharacteristic = 1; // a characteristic dimension of the map, recalculated on turn 1. Is 1 when map is 60x60
 	static float AdToMana = 1; // updated on turn 1, sets which resource to prioritize
-	static final int congestionMax = 40;
+	static final int congestionMax = 30;
 	static final int congestionMax2 = 69;
 	static final int ANCHOR_LIMIT = 2;
 	static final double ANCHOR_MAP_FRAC = 0.1; // the portion of the map to cover before building anchors
@@ -42,7 +44,6 @@ public class HQStrategy {
 			Communication.updateHeadquarterInfo(rc);
 			selfidx = Communication.getIdxHQbyLocation(rc, rc.getLocation());
 		}
-
 		// TRAFFIC MANAGEMENT
 		// Check number of ally robots every 10 turns
 		if (RobotPlayer.turnCount % 10 == 0) {
@@ -126,6 +127,9 @@ public class HQStrategy {
 	
 	static void buildStuff(RobotController rc, MapLocation[] newLocs) throws GameActionException {
 		boolean launcherCluster = (rc.getResourceAmount(ResourceType.MANA) > (RobotPlayer.isSmallMap ? 239 : 179)) || (RobotPlayer.turnCount < 2 && !RobotPlayer.isSmallMap); // whether we can make 4+ launchers
+		boolean saveForAnchor = (RobotPlayer.turnCount > 1000
+				|| rc.getRobotCount() > rc.getMapWidth() * rc.getMapHeight() * ANCHOR_MAP_FRAC)
+				&& rc.getNumAnchors(Anchor.STANDARD) < ANCHOR_LIMIT;
 		for (MapLocation newLoc : newLocs) {
 			if (newLoc == null) {
 				continue;
@@ -149,16 +153,14 @@ public class HQStrategy {
 			}
 
 			// Otherwise, build anchor after early game if resource rich
-			if ((RobotPlayer.turnCount > 1000
-					|| rc.getRobotCount() > rc.getMapWidth() * rc.getMapHeight() * ANCHOR_MAP_FRAC)
-					&& rc.canBuildAnchor(Anchor.STANDARD)
-					&& rc.getNumAnchors(Anchor.STANDARD) < ANCHOR_LIMIT) {
+			if (saveForAnchor && rc.canBuildAnchor(Anchor.STANDARD)) {
 				rc.buildAnchor(Anchor.STANDARD);
+				saveForAnchor = false;
 				System.out.println("built an anchor");
-			} 
-		
+			}
+
 			// Otherwise, build carriers continuously if starving and not superCongested
-			if (!congested) {
+			if (!congested && !saveForAnchor) {
 				if (rc.canBuildRobot(RobotType.CARRIER, newLoc)) {
 					rc.buildRobot(RobotType.CARRIER, newLoc);
 				}

@@ -9,7 +9,7 @@ public class BellmanFord {
         Direction currentDir;
         boolean open00 = false;
         Direction current00 = null;
-        int cost00 = Integer.MAX_VALUE;
+        int cost00 = 2147483647;
         pos = new MapLocation(bot.x + -2, bot.y + -2);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -24,7 +24,7 @@ public class BellmanFord {
         }
         boolean open01 = false;
         Direction current01 = null;
-        int cost01 = Integer.MAX_VALUE;
+        int cost01 = 2147483647;
         pos = new MapLocation(bot.x + -2, bot.y + -1);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -39,7 +39,7 @@ public class BellmanFord {
         }
         boolean open02 = false;
         Direction current02 = null;
-        int cost02 = Integer.MAX_VALUE;
+        int cost02 = 2147483647;
         pos = new MapLocation(bot.x + -2, bot.y + 0);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -54,7 +54,7 @@ public class BellmanFord {
         }
         boolean open03 = false;
         Direction current03 = null;
-        int cost03 = Integer.MAX_VALUE;
+        int cost03 = 2147483647;
         pos = new MapLocation(bot.x + -2, bot.y + 1);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -69,7 +69,7 @@ public class BellmanFord {
         }
         boolean open04 = false;
         Direction current04 = null;
-        int cost04 = Integer.MAX_VALUE;
+        int cost04 = 2147483647;
         pos = new MapLocation(bot.x + -2, bot.y + 2);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -84,7 +84,7 @@ public class BellmanFord {
         }
         boolean open10 = false;
         Direction current10 = null;
-        int cost10 = Integer.MAX_VALUE;
+        int cost10 = 2147483647;
         pos = new MapLocation(bot.x + -1, bot.y + -2);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -99,7 +99,7 @@ public class BellmanFord {
         }
         boolean open11 = false;
         Direction current11 = null;
-        int cost11 = Integer.MAX_VALUE;
+        int cost11 = 2147483647;
         pos = new MapLocation(bot.x + -1, bot.y + -1);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -114,7 +114,7 @@ public class BellmanFord {
         }
         boolean open12 = false;
         Direction current12 = null;
-        int cost12 = Integer.MAX_VALUE;
+        int cost12 = 2147483647;
         pos = new MapLocation(bot.x + -1, bot.y + 0);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -129,7 +129,7 @@ public class BellmanFord {
         }
         boolean open13 = false;
         Direction current13 = null;
-        int cost13 = Integer.MAX_VALUE;
+        int cost13 = 2147483647;
         pos = new MapLocation(bot.x + -1, bot.y + 1);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -144,7 +144,7 @@ public class BellmanFord {
         }
         boolean open14 = false;
         Direction current14 = null;
-        int cost14 = Integer.MAX_VALUE;
+        int cost14 = 2147483647;
         pos = new MapLocation(bot.x + -1, bot.y + 2);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -159,7 +159,7 @@ public class BellmanFord {
         }
         boolean open20 = false;
         Direction current20 = null;
-        int cost20 = Integer.MAX_VALUE;
+        int cost20 = 2147483647;
         pos = new MapLocation(bot.x + 0, bot.y + -2);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -174,7 +174,7 @@ public class BellmanFord {
         }
         boolean open21 = false;
         Direction current21 = null;
-        int cost21 = Integer.MAX_VALUE;
+        int cost21 = 2147483647;
         pos = new MapLocation(bot.x + 0, bot.y + -1);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -189,7 +189,7 @@ public class BellmanFord {
         }
         boolean open22 = false;
         Direction current22 = null;
-        int cost22 = Integer.MAX_VALUE;
+        int cost22 = 2147483647;
         pos = new MapLocation(bot.x + 0, bot.y + 0);
         open22 = true;
         currentDir = rc.senseMapInfo(pos).getCurrentDirection();
@@ -197,7 +197,7 @@ public class BellmanFord {
         current22 = currentDir;
         boolean open23 = false;
         Direction current23 = null;
-        int cost23 = Integer.MAX_VALUE;
+        int cost23 = 2147483647;
         pos = new MapLocation(bot.x + 0, bot.y + 1);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -212,7 +212,7 @@ public class BellmanFord {
         }
         boolean open24 = false;
         Direction current24 = null;
-        int cost24 = Integer.MAX_VALUE;
+        int cost24 = 2147483647;
         pos = new MapLocation(bot.x + 0, bot.y + 2);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -227,7 +227,7 @@ public class BellmanFord {
         }
         boolean open30 = false;
         Direction current30 = null;
-        int cost30 = Integer.MAX_VALUE;
+        int cost30 = 2147483647;
         pos = new MapLocation(bot.x + 1, bot.y + -2);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -242,7 +242,7 @@ public class BellmanFord {
         }
         boolean open31 = false;
         Direction current31 = null;
-        int cost31 = Integer.MAX_VALUE;
+        int cost31 = 2147483647;
         pos = new MapLocation(bot.x + 1, bot.y + -1);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -257,7 +257,7 @@ public class BellmanFord {
         }
         boolean open32 = false;
         Direction current32 = null;
-        int cost32 = Integer.MAX_VALUE;
+        int cost32 = 2147483647;
         pos = new MapLocation(bot.x + 1, bot.y + 0);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -272,7 +272,7 @@ public class BellmanFord {
         }
         boolean open33 = false;
         Direction current33 = null;
-        int cost33 = Integer.MAX_VALUE;
+        int cost33 = 2147483647;
         pos = new MapLocation(bot.x + 1, bot.y + 1);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -287,7 +287,7 @@ public class BellmanFord {
         }
         boolean open34 = false;
         Direction current34 = null;
-        int cost34 = Integer.MAX_VALUE;
+        int cost34 = 2147483647;
         pos = new MapLocation(bot.x + 1, bot.y + 2);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -302,7 +302,7 @@ public class BellmanFord {
         }
         boolean open40 = false;
         Direction current40 = null;
-        int cost40 = Integer.MAX_VALUE;
+        int cost40 = 2147483647;
         pos = new MapLocation(bot.x + 2, bot.y + -2);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -317,7 +317,7 @@ public class BellmanFord {
         }
         boolean open41 = false;
         Direction current41 = null;
-        int cost41 = Integer.MAX_VALUE;
+        int cost41 = 2147483647;
         pos = new MapLocation(bot.x + 2, bot.y + -1);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -332,7 +332,7 @@ public class BellmanFord {
         }
         boolean open42 = false;
         Direction current42 = null;
-        int cost42 = Integer.MAX_VALUE;
+        int cost42 = 2147483647;
         pos = new MapLocation(bot.x + 2, bot.y + 0);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -347,7 +347,7 @@ public class BellmanFord {
         }
         boolean open43 = false;
         Direction current43 = null;
-        int cost43 = Integer.MAX_VALUE;
+        int cost43 = 2147483647;
         pos = new MapLocation(bot.x + 2, bot.y + 1);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -362,7 +362,7 @@ public class BellmanFord {
         }
         boolean open44 = false;
         Direction current44 = null;
-        int cost44 = Integer.MAX_VALUE;
+        int cost44 = 2147483647;
         pos = new MapLocation(bot.x + 2, bot.y + 2);
         if (rc.canSenseLocation(pos)) {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
@@ -376,33 +376,33 @@ public class BellmanFord {
             cost44 = 100 * pos.distanceSquaredTo(target);
         }
 
-        int minCost = Integer.MAX_VALUE;
+        int minCost = 2147483647;
         Direction dir = null;
-        int newcost00 = Integer.MAX_VALUE;
-        int newcost01 = Integer.MAX_VALUE;
-        int newcost02 = Integer.MAX_VALUE;
-        int newcost03 = Integer.MAX_VALUE;
-        int newcost04 = Integer.MAX_VALUE;
-        int newcost10 = Integer.MAX_VALUE;
-        int newcost11 = Integer.MAX_VALUE;
-        int newcost12 = Integer.MAX_VALUE;
-        int newcost13 = Integer.MAX_VALUE;
-        int newcost14 = Integer.MAX_VALUE;
-        int newcost20 = Integer.MAX_VALUE;
-        int newcost21 = Integer.MAX_VALUE;
-        int newcost22 = Integer.MAX_VALUE;
-        int newcost23 = Integer.MAX_VALUE;
-        int newcost24 = Integer.MAX_VALUE;
-        int newcost30 = Integer.MAX_VALUE;
-        int newcost31 = Integer.MAX_VALUE;
-        int newcost32 = Integer.MAX_VALUE;
-        int newcost33 = Integer.MAX_VALUE;
-        int newcost34 = Integer.MAX_VALUE;
-        int newcost40 = Integer.MAX_VALUE;
-        int newcost41 = Integer.MAX_VALUE;
-        int newcost42 = Integer.MAX_VALUE;
-        int newcost43 = Integer.MAX_VALUE;
-        int newcost44 = Integer.MAX_VALUE;
+        int newcost00 = 2147483647;
+        int newcost01 = 2147483647;
+        int newcost02 = 2147483647;
+        int newcost03 = 2147483647;
+        int newcost04 = 2147483647;
+        int newcost10 = 2147483647;
+        int newcost11 = 2147483647;
+        int newcost12 = 2147483647;
+        int newcost13 = 2147483647;
+        int newcost14 = 2147483647;
+        int newcost20 = 2147483647;
+        int newcost21 = 2147483647;
+        int newcost22 = 2147483647;
+        int newcost23 = 2147483647;
+        int newcost24 = 2147483647;
+        int newcost30 = 2147483647;
+        int newcost31 = 2147483647;
+        int newcost32 = 2147483647;
+        int newcost33 = 2147483647;
+        int newcost34 = 2147483647;
+        int newcost40 = 2147483647;
+        int newcost41 = 2147483647;
+        int newcost42 = 2147483647;
+        int newcost43 = 2147483647;
+        int newcost44 = 2147483647;
         minCost = cost00;
         if (open01 && (current01 == null || current01 != Direction.SOUTH)) {
             minCost = Math.min(minCost, cost01 + 1);
@@ -1926,7 +1926,7 @@ public class BellmanFord {
         cost44 = newcost44;
 
         Direction bestDir = Direction.CENTER;
-        int bestCost = Integer.MAX_VALUE;
+        int bestCost = 2147483647;
         if (open23 && (current23 == null || current23 != Direction.SOUTH)) {
             if (cost23 < bestCost) {
                 bestCost = cost23;
@@ -1982,4 +1982,5 @@ public class BellmanFord {
         }
     }
 }
+
 
