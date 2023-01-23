@@ -18,6 +18,7 @@ public class CarrierStrategy {
     static boolean anchorMode = false;
     static boolean inDanger = false;
     static boolean bugOverride = false;
+    static final int BUG_OVERRIDE_THRESH = 20;
 
     static MapLocation wellLoc;
     static MapLocation[] wellLocs = new MapLocation[]{null, null, null, null, null};
@@ -51,24 +52,50 @@ public class CarrierStrategy {
 	            }
 	        }
     	}
+    	
+    	// ENEMIES
+        int radiusAct = rc.getType().actionRadiusSquared;
+        Team opponent = rc.getTeam().opponent();
+        RobotInfo[] robots = rc.senseNearbyRobots();
+        
+        int lowestHealth = 1000;
+        int smallestDistance = 100;
+        RobotInfo target = null;
+        inDanger = false;
+        if (robots.length > 0) {
+            for (RobotInfo robot: robots){
+            	if (robot.getTeam() == opponent) {
+	                int enemyHealth = robot.getHealth();
+	                int enemyDistance = robot.getLocation().distanceSquaredTo(rc.getLocation());
+	                if (enemyHealth < lowestHealth && enemyDistance < radiusAct){
+	                    target = robot;
+	                    lowestHealth = enemyHealth;
+	                    smallestDistance = enemyDistance;
+	                }
+	                else if (enemyHealth == lowestHealth){
+	                    if (enemyDistance < smallestDistance){
+	                        target = robot;
+	                        smallestDistance = enemyDistance;
+	                    }
+	                }
+	                inDanger = true;
+            	}
+            }
+            if (robots.length > BUG_OVERRIDE_THRESH) {
+            	bugOverride = true;
+            } else { bugOverride = false; }
+        }
+        Communication.clearObsoleteEnemies(rc);
+        Communication.tryWriteMessages(rc);
 
         // MINING AND SCOUTING
         // Transfer resource to headquarters
         depositResource(rc, ResourceType.ADAMANTIUM);
         depositResource(rc, ResourceType.MANA);
         
-        // Update local well cache
-        for (WellInfo well : rc.senseNearbyWells()) {
-            if (!Communication.isWellWritten(rc, well.getMapLocation())) {
-                for (int i=0; i < wellLocs.length; i++) {
-                    if (wellLocs[i] == null) {
-                        wellLocs[i] = well.getMapLocation();
-                        wellTypes[i] = well.getResourceType();
-                        break;
-                    }
-                }
-            }
-        }
+        // Scan wells, update local well cache, scan islands, and set target locations
+        scanWellsSelective(rc, demanded);
+        scanIslands(rc);
 
         // Push to global well cache and reset local cache
         // TODO: Have some sort of calculation to determine which wells to add
@@ -82,10 +109,6 @@ public class CarrierStrategy {
             wellLocs = new MapLocation[]{null, null, null, null, null};
             wellTypes = new ResourceType[]{null, null, null, null, null};
         }
-        
-        // Default to 
-        scanWellsSelective(rc, demanded);
-        scanIslands(rc);
 
         //Collect from well if close and inventory not full
         if(wellLoc != null && rc.canCollectResource(wellLoc, -1)) {
@@ -131,41 +154,6 @@ public class CarrierStrategy {
                 nextLoc = hqLoc;
             }
         }
-        
-        // ENEMIES
-        int radiusAct = rc.getType().actionRadiusSquared;
-        Team opponent = rc.getTeam().opponent();
-        RobotInfo[] robots = rc.senseNearbyRobots();
-        
-        int lowestHealth = 1000;
-        int smallestDistance = 100;
-        RobotInfo target = null;
-        inDanger = false;
-        if (robots.length > 0) {
-            for (RobotInfo robot: robots){
-            	if (robot.getTeam() == opponent) {
-	                int enemyHealth = robot.getHealth();
-	                int enemyDistance = robot.getLocation().distanceSquaredTo(rc.getLocation());
-	                if (enemyHealth < lowestHealth && enemyDistance < radiusAct){
-	                    target = robot;
-	                    lowestHealth = enemyHealth;
-	                    smallestDistance = enemyDistance;
-	                }
-	                else if (enemyHealth == lowestHealth){
-	                    if (enemyDistance < smallestDistance){
-	                        target = robot;
-	                        smallestDistance = enemyDistance;
-	                    }
-	                }
-	                inDanger = true;
-            	}
-            }
-            if (robots.length > 10) {
-            	bugOverride = true;
-            } else { bugOverride = false; }
-        }
-        Communication.clearObsoleteEnemies(rc);
-        Communication.tryWriteMessages(rc);
         
         // attack if about to die
         if (rc.getHealth() < ATTACK_HEALTH_THRESH) {
@@ -220,6 +208,17 @@ public class CarrierStrategy {
         int closestDistSq = 1000;
         if (wells.length > 0) {
         	for (WellInfo well : wells) {
+        		// Add to local well cache
+        		if (!Communication.isWellWritten(rc, well.getMapLocation())) {
+                    for (int i=0; i < wellLocs.length; i++) {
+                        if (wellLocs[i] == null) {
+                            wellLocs[i] = well.getMapLocation();
+                            wellTypes[i] = well.getResourceType();
+                            break;
+                        }
+                    }
+                }
+        		// Do selection
         		if (well.getResourceType() == ResourceType.ELIXIR || well.getResourceType() == demanded) {
         			int numberAdjacent = 0;
         			MapLocation thisWellLoc = well.getMapLocation();

@@ -6,6 +6,7 @@ public class LauncherStrategy {
 	
 	static boolean attackmode = RobotPlayer.isSmallMap;
 	static boolean bugOverride = false;
+	static final int BUG_OVERRIDE_THRESH = 20;
 	static boolean inDanger = false;
     static MapLocation hqLoc;
 	static MapLocation nextLoc;
@@ -35,7 +36,7 @@ public class LauncherStrategy {
         int smallestDistance = 100;
         RobotInfo target = null;
         inDanger = false;
-        bugOverride = robots.length > 18;
+        bugOverride = robots.length > BUG_OVERRIDE_THRESH;
         if (robots.length > 0) {
             for (RobotInfo enemy: robots) {
             	if (enemy.getTeam() != opponent) { continue; }
