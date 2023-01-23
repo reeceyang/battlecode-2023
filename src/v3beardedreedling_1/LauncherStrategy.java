@@ -35,7 +35,7 @@ public class LauncherStrategy {
         int smallestDistance = 100;
         RobotInfo target = null;
         inDanger = false;
-        bugOverride = robots.length > 10;
+        bugOverride = robots.length > 18;
         if (robots.length > 0) {
             for (RobotInfo enemy: robots) {
             	if (enemy.getTeam() != opponent) { continue; }
@@ -72,31 +72,32 @@ public class LauncherStrategy {
             	rc.setIndicatorString("Failed to attack");
             }
         } else if (attackmode && !inDanger) {
-            // go to nearest reported enemy
-            MapLocation closest = Communication.getClosestEnemy(rc);
-            if (closest != null) {
-                nextLoc = closest;
-            }
-        }
-
-        if (!attackmode) {
-        	// go patrol a nearby well or island
-            int[] ids = rc.senseNearbyIslands();
+            // go to nearest island, with priority for visible enemy island
+        	boolean attackingIsland = false;
+        	int[] ids = rc.senseNearbyIslands();
             for(int id : ids) {
-                if(rc.senseTeamOccupyingIsland(id) == Team.NEUTRAL) {
+                if(rc.senseTeamOccupyingIsland(id) == opponent) {
                     MapLocation[] locs = rc.senseNearbyIslandLocations(id);
-//                    if(locs.length > 0) {
-//                        islandLoc = locs[0];
-//                    }
+                    if (locs.length > 0) {
+                    	nextLoc = locs[0];
+                    	attackingIsland = true;
+                    } else {
+                    	MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
+                        if (closestIslandLoc != null) {
+                            nextLoc = closestIslandLoc;
+                        }
+                    }
                 }
                 rc.setIndicatorString("sensed " + id);
                 Communication.updateIslandInfo(rc, id);
             }
-            MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
-            if (closestIslandLoc != null) {
-                nextLoc = closestIslandLoc;
-            }
+        	// or go to nearest reported enemy
+            MapLocation closest = Communication.getClosestEnemy(rc);
+            if (closest != null && !attackingIsland) {
+                nextLoc = closest;
+            }     
         }
+        	
         
         Communication.clearObsoleteEnemies(rc);
         Communication.tryWriteMessages(rc);
