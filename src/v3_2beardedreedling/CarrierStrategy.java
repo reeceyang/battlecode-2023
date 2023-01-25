@@ -1,8 +1,6 @@
-package v3beardedreedling;
+package v3_2beardedreedling;
 
 import battlecode.common.*;
-
-import static v3beardedreedling.Communication.headquarterLocs;
 
 public class CarrierStrategy {
 	
@@ -17,6 +15,7 @@ public class CarrierStrategy {
 
     static MapLocation nextLoc;
     static boolean anchorMode = false;
+    static boolean reportMode = false;
     static boolean inDanger = false;
 
     static MapLocation[] wellLocs = new MapLocation[]{null, null, null, null, null};
@@ -31,14 +30,6 @@ public class CarrierStrategy {
     	else if (hqIdx == -1) {
     		hqIdx = Communication.getIdxHQbyLocation(rc, hqLoc);
     		rc.setIndicatorString("Checking HQ");
-    		// check for what HQ wants once idx is known
-//        	if (demanded == null) {
-//    	    	if ((rc.readSharedArray(hqIdx) & Communication.MA_AD_MASK) == 0) {
-//    	    		demanded = ResourceType.ADAMANTIUM;
-//    	    	} else {
-//    	    		demanded = ResourceType.MANA;
-//    	    	}
-//        	}
     	}
         if (demanded == null) {
             if (rc.getRoundNum() < 100) {
@@ -70,11 +61,18 @@ public class CarrierStrategy {
             }
         }
 
+        for (MapLocation loc : wellLocs) {
+            if (loc != null && !Communication.isWellWritten(rc, loc)) { // if any location is not written, turn on reportMode to go back to hq
+                reportMode = true;
+                break;
+            }
+            reportMode = false; // if all locations have been written or there's nothing in the array(?) turn off reportMode
+        }
+
         if (rc.canWriteSharedArray(0,0)) {
             for (int j=0; j < wellLocs.length; j++) {
                 if (wellLocs[j] != null) {
                     Communication.addWell(rc, wellTypes[j], wellLocs[j]);
-//                    System.out.println("Added well at "+wellLocs[j]+" to shared array");
                 }
             }
             wellLocs = new MapLocation[]{null, null, null, null, null};
@@ -86,7 +84,8 @@ public class CarrierStrategy {
     		rc.setIndicatorString("Looking for Ad well " + wellLoc);
     	} else { rc.setIndicatorString("Looking for Mana well" + wellLoc); }
     	
-        if(wellLoc == null || RobotPlayer.turnCount % 5 == 0) scanWellsSelective(rc, demanded);
+        if (wellLoc == null || RobotPlayer.turnCount % 5 == 0) scanWellsSelective(rc, demanded);
+
         scanIslands(rc);
 
         // Enemies and scouting
@@ -98,20 +97,17 @@ public class CarrierStrategy {
         int lowestHealth = 1000;
         int smallestDistance = 100;
         RobotInfo target = null;
-        if (enemies.length > 0) {
-            for (RobotInfo enemy: enemies){
-                int enemyHealth = enemy.getHealth();
-                int enemyDistance = enemy.getLocation().distanceSquaredTo(rc.getLocation());
-                if (enemyHealth < lowestHealth && enemyDistance < radiusAct){
+        for (RobotInfo enemy : enemies) {
+            int enemyHealth = enemy.getHealth();
+            int enemyDistance = enemy.getLocation().distanceSquaredTo(rc.getLocation());
+            if (enemyHealth < lowestHealth && enemyDistance < radiusAct) {
+                target = enemy;
+                lowestHealth = enemyHealth;
+                smallestDistance = enemyDistance;
+            } else if (enemyHealth == lowestHealth) {
+                if (enemyDistance < smallestDistance) {
                     target = enemy;
-                    lowestHealth = enemyHealth;
                     smallestDistance = enemyDistance;
-                }
-                else if (enemyHealth == lowestHealth){
-                    if (enemyDistance < smallestDistance){
-                        target = enemy;
-                        smallestDistance = enemyDistance;
-                    }
                 }
             }
         }
@@ -133,22 +129,33 @@ public class CarrierStrategy {
         if(anchorMode) {
             rc.setIndicatorDot(rc.getLocation(), 1,0,0);
             if(islandLoc == null) nextLoc = null;
-            else nextLoc = islandLoc;
+            else {
+                scanIslands(rc); // implementing this should make it so carriers continually look for optimal island to place anchor on?
+                nextLoc = islandLoc;
+            }
             rc.setIndicatorString("going to island " + nextLoc);
 
             if(rc.canPlaceAnchor() && rc.senseTeamOccupyingIsland(rc.senseIsland(rc.getLocation())) == Team.NEUTRAL) {
                 rc.placeAnchor();
                 anchorMode = false;
             }
-        }
-        else {
+        } else if (reportMode) {
+            nextLoc = hqLoc;
+        } else {
             int total = getTotalResources(rc);
             if(total < GameConstants.CARRIER_CAPACITY) {
                 //move towards well or search for well
-                if(wellLoc == null) nextLoc = null;
-                else if(!rc.getLocation().isAdjacentTo(wellLoc)) nextLoc = wellLoc;
+                if (wellLoc == null && demanded == ResourceType.MANA) {
+                    scanWellsSelective(rc, ResourceType.ADAMANTIUM);
+                    if (wellLoc != null) {
+                        nextLoc = Pathing.findManaWell(rc, wellLoc);
+                        wellLoc = null;
+                    }
+                } else if (wellLoc != null && !rc.getLocation().isAdjacentTo(wellLoc)) {
+                    nextLoc = wellLoc;
+                } else nextLoc = null;
             }
-            if(total == GameConstants.CARRIER_CAPACITY || inDanger && total > 0) {
+            if (total == GameConstants.CARRIER_CAPACITY || inDanger && total > 0) {
                 //move towards HQ
                 nextLoc = hqLoc;
             }
@@ -263,6 +270,7 @@ public class CarrierStrategy {
                 MapLocation[] locs = rc.senseNearbyIslandLocations(id);
                 if(locs.length > 0) {
                     islandLoc = locs[0];
+                    if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("nearest unoccupied island sensed is "+islandLoc);
                 }
             }
             Communication.updateIslandInfo(rc, id);
@@ -281,5 +289,6 @@ public class CarrierStrategy {
                 }
             }
         }
+        if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("ultimate island decided upon is "+islandLoc);
     }
 }

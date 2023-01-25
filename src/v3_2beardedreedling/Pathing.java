@@ -1,4 +1,4 @@
-package v3beardedreedling;
+package v3_2beardedreedling;
 
 import battlecode.common.*;
 
@@ -203,4 +203,20 @@ public class Pathing {
     	}
     	return answer;
     }
+
+	static MapLocation findManaWell(RobotController rc, MapLocation adWell) throws GameActionException {
+		if (RobotPlayer.distSquaredLoc(rc.getLocation(), adWell) > 36) {
+			rc.setIndicatorString("Going towards Ad well "+adWell);
+			return adWell;
+		} else {
+			MapLocation[] nearbyClouds = rc.senseNearbyCloudLocations(adWell, 100);
+			if (nearbyClouds.length > 0) {
+				rc.setIndicatorString("Going towards cloud "+nearbyClouds[0]);
+				return nearbyClouds[0]; // need better strategy so it doesn't get stuck in a cloud forever ;-;
+			} else {
+				rc.setIndicatorString("Going around Ad well "+adWell);
+				return rc.getLocation().add((rc.getLocation().directionTo(adWell)).rotateLeft().rotateLeft()); // go in a circle around adWell
+			}
+		}
+	}
 }

@@ -1,6 +1,5 @@
-package v3beardedreedling;
+package v3_2beardedreedling;
 
-import java.util.Arrays;
 import java.util.List;
 
 import java.util.ArrayList;
@@ -191,10 +190,15 @@ class Communication {
             // Remember reading is cheaper than writing so we don't want to write without knowing if it's helpful
             int idx = id + STARTING_ISLAND_IDX;
             int oldIslandValue = rc.readSharedArray(idx);
-            int updatedIslandValue = bitPackIslandInfo(rc, idx, islandLocs[0]);
+            int updatedIslandValue = bitPackIslandInfo(rc, id, islandLocs[0]);
             if (oldIslandValue != updatedIslandValue) {
-                Message msg = new Message(idx, updatedIslandValue, RobotPlayer.turnCount);
-                messagesQueue.add(msg);
+//                if (rc.getType() == RobotType.AMPLIFIER) {
+//                    rc.writeSharedArray(idx, updatedIslandValue);
+//                    System.out.println(oldIslandValue + " " + updatedIslandValue);
+//                } else {
+                    Message msg = new Message(idx, updatedIslandValue, RobotPlayer.turnCount);
+                    messagesQueue.add(msg);
+//                }
             }
         }
     }
@@ -203,8 +207,9 @@ class Communication {
         int islandInt = locationToInt(rc, closestLoc);
         islandInt = islandInt << (TOTAL_BITS - MAPLOC_BITS);
         try {
-            Team teamHolding = rc.senseTeamOccupyingIsland(islandId);
-            islandInt += teamHolding.ordinal() << (TOTAL_BITS - MAPLOC_BITS - TEAM_BITS);
+            int teamHolding = 0;
+            if (rc.senseTeamOccupyingIsland(islandId) == Team.B) teamHolding=1;
+            islandInt += teamHolding << (TOTAL_BITS - MAPLOC_BITS - TEAM_BITS);
             int islandHealth = rc.senseAnchorPlantedHealth(islandId);
             int healthEncoding = (int) Math.ceil((double) islandHealth / HEALTH_SIZE);
             islandInt += healthEncoding;
@@ -222,7 +227,10 @@ class Communication {
             int health = islandInt & healthMask;
             int team = (islandInt >> HEALTH_BITS) & 0b1;
             if (health > 0) {
-                return Team.values()[team];
+                switch (team) {
+                    case 0: return Team.A;
+                    case 1: return Team.B;
+                }
             }
         } catch (GameActionException e) {}
         return Team.NEUTRAL;

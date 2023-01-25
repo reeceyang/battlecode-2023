@@ -1,8 +1,6 @@
-package v3beardedreedling;
+package v3_2beardedreedling;
 
 import battlecode.common.*;
-
-import static v3beardedreedling.Communication.headquarterLocs;
 
 public class HQStrategy {
 	static int selfidx = 0;

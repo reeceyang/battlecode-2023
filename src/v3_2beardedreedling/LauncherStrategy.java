@@ -1,4 +1,4 @@
-package v3beardedreedling;
+package v3_2beardedreedling;
 
 import battlecode.common.*;
 

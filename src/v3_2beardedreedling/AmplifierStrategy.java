@@ -1,4 +1,4 @@
-package v3beardedreedling;
+package v3_2beardedreedling;
 
 import battlecode.common.*;
 
@@ -48,6 +48,11 @@ public class AmplifierStrategy {
                     nextLoc = closestIslandLoc;
                 }
             }
+        }
+
+        for (int id : rc.senseNearbyIslands()) {
+            Communication.updateIslandInfo(rc, id);
+            System.out.println("island "+id+" is held by "+Communication.readTeamHoldingIsland(rc, id));
         }
 
         Communication.clearObsoleteEnemies(rc);
@@ -148,7 +153,7 @@ public class AmplifierStrategy {
                 MapLocation target_yloc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, hq));
                 if (rc.canSenseLocation(target_yloc)) {
                     if (rc.canSenseRobotAtLocation((target_yloc))) {
-                        if (rc.senseRobotAtLocation(target_yloc).type != RobotType.HEADQUARTERS || rc.senseRobotAtLocation(target_xloc).team == rc.getTeam()) {
+                        if (rc.senseRobotAtLocation(target_yloc).type != RobotType.HEADQUARTERS || rc.senseRobotAtLocation(target_yloc).team == rc.getTeam()) {
                             rc.setIndicatorString("ny");
                             Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
                         }
