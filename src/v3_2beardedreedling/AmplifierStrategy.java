@@ -50,9 +50,10 @@ public class AmplifierStrategy {
             }
         }
 
-        for (int id : rc.senseNearbyIslands()) {
+        int[] islandIds = rc.senseNearbyIslands();
+        for (int id : islandIds) {
             Communication.updateIslandInfo(rc, id);
-            System.out.println("island "+id+" is held by "+Communication.readTeamHoldingIsland(rc, id));
+//            System.out.println("island "+id+" is held by "+Communication.readTeamHoldingIsland(rc, id));
         }
 
         Communication.clearObsoleteEnemies(rc);
@@ -84,43 +85,43 @@ public class AmplifierStrategy {
                 if (RobotPlayer.xReflect(rc, bot.location) == hqLoc[0]) {
                     rc.setIndicatorString("x1");
                     hqId = 1;
-                    Communication.updateHQStatus(rc, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                    Communication.updateHQStatus(rc, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 } else if (hqLoc[1] != 0 && RobotPlayer.xReflect(rc, bot.location) == hqLoc[1]) {
                     rc.setIndicatorString("x2");
                     hqId = 2;
-                    Communication.updateHQStatus(rc, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+                    Communication.updateHQStatus(rc, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 } else if (hqLoc[2] != 0 && RobotPlayer.xReflect(rc, bot.location) == hqLoc[2]) {
                     rc.setIndicatorString("x3");
                     hqId = 3;
-                    Communication.updateHQStatus(rc, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+                    Communication.updateHQStatus(rc, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0);
                 } else if (hqLoc[3] != 0 && RobotPlayer.xReflect(rc, bot.location) == hqLoc[3]) {
                     rc.setIndicatorString("x4");
                     hqId = 4;
-                    Communication.updateHQStatus(rc, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0);
+                    Communication.updateHQStatus(rc, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
                 } else {
                     rc.setIndicatorString("nx");
-                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
                 }
 
                 if (RobotPlayer.yReflect(rc, bot.location) == hqLoc[0]) {
                     rc.setIndicatorString("y1");
                     hqId = 1;
-                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0);
+                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0);
                 } else if (hqLoc[1] != 0 && RobotPlayer.yReflect(rc, bot.location) == hqLoc[1]) {
                     rc.setIndicatorString("y2");
                     hqId = 2;
-                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0);
+                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0);
                 } else if (hqLoc[2] != 0 && RobotPlayer.yReflect(rc, bot.location) == hqLoc[2]) {
                     rc.setIndicatorString("y3");
                     hqId = 3;
-                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);
+                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0);
                 } else if (hqLoc[3] != 0 && RobotPlayer.yReflect(rc, bot.location) == hqLoc[3]) {
                     rc.setIndicatorString("y4");
                     hqId = 4;
-                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
+                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);
                 } else {
                     rc.setIndicatorString("ny");
-                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                    Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
                 }
 
                 if (hqId == 0) {
@@ -135,31 +136,177 @@ public class AmplifierStrategy {
             }
         }
 
-        for (int i : hqLoc) {
-            if (i != 0) {
-                MapLocation hq = Communication.intToLocation(rc, i);
-                MapLocation target_xloc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, hq));
-                if (rc.canSenseLocation(target_xloc)) {
-                    if (rc.canSenseRobotAtLocation((target_xloc))) {
-                        if (rc.senseRobotAtLocation(target_xloc).type != RobotType.HEADQUARTERS || rc.senseRobotAtLocation(target_xloc).team == rc.getTeam()) {
-                            rc.setIndicatorString("nx");
-                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+        // TODO: implement nx/ny/nr reporting for island locations as well
+
+        if (Communication.findSymmetry(rc) == 0) {
+            for (int i : hqLoc) {
+                if (i != 0) {
+                    MapLocation hq = Communication.intToLocation(rc, i);
+                    MapLocation target_xloc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, hq));
+                    if (rc.canSenseLocation(target_xloc)) {
+                        if (rc.canSenseRobotAtLocation((target_xloc))) {
+                            if (rc.senseRobotAtLocation(target_xloc).type != RobotType.HEADQUARTERS || rc.senseRobotAtLocation(target_xloc).team == rc.getTeam()) {
+                                rc.setIndicatorString("hq nx");
+                                Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
+                            }
+                        } else {
+                            rc.setIndicatorString("hq nx");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
                         }
-                    } else {
-                        rc.setIndicatorString("nx");
-                        Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                    }
+                    MapLocation target_yloc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, hq));
+                    if (rc.canSenseLocation(target_yloc)) {
+                        if (rc.canSenseRobotAtLocation((target_yloc))) {
+                            if (rc.senseRobotAtLocation(target_yloc).type != RobotType.HEADQUARTERS || rc.senseRobotAtLocation(target_yloc).team == rc.getTeam()) {
+                                rc.setIndicatorString("hq ny");
+                                Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                            }
+                        } else {
+                            rc.setIndicatorString("hq ny");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                        }
+                    }
+                    MapLocation target_rloc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, hq));
+                    if (rc.canSenseLocation(target_rloc)) {
+                        if (rc.canSenseRobotAtLocation((target_rloc))) {
+                            if (rc.senseRobotAtLocation(target_rloc).type != RobotType.HEADQUARTERS || rc.senseRobotAtLocation(target_rloc).team == rc.getTeam()) {
+                                rc.setIndicatorString("hq nr");
+                                Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                            }
+                        } else {
+                            rc.setIndicatorString("hq nr");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                        }
                     }
                 }
-                MapLocation target_yloc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, hq));
-                if (rc.canSenseLocation(target_yloc)) {
-                    if (rc.canSenseRobotAtLocation((target_yloc))) {
-                        if (rc.senseRobotAtLocation(target_yloc).type != RobotType.HEADQUARTERS || rc.senseRobotAtLocation(target_yloc).team == rc.getTeam()) {
-                            rc.setIndicatorString("ny");
-                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+            }
+
+            MapLocation[] adWellLocs = new MapLocation[]{null, null, null, null, null};
+            MapLocation[] manaWellLocs = new MapLocation[]{null, null, null, null, null};
+            for (int idx = Communication.STARTING_WELL_IDX; idx < GameConstants.SHARED_ARRAY_LENGTH; idx++) {
+                if (Communication.getWellType(rc, idx) == ResourceType.ADAMANTIUM) {
+                    adWellLocs[idx - Communication.STARTING_WELL_IDX] = Communication.readWellLocation(rc, idx);
+                } else if (Communication.getWellType(rc, idx) == ResourceType.MANA) {
+                    manaWellLocs[idx - Communication.STARTING_WELL_IDX] = Communication.readWellLocation(rc, idx);
+                }
+            }
+
+            for (MapLocation adWell : adWellLocs) {
+                if (adWell != null) {
+                    MapLocation target_xloc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, adWell));
+                    if (rc.canSenseLocation(target_xloc)) {
+                        WellInfo well = rc.senseWell(target_xloc);
+                        if (well != null) {
+                            if (well.getResourceType() != ResourceType.ADAMANTIUM) {
+                                rc.setIndicatorString("adwell nx");
+                                Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
+                            }
+                        } else {
+                            rc.setIndicatorString("adwell nx");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
                         }
-                    } else {
-                        rc.setIndicatorString("ny");
-                        Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                    }
+                    MapLocation target_yloc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, adWell));
+                    if (rc.canSenseLocation(target_yloc)) {
+                        WellInfo well = rc.senseWell(target_yloc);
+                        if (well != null) {
+                            if (well.getResourceType() != ResourceType.ADAMANTIUM) {
+                                rc.setIndicatorString("adwell ny");
+                                Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                            }
+                        } else {
+                            rc.setIndicatorString("adwell ny");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                        }
+                    }
+                    MapLocation target_rloc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, adWell));
+                    if (rc.canSenseLocation(target_rloc)) {
+                        WellInfo well = rc.senseWell(target_rloc);
+                        if (well != null) {
+                            if (well.getResourceType() != ResourceType.ADAMANTIUM) {
+                                rc.setIndicatorString("adwell nr");
+                                Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                            }
+                        } else {
+                            rc.setIndicatorString("adwell nr");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                        }
+                    }
+                }
+            }
+
+            for (MapLocation manaWell : manaWellLocs) {
+                if (manaWell != null) {
+                    MapLocation target_xloc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, manaWell));
+                    if (rc.canSenseLocation(target_xloc)) {
+                        WellInfo well = rc.senseWell(target_xloc);
+                        if (well != null) {
+                            if (well.getResourceType() != ResourceType.MANA) {
+                                rc.setIndicatorString("mana nx");
+                                Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
+                            }
+                        } else {
+                            rc.setIndicatorString("mana nx");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
+                        }
+                    }
+                    MapLocation target_yloc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, manaWell));
+                    if (rc.canSenseLocation(target_yloc)) {
+                        WellInfo well = rc.senseWell(target_yloc);
+                        if (well != null) {
+                            if (well.getResourceType() != ResourceType.MANA) {
+                                rc.setIndicatorString("mana ny");
+                                Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                            }
+                        } else {
+                            rc.setIndicatorString("mana ny");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                        }
+                    }
+                    MapLocation target_rloc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, manaWell));
+                    if (rc.canSenseLocation(target_rloc)) {
+                        WellInfo well = rc.senseWell(target_rloc);
+                        if (well != null) {
+                            if (well.getResourceType() != ResourceType.MANA) {
+                                rc.setIndicatorString("mana nr");
+                                Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                            }
+                        } else {
+                            rc.setIndicatorString("mana nr");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                        }
+                    }
+                }
+            }
+
+            for (int idx = Communication.STARTING_ISLAND_IDX; idx < Communication.STARTING_ENEMY_IDX; idx++) {
+                if (rc.readSharedArray(idx) != 0) {
+                    MapLocation target_xloc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, Communication.readIslandLocation(rc, idx - Communication.STARTING_ISLAND_IDX)));
+                    if (rc.canSenseLocation(target_xloc)) {
+                        int island = rc.senseIsland(target_xloc);
+                        if (island == -1) {
+                            rc.setIndicatorLine(target_xloc, Communication.readIslandLocation(rc, idx - Communication.STARTING_ISLAND_IDX),0, 0, 0);
+                            System.out.println(target_xloc);
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
+                        }
+                    }
+                    MapLocation target_yloc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, Communication.readIslandLocation(rc, idx - Communication.STARTING_ISLAND_IDX)));
+                    if (rc.canSenseLocation(target_yloc)) {
+                        int island = rc.senseIsland(target_yloc);
+                        if (island == -1) {
+                            rc.setIndicatorLine(target_yloc, Communication.readIslandLocation(rc, idx - Communication.STARTING_ISLAND_IDX),0, 0, 0);
+                            rc.setIndicatorString("island ny");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                        }
+                    }
+                    MapLocation target_rloc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, Communication.readIslandLocation(rc, idx - Communication.STARTING_ISLAND_IDX)));
+                    if (rc.canSenseLocation(target_rloc)) {
+                        int island = rc.senseIsland(target_rloc);
+                        if (island == -1) {
+                            rc.setIndicatorLine(target_rloc, Communication.readIslandLocation(rc, idx - Communication.STARTING_ISLAND_IDX),0, 0, 0);
+                            rc.setIndicatorString("island nr");
+                            Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                        }
                     }
                 }
             }

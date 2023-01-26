@@ -25,8 +25,8 @@ class Communication {
 
     // Maybe you want to change this based on exact amounts which you can get on turn 1
     private static final int STARTING_HQ_IDX = 2;
-    static final int STARTING_ISLAND_IDX = GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX;
-    private static final int STARTING_ENEMY_IDX = GameConstants.MAX_NUMBER_ISLANDS + GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX;
+    public static final int STARTING_ISLAND_IDX = GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX;
+    public static final int STARTING_ENEMY_IDX = GameConstants.MAX_NUMBER_ISLANDS + GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX;
     public static final int STARTING_WELL_IDX = 59; // there is no reason for this
     private static final int COUNT_IDX = 0;
     private static final int SYMMETRY_IDX = 1;
@@ -128,9 +128,9 @@ class Communication {
         return 0;
     }
 
-    static void updateHQStatus(RobotController rc, int x1, int x2, int x3, int x4, int y1, int y2, int y3, int y4, int nx, int ny) {
+    static void updateHQStatus(RobotController rc, int x1, int x2, int x3, int x4, int y1, int y2, int y3, int y4, int nx, int ny, int nr) {
         try {
-            int val = (x1*0b1000000000 + x2*0b100000000 + x3*0b10000000 + x4*0b1000000 + y1*0b100000 + y2*0b10000 + y3*0b1000 + y4*0b100 + nx*0b10 + ny*0b1) | rc.readSharedArray(SYMMETRY_IDX);
+            int val = (x1*0b10000000000 + x2*0b1000000000 + x3*0b100000000 + x4*0b10000000 + y1*0b1000000 + y2*0b100000 + y3*0b10000 + y4*0b1000 + nx*0b100 + ny*0b10 + nr*0b1) | rc.readSharedArray(SYMMETRY_IDX);
             rc.writeSharedArray(SYMMETRY_IDX, val);
         } catch (GameActionException e) {}
     }
@@ -138,16 +138,17 @@ class Communication {
     static int readHQStatus(RobotController rc, String j) {
         try {
             switch (j) {
-                case "x1": return (rc.readSharedArray(SYMMETRY_IDX) >> (9));
-                case "x2": return (rc.readSharedArray(SYMMETRY_IDX) >> (8)) % 0b10;
-                case "x3": return (rc.readSharedArray(SYMMETRY_IDX) >> (7)) % 0b10;
-                case "x4": return (rc.readSharedArray(SYMMETRY_IDX) >> (6)) % 0b10;
-                case "y1": return (rc.readSharedArray(SYMMETRY_IDX) >> (5)) % 0b10;
-                case "y2": return (rc.readSharedArray(SYMMETRY_IDX) >> (4)) % 0b10;
-                case "y3": return (rc.readSharedArray(SYMMETRY_IDX) >> (3)) % 0b10;
-                case "y4": return (rc.readSharedArray(SYMMETRY_IDX) >> (2)) % 0b10;
-                case "nx": return (rc.readSharedArray(SYMMETRY_IDX) >> (1)) % 0b10;
-                case "ny": return (rc.readSharedArray(SYMMETRY_IDX) >> (0)) % 0b10;
+                case "x1": return (rc.readSharedArray(SYMMETRY_IDX) >> (10));
+                case "x2": return (rc.readSharedArray(SYMMETRY_IDX) >> (9)) % 0b10;
+                case "x3": return (rc.readSharedArray(SYMMETRY_IDX) >> (8)) % 0b10;
+                case "x4": return (rc.readSharedArray(SYMMETRY_IDX) >> (7)) % 0b10;
+                case "y1": return (rc.readSharedArray(SYMMETRY_IDX) >> (6)) % 0b10;
+                case "y2": return (rc.readSharedArray(SYMMETRY_IDX) >> (5)) % 0b10;
+                case "y3": return (rc.readSharedArray(SYMMETRY_IDX) >> (4)) % 0b10;
+                case "y4": return (rc.readSharedArray(SYMMETRY_IDX) >> (3)) % 0b10;
+                case "nx": return (rc.readSharedArray(SYMMETRY_IDX) >> (2)) % 0b10;
+                case "ny": return (rc.readSharedArray(SYMMETRY_IDX) >> (1)) % 0b10;
+                case "nr": return (rc.readSharedArray(SYMMETRY_IDX) >> (0)) % 0b10;
             }
             return 2;
         } catch (GameActionException e) {
@@ -168,9 +169,9 @@ class Communication {
         }
     }
 
-    static void updateIslandCount(RobotController rc) throws GameActionException {
-        rc.writeSharedArray(COUNT_IDX, rc.getIslandCount() >> HQ_COUNT_BITS);
-    }
+//    static void updateIslandCount(RobotController rc) throws GameActionException {
+//        rc.writeSharedArray(COUNT_IDX, rc.getIslandCount() >> HQ_COUNT_BITS);
+//    }
 
     static void updateIslandInfo(RobotController rc, int id) throws GameActionException {
 //        for (int i = STARTING_HQ_IDX; i < GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX; i++) {
@@ -502,13 +503,11 @@ class Communication {
     }
 
     static int findSymmetry(RobotController rc) throws GameActionException {
-        if ((readHQStatus(rc, "x1") + readHQStatus(rc, "x2") + readHQStatus(rc, "x3") + readHQStatus(rc, "x4")) > 0.6*headquarterCount) {
+        if (readHQStatus(rc, "ny")==1 && readHQStatus(rc, "nr")==1) {
             return 1; // symmetry about x
-        } else if ((readHQStatus(rc, "y1") + readHQStatus(rc, "y2") + readHQStatus(rc, "y3") + readHQStatus(rc, "y4")) > 0.6*headquarterCount) {
+        } else if (readHQStatus(rc, "nx")==1 && readHQStatus(rc, "nr")==1) {
             return 2; // symmetry about y
-        } else if ((readHQStatus(rc, "nx") == 1 && readHQStatus(rc, "ny") == 1) ||
-                ((readHQStatus(rc, "x1") == 1 || readHQStatus(rc, "x2") == 1 || readHQStatus(rc, "x3") == 1 || readHQStatus(rc, "x4") == 1)
-                        && (readHQStatus(rc, "y1") == 1 || readHQStatus(rc, "y2") == 1 || readHQStatus(rc, "y3") == 1 || readHQStatus(rc, "y4") == 1))) {
+        } else if (readHQStatus(rc, "nx")==1 && readHQStatus(rc, "ny")==1) {
             return 3; // rotational symmetry
         } else {
             return 0;
