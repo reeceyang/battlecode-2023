@@ -336,18 +336,20 @@ public class CarrierStrategy {
             Communication.updateIslandInfo(rc, id);
         }
         // check shared data to see if there's closer islands
-        int islandCount = rc.getIslandCount();
-        for (int id = 1; id < islandCount; id++) {
-            if(Communication.readTeamHoldingIsland(rc, id) == Team.NEUTRAL) {
-                MapLocation loc = Communication.readIslandLocation(rc, id);
-                if (loc != null) {
-                    int locDist = loc.distanceSquaredTo(rc.getLocation());
-                    if (locDist < closest) {
-                        closest = locDist;
-                        islandLoc = loc;
-                    }
-                }
-            }
-        }
+		if (islandLoc == null) {
+			int islandCount = rc.getIslandCount();
+			for (int id = 1; id < islandCount; id++) {
+				if (Communication.readTeamHoldingIsland(rc, id) == Team.NEUTRAL) {
+					MapLocation loc = Communication.readIslandLocation(rc, id);
+					if (loc != null) {
+						int locDist = loc.distanceSquaredTo(rc.getLocation());
+						if (locDist < closest) {
+							closest = locDist;
+							islandLoc = loc;
+						}
+					}
+				}
+			}
+		}
     }
 }

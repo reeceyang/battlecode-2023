@@ -5,16 +5,17 @@ import battlecode.common.*;
 public class AmplifierStrategy {
     static boolean combatmode = false;
     static MapLocation nextLoc;
-
+    static MapLocation[] emptyClouds = new MapLocation[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
+    static int emptyIndex = 0;
     /**
-     * Run a single turn for a Launcher.
+     * Run a single turn for an Amplifier.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void runAmplifier(RobotController rc) throws GameActionException {
         Team enemyTeam = rc.getTeam().opponent();
 
-        rc.senseNearbyWells();
-        for (WellInfo well : rc.senseNearbyWells()) {
+        WellInfo[] wells = rc.senseNearbyWells();
+        for (WellInfo well : wells) {
             Communication.addWell(rc, well.getResourceType(), well.getMapLocation());
         }
 
@@ -29,7 +30,7 @@ public class AmplifierStrategy {
 
         if (nextLoc == null) {
             // go patrol a nearby well or island
-            WellInfo[] wells = rc.senseNearbyWells();
+            MapLocation[] clouds = rc.senseNearbyCloudLocations();
             if (wells.length > 0) {
                 int closestDistSq = 4000;
                 MapLocation closestWellLoc = null;
@@ -42,6 +43,27 @@ public class AmplifierStrategy {
                     }
                 }
                 nextLoc = closestWellLoc;
+            } else if (clouds.length > 0) {
+                int closestDistSq = 4000;
+                MapLocation closestCloudLoc = null;
+                boolean isEmpty = false;
+                for (MapLocation cloud : clouds) {
+                    for (MapLocation emptyCloud : emptyClouds) {
+                        if (emptyCloud == null) break;
+                        if (cloud.equals(emptyCloud)) {
+                            isEmpty = true;
+                            break;
+                        }
+                    }
+                    if (!isEmpty) {
+                        int d2 = rc.getLocation().distanceSquaredTo(cloud);
+                        if (d2 < closestDistSq) {
+                            closestDistSq = d2;
+                            closestCloudLoc = cloud;
+                        }
+                    }
+                }
+                nextLoc = closestCloudLoc;
             } else {
                 MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
                 if (closestIslandLoc != null) {
@@ -50,10 +72,29 @@ public class AmplifierStrategy {
             }
         }
 
+        if (rc.senseCloud(rc.getLocation())) {
+            for (MapLocation loc : rc.getAllLocationsWithinRadiusSquared(rc.getLocation(), GameConstants.CLOUD_VISION_RADIUS_SQUARED)) {
+                if (rc.senseCloud(loc)) {
+                    boolean isEmpty = false;
+                    for (MapLocation emptyCloud : emptyClouds) {
+                        if (emptyCloud == null) break;
+                        if (loc.equals(emptyCloud)) {
+                            isEmpty = true;
+                            break;
+                        }
+                    }
+                    if (!isEmpty && rc.senseWell(loc) == null && rc.senseIsland(loc) == -1) {
+                        emptyClouds[emptyIndex] = loc;
+                        System.out.println(emptyIndex + " " + loc);
+                        emptyIndex++;
+                    }
+                }
+            }
+        }
+
         int[] islandIds = rc.senseNearbyIslands();
         for (int id : islandIds) {
             Communication.updateIslandInfo(rc, id);
-//            System.out.println("island "+id+" is held by "+Communication.readTeamHoldingIsland(rc, id));
         }
 
         Communication.clearObsoleteEnemies(rc);
@@ -135,8 +176,6 @@ public class AmplifierStrategy {
                 }
             }
         }
-
-        // TODO: implement nx/ny/nr reporting for island locations as well
 
         if (Communication.findSymmetry(rc) == 0) {
             for (int i : hqLoc) {

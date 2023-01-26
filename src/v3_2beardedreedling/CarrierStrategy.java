@@ -270,7 +270,7 @@ public class CarrierStrategy {
                 MapLocation[] locs = rc.senseNearbyIslandLocations(id);
                 if(locs.length > 0) {
                     islandLoc = locs[0];
-                    if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("nearest unoccupied island sensed is "+islandLoc);
+//                    if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("nearest unoccupied island sensed is "+islandLoc);
                 }
             }
             Communication.updateIslandInfo(rc, id);
@@ -289,6 +289,6 @@ public class CarrierStrategy {
                 }
             }
         }
-        if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("ultimate island decided upon is "+islandLoc);
+//        if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("ultimate island decided upon is "+islandLoc);
     }
 }
