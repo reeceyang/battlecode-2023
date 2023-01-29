@@ -44,15 +44,15 @@ public strictfp class RobotPlayer {
         rng = new Random(rc.getID());
         isSmallMap = rc.getMapWidth() * rc.getMapHeight() < 600;
 
-        if (rc.getRoundNum() < 100) {
-            if ((7*rc.getID()) % 100 > 30) {
+        if (rc.getRoundNum() < 60) {
+            if ((7*rc.getID()) % 100 > 50) {
                 demanded = ResourceType.MANA;
             } else {
                 demanded = ResourceType.ADAMANTIUM;
             }
         }
         else {
-            if ((7*rc.getID()) % 100 > 20) {
+            if ((7*rc.getID()) % 100 > 10) {
                 demanded = ResourceType.MANA;
             } else {
                 demanded = ResourceType.ADAMANTIUM;
