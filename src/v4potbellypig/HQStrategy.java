@@ -33,7 +33,6 @@ public class HQStrategy {
 	static int AdIncomeTarget = 2;
 	static int MaIncomeTarget = 5;
 	static float mapCharacteristic = 1; // a characteristic dimension of the map, recalculated on turn 1. Is 1 when map is 60x60
-	// static float AdToMana = 1; // updated on turn 1, sets which resource to prioritize
 	static final int congestionMax = 30;
 	static final int congestionMax2 = 69;
 	static final int ANCHOR_LIMIT = 2;
@@ -54,8 +53,7 @@ public class HQStrategy {
 		// INITIALIZATION
 		if (RobotPlayer.turnCount == 1) {
 			Communication.addHeadquarter(rc);
-			mapCharacteristic = (float) Math.sqrt(rc.getMapWidth() * rc.getMapHeight()) / 120; // max map size; bigger map -> more Ad
-			// AdToMana = (float) (mapCharacteristic + 0.3);
+			mapCharacteristic = (float) Math.sqrt(rc.getMapWidth() * rc.getMapHeight());
 		} else if (RobotPlayer.turnCount == 2) {
 			Communication.updateHeadquarterInfo(rc);
 			selfidx = Communication.getIdxHQbyLocation(rc, rc.getLocation());
@@ -162,6 +160,12 @@ public class HQStrategy {
 		if (rc.canWriteSharedArray(selfidx, stateInt)) {
 			rc.writeSharedArray(selfidx, stateInt);
 		}
+		
+		// Bait launchers out into the world
+		if (RobotPlayer.turnCount < 100 && RobotPlayer.turnCount % 30 == 0 || RobotPlayer.isSmallMap && RobotPlayer.turnCount == 10) {
+			baitFriendlyLaunchers(rc);
+		}
+				
 		Communication.tryWriteMessages(rc);
 
 		rc.setIndicatorString(String.format("AdIncome: %f, MaIncome: %f\"", (float) AdTotRecord / N_TURNS_AVG, (float) MaTotRecord / N_TURNS_AVG));
@@ -195,7 +199,7 @@ public class HQStrategy {
 		MaSpent = 0;
 		turns_since_anchor++;
 		boolean launcherCluster = (rc.getResourceAmount(ResourceType.MANA) > 179) || (RobotPlayer.turnCount < 2 && !RobotPlayer.isSmallMap); // whether we can make 4+ launchers
-		boolean saveForAnchor = (turns_since_anchor > TURNS_PER_ANCHOR)
+		boolean saveForAnchor = rc.getNumAnchors(Anchor.STANDARD) < ANCHOR_LIMIT && (turns_since_anchor > TURNS_PER_ANCHOR)
 				&& (RobotPlayer.turnCount > 1000 || rc.getRobotCount() > rc.getMapWidth() * rc.getMapHeight() * ANCHOR_MAP_FRAC);
 		for (MapLocation newLoc : newLocs) {
 			if (newLoc == null) {
@@ -203,7 +207,7 @@ public class HQStrategy {
 			}
 
 			// If we've made launchers, make one amplifier
-			if (launcherClustersMade > 2) {
+			if (launcherClustersMade > 1) {
 				if (rc.canBuildRobot(RobotType.AMPLIFIER, newLoc)) {
 					rc.buildRobot(RobotType.AMPLIFIER, newLoc);
 					AdSpent += 30;
@@ -258,5 +262,18 @@ public class HQStrategy {
 				known_welltypes[j+5 - Communication.STARTING_WELL_IDX] = known_welltypes[j - Communication.STARTING_WELL_IDX];
 			}
 		}
+	}
+	
+	static void baitFriendlyLaunchers(RobotController rc) throws GameActionException {
+		// Places "enemies" on map for launchers in attackMode to rally towards.
+		MapLocation center = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
+		int distance = (int) Math.min(Math.ceil(mapCharacteristic / 2), 15);
+		Direction dir = rc.getLocation().directionTo(center);
+		MapLocation target1 = RobotPlayer.shiftByAmount(rc, rc.getLocation(), dir, distance);
+		MapLocation target2 = RobotPlayer.shiftByAmount(rc, rc.getLocation(), dir.rotateLeft(), distance);
+		MapLocation target3 = RobotPlayer.shiftByAmount(rc, rc.getLocation(), dir.rotateRight(), distance);
+		if (rc.onTheMap(target1)) { Communication.reportEnemy(rc, target1); }
+		if (rc.onTheMap(target3)) { Communication.reportEnemy(rc, target3); }
+		if (rc.onTheMap(target2)) { Communication.reportEnemy(rc, target2); }	
 	}
 }

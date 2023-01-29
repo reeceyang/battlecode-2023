@@ -239,27 +239,43 @@ public class CarrierStrategy {
                     keepExploring = false;
                 } else if (keepExploring) {
 //                    rc.setIndicatorString("keep exploring" + islandLoc);
-					Direction dir = hqLoc.directionTo(rc.getLocation());
-					Direction dir1 = dir.rotateLeft();
-					Direction dir2 = dir.rotateRight();
-					switch (rc.getID() % 3) {
-						case 0: nextLoc = rc.getLocation().add(dir); break;
-						case 1: nextLoc = rc.getLocation().add(dir1); break;
-						case 2: nextLoc = rc.getLocation().add(dir2); break;
-					}
-//					if (rc.canSenseLocation(islandLoc) && rc.senseTeamOccupyingIsland(currentIslandId) == rc.getTeam()) {
-//						rc.setIndicatorString("condition 1");
-//					}
-					if (rc.canSenseLocation(nextLoc) && rc.senseIsland(nextLoc) == -1 || !rc.onTheMap(nextLoc)) {
-						rc.setIndicatorString("condition 2");
-						if (!rc.onTheMap(nextLoc)) {
-							switch (rc.getID() % 3) {
-								case 0: nextLoc = nextLoc.add(dir1).add(dir1); break;
-								case 1: nextLoc = nextLoc.add(dir2); break;
-								case 2: nextLoc = nextLoc.add(dir1); break;
-							}
-						}
-					}
+
+                    if (Communication.readHQStatus(rc, "nx") == 1) {
+                        switch (rc.getID() % 2) {
+                            case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, islandLoc)); break;
+                            case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, islandLoc)); break;
+                        }
+                    } else if (Communication.readHQStatus(rc, "ny") == 1) {
+                        switch (rc.getID() % 2) {
+                            case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, islandLoc)); break;
+                            case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, islandLoc)); break;
+                        }
+                    } else if (Communication.readHQStatus(rc, "nr") == 1) {
+                        switch (rc.getID() % 2) {
+                            case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, islandLoc)); break;
+                            case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, islandLoc)); break;
+                        }
+                    } else {
+                        Direction dir = hqLoc.directionTo(rc.getLocation());
+                        Direction dir1 = dir.rotateLeft();
+                        Direction dir2 = dir.rotateRight();
+                        switch (rc.getID() % 3) {
+                            case 0: nextLoc = rc.getLocation().add(dir); break;
+                            case 1: nextLoc = rc.getLocation().add(dir1); break;
+                            case 2: nextLoc = rc.getLocation().add(dir2); break;
+                        }
+                        if (rc.canSenseLocation(nextLoc) && rc.senseIsland(nextLoc) == -1 || !rc.onTheMap(nextLoc)) {
+                            rc.setIndicatorString("condition 2");
+                            if (!rc.onTheMap(nextLoc)) {
+                                switch (rc.getID() % 3) {
+                                    case 0: nextLoc = nextLoc.add(dir1).add(dir1); break;
+                                    case 1: nextLoc = nextLoc.add(dir2); break;
+                                    case 2: nextLoc = nextLoc.add(dir1); break;
+                                }
+                            }
+                        }
+                    }
+                    
 					if (islandLoc != null) {
 						nextLoc = islandLoc;
 					}
