@@ -45,14 +45,14 @@ public strictfp class RobotPlayer {
         isSmallMap = rc.getMapWidth() * rc.getMapHeight() < 600;
 
         if (rc.getRoundNum() < 100) {
-            if ((7*rc.getID()) % 100 > 50) {
+            if ((7*rc.getID()) % 100 > 30) {
                 demanded = ResourceType.MANA;
             } else {
                 demanded = ResourceType.ADAMANTIUM;
             }
         }
         else {
-            if ((7*rc.getID()) % 100 > 30) {
+            if ((7*rc.getID()) % 100 > 20) {
                 demanded = ResourceType.MANA;
             } else {
                 demanded = ResourceType.ADAMANTIUM;
@@ -103,8 +103,12 @@ public strictfp class RobotPlayer {
         Direction dir = directions[rng.nextInt(directions.length)];
         if(rc.canMove(dir)) rc.move(dir);
     }
-    static int distSquaredLoc(MapLocation loc1, MapLocation loc2) {
-        return (loc1.x - loc2.x) * (loc1.x - loc2.x) + (loc1.y - loc2.y) * (loc1.y - loc2.y);
+    static MapLocation shiftByAmount(RobotController rc, MapLocation start, Direction dir, int amount) {
+    	MapLocation answer = new MapLocation(start.x, start.y);
+    	for (int i = amount; i >= 0; i--) {
+    		answer = answer.add(dir);
+    	}
+    	return answer;
     }
 
     static int yReflect(RobotController rc, MapLocation loc) {

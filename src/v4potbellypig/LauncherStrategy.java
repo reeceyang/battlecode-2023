@@ -2,8 +2,6 @@ package v4potbellypig;
 
 import battlecode.common.*;
 
-import java.util.Map;
-
 public class LauncherStrategy {
 
     enum LauncherState {
@@ -42,7 +40,7 @@ public class LauncherStrategy {
             }
         }
 
-        // Targeting
+        // TARGETING
         int lowestHealth = 1000;
         int smallestDistance = 100;
         RobotInfo target = null;
@@ -82,7 +80,9 @@ public class LauncherStrategy {
 //            }
         }
 
-        // keep the launchers at the hq for the first 50 turns
+        // MOVING
+        boolean foundObsoleteEnemyOnly = Communication.clearObsoleteEnemies(rc); // used to ignore obsolete enemies
+        
         if (target != null) {
             MapLocation targetLoc = target.getLocation();
             if (rc.canAttack(targetLoc)) {
@@ -96,6 +96,7 @@ public class LauncherStrategy {
             }
         } else if (state == LauncherState.OFFENSE) {// go to nearest island, with priority for visible enemy island
             boolean attackingIsland = false;
+            // Sense nearby islands and see if there are any visible squares on that island
             int[] ids = rc.senseNearbyIslands();
             for (int id : ids) {
                 if (rc.senseTeamOccupyingIsland(id) == opponent) {
@@ -103,24 +104,24 @@ public class LauncherStrategy {
                     if (locs.length > 0) {
                         nextLoc = locs[0];
                         attackingIsland = true;
-                    } else {
-                        MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
-                        if (closestIslandLoc != null) {
-                            nextLoc = closestIslandLoc;
-                        }
-                    }
+                    } 
                 }
                 rc.setIndicatorString("sensed " + id);
                 Communication.updateIslandInfo(rc, id);
             }
-            // or go to nearest reported enemy
-            MapLocation closest = Communication.getClosestEnemy(rc);
-            if (closest != null && !attackingIsland) {
-                nextLoc = closest;
+            // If we don't sense an island nearby, check communications for islands
+            if (!attackingIsland) {
+            	MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
+                if (closestIslandLoc != null) {
+                    nextLoc = closestIslandLoc;
+                }
+                MapLocation closestEnemyLoc = Communication.getClosestEnemy(rc);
+                if (closestEnemyLoc != null && !foundObsoleteEnemyOnly) {
+                    nextLoc = closestEnemyLoc;
+                }
             }
         }
 
-        Communication.clearObsoleteEnemies(rc);
         Communication.tryWriteMessages(rc);
         
         // Execute Movement
@@ -134,7 +135,7 @@ public class LauncherStrategy {
 //        		// don't go anywhere near a congested HQ; this would interfere with carriers
 //        		nextLoc = rc.getLocation().add(overrideDirection).add(overrideDirection);
 //        	}
-        	Pathing.moveTowards(rc, nextLoc, bugOverride);
+        	Pathing.moveTowards(rc, nextLoc, bugOverride, false);
         	rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 255, 0);
 //            rc.setIndicatorString(nextLoc + " " + rc.getLocation());
         }

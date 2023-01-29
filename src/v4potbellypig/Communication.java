@@ -271,7 +271,8 @@ class Communication {
     }
 
 
-    static void clearObsoleteEnemies(RobotController rc) {
+    static boolean clearObsoleteEnemies(RobotController rc) {
+    	boolean foundObsoleteEnemyOnly = false;
         for (int i = STARTING_ENEMY_IDX; i < STARTING_WELL_IDX; i++) {
             try {
                 MapLocation mapLoc = intToLocation(rc, rc.readSharedArray(i));
@@ -281,11 +282,13 @@ class Communication {
                 if (rc.canSenseLocation(mapLoc) && rc.senseNearbyRobots(mapLoc, AREA_RADIUS, rc.getTeam().opponent()).length == 0) {
                     Message msg = new Message(i, locationToInt(rc, null), RobotPlayer.turnCount);
                     messagesQueue.add(msg);
+                    foundObsoleteEnemyOnly = true;
                 }
             } catch (GameActionException e) {
                 continue;
-            }
+            }    
         }
+        return foundObsoleteEnemyOnly;
     }
 
     static void reportEnemy(RobotController rc, MapLocation enemy) {
@@ -438,11 +441,11 @@ class Communication {
         MapLocation[] locs = new MapLocation[5];
 
         for (int j=STARTING_WELL_IDX; j<GameConstants.SHARED_ARRAY_LENGTH; j++) {
-            if (rc.readSharedArray(j) != 0 && getWellType(rc, j) == r && !(CarrierStrategy.findNewWell && readWellLocation(rc, j).equals(CarrierStrategy.badWell))) {
-                dists[j-STARTING_WELL_IDX] = RobotPlayer.distSquaredLoc(rc.getLocation(), readWellLocation(rc, j)) * (1 + isWellCongested(rc, j)); // weighted such that a non-congested well at any distance less than 2x the distance of a congested well will be prioritized
+            if (rc.readSharedArray(j) != 0 && getWellType(rc, j) == r) {
+                dists[j-STARTING_WELL_IDX] = rc.getLocation().distanceSquaredTo(readWellLocation(rc, j)) * (1 + isWellCongested(rc, j)); // weighted such that a non-congested well at any distance less than 2x the distance of a congested well will be prioritized
                 locs[j-STARTING_WELL_IDX] = readWellLocation(rc, j);
                 if (findSymmetry(rc) != 0) {
-                    int new_dist = RobotPlayer.distSquaredLoc(rc.getLocation(), getSymLoc(rc, readWellLocation(rc, j))) * (1 + isWellCongested(rc, j));
+                    int new_dist = rc.getLocation().distanceSquaredTo(getSymLoc(rc, readWellLocation(rc, j))) * (1 + isWellCongested(rc, j));
                     if (new_dist < dists[j-STARTING_WELL_IDX]) {
                         dists[j-STARTING_WELL_IDX] = new_dist;
                         locs[j-STARTING_WELL_IDX] = getSymLoc(rc, readWellLocation(rc, j));

@@ -18,7 +18,7 @@ public class Pathing {
 	static boolean bugMode = false;
 	static final int BUG_MODE_TIME_LIMIT = 100;
 
-    static void moveTowards(RobotController rc, MapLocation target, boolean bugOverride) throws GameActionException {
+    static void moveTowards(RobotController rc, MapLocation target, boolean bugOverride, boolean moveTwice) throws GameActionException {
     	
         if (rc.getLocation().equals(target)) {
             return;
@@ -29,47 +29,18 @@ public class Pathing {
 		if (target != previousTarget) {
 			previousTarget = target;
 			closest = Integer.MAX_VALUE;
-			bugMode = false;
-			progressCountdown = TIME_LIMIT;
 		}
 		// apply bug mode override
 		if (bugOverride) bugMode = true;
-		
+		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target);
 		if (!bugMode) {
 			//int before = Clock.getBytecodesLeft();
-			BellmanFord.doBellmanFord(rc, target);
+			BellmanFord.doBellmanFord(rc, target, moveTwice);
 //			rc.setIndicatorString("bellman ford used " + (before - Clock.getBytecodesLeft()));
 		} else {
-			//rc.setIndicatorString("bug mode " + progressCountdown + " left");
-			Direction d = rc.getLocation().directionTo(target);
-			if (rc.canMove(d)) {
-				rc.move(d);
-				currentDirection = null; // there is no obstacle we're going around
-			} else {
-				// Going around some obstacle: can't move towards d because there's an obstacle there
-				// Idea: keep the obstacle on our right hand
-
-				if (currentDirection == null) {
-					currentDirection = d;
-				}
-				// Try to move in a way that keeps the obstacle on our right or left
-				for (int i = 0; i < 8; i++) {
-					if (rc.canMove(currentDirection)) {
-						rc.move(currentDirection);
-						if (leftHanded) {
-							currentDirection = currentDirection.rotateRight();
-						} else {
-							currentDirection = currentDirection.rotateLeft();
-						}
-						break;
-					} else {
-						if (leftHanded) {
-							currentDirection = currentDirection.rotateLeft();
-						} else {
-							currentDirection = currentDirection.rotateRight();
-						}
-					}
-				}
+			doBugMode(rc, target);
+			if (moveTwice && !rc.getLocation().equals(target) && rc.isMovementReady()) {
+				doBugMode(rc, target);
 			}
 		}
 		int currentDistance = rc.getLocation().distanceSquaredTo(target);
@@ -83,7 +54,42 @@ public class Pathing {
 			}
 		}
 	}
-    
+
+	static void doBugMode(RobotController rc, MapLocation target) throws GameActionException {
+//rc.setIndicatorString("bug mode " + progressCountdown + " left");
+		Direction d = rc.getLocation().directionTo(target);
+		if (rc.canMove(d)) {
+			rc.move(d);
+			currentDirection = null; // there is no obstacle we're going around
+		} else {
+			// Going around some obstacle: can't move towards d because there's an obstacle there
+			// Idea: keep the obstacle on our right hand
+
+			if (currentDirection == null) {
+				currentDirection = d;
+			}
+			// Try to move in a way that keeps the obstacle on our right or left
+			for (int i = 0; i < 8; i++) {
+				if (rc.canMove(currentDirection)) {
+					rc.move(currentDirection);
+					if (leftHanded) {
+						currentDirection = currentDirection.rotateRight();
+					} else {
+						currentDirection = currentDirection.rotateLeft();
+					}
+					break;
+				} else {
+					if (leftHanded) {
+						currentDirection = currentDirection.rotateLeft();
+					} else {
+						currentDirection = currentDirection.rotateRight();
+					}
+				}
+			}
+		}
+	}
+
+
     // COMBAT MICRO
     static MapLocation reportAndPlaySafe(RobotController rc, RobotInfo[] robots, int safetyLevel) throws GameActionException {
     	// In combat, return a move away from enemies and toward friendlies. As a side effect, also scans and reports enemies.
