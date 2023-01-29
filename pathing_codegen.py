@@ -96,16 +96,18 @@ def relax_graph(iterations):
                     neigh_y = y + dy
                     if 0 <= neigh_x < SIZE and 0 <= neigh_y < SIZE:
                         # don't go into an inaccessible square or an opposing current
-                        s += f"""if ({OPEN}{neigh_x}{neigh_y} && ({CURR}{neigh_x}{neigh_y} == null || {CURR}{neigh_x}{neigh_y} != {OPPOSITE[dir]})) {{
+                        s += f"""if ({OPEN}{neigh_x}{neigh_y} && {CURR}{neigh_x}{neigh_y} != {OPPOSITE[dir]}) {{
     minCost = Math.min(minCost, {COST}{neigh_x}{neigh_y} + 1);
 }}
 """
                 s += f'new{COST}{x}{y} = minCost;\n'
 
         # swap the costs with the new costs at the end of the iteration
-        for x in range(SIZE):
-            for y in range(SIZE):
-                s += f'{COST}{x}{y} = new{COST}{x}{y};\n'
+        # don't need to swap costs the last iteration - just use new costs for calculating best direction
+        if _ != iterations - 1:
+            for x in range(SIZE):
+                for y in range(SIZE):
+                    s += f'{COST}{x}{y} = new{COST}{x}{y};\n'
     return s
 
 def choose_best_dir():
@@ -116,9 +118,9 @@ int bestCost = {MAX_V};
         dx, dy = DIR_TO_D[dir]
         neigh_x = HOME + dx
         neigh_y = HOME + dy
-        s += f"""if ({OPEN}{neigh_x}{neigh_y} && ({CURR}{neigh_x}{neigh_y} == null || {CURR}{neigh_x}{neigh_y} != {OPPOSITE[dir]})) {{
-    if ({COST}{neigh_x}{neigh_y} < bestCost) {{
-        bestCost = {COST}{neigh_x}{neigh_y};
+        s += f"""if ({OPEN}{neigh_x}{neigh_y} && {CURR}{neigh_x}{neigh_y} != {OPPOSITE[dir]}) {{
+    if (new{COST}{neigh_x}{neigh_y} < bestCost) {{
+        bestCost = new{COST}{neigh_x}{neigh_y};
         bestDir = {dir};
     }}
 }}

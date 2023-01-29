@@ -1,4 +1,4 @@
-package v2hognosebellplayer;
+package v3beardedreedling;
 
 import battlecode.common.*;
 
@@ -46,7 +46,7 @@ public class Pathing {
 		if (!bugMode) {
 			int before = Clock.getBytecodesLeft();
 			BellmanFord.doBellmanFord(rc, target);
-			rc.setIndicatorString("bellman ford used " + (before - Clock.getBytecodesLeft()));
+//			rc.setIndicatorString("bellman ford used " + (before - Clock.getBytecodesLeft()));
 		} else {
 			rc.setIndicatorString("bug mode " + progressCountdown + " left");
 			Direction d = rc.getLocation().directionTo(target);
@@ -108,14 +108,18 @@ public class Pathing {
         Team opponent = rc.getTeam().opponent();
         // Report and get average location of enemies and of friendlies	
         for (RobotInfo robot : robots) {
-        	if (robot.getTeam() == opponent && robot.getType() != RobotType.HEADQUARTERS) {
+        	if (robot.getTeam() == opponent) {
+				if (robot.getType() == RobotType.HEADQUARTERS) {
+					nEnemy = 50; // headquarters are extremely dangerous
+					continue;
+				}
         		Communication.reportEnemy(rc, robot.getLocation());
         		if (robot.getType() == RobotType.LAUNCHER || robot.getType() == RobotType.DESTABILIZER) {
 	        		xEnemyAvg += robot.getLocation().x;
 	        		yEnemyAvg += robot.getLocation().y;
 	        		nEnemy++;
         		}
-        	} else if (safetyLevel < 2 && robot.getType() == RobotType.LAUNCHER || robot.getType() == RobotType.DESTABILIZER) {
+			} else if (safetyLevel < 2 && robot.getType() == RobotType.LAUNCHER || robot.getType() == RobotType.DESTABILIZER) {
         		xFriendlyAvg += robot.getLocation().x;
         		yFriendlyAvg += robot.getLocation().y;
         		nFriendly++;
