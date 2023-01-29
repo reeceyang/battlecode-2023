@@ -8,6 +8,7 @@ public class LauncherStrategy {
         DEFAULT,
         OFFENSE,
         DANGER,
+        SHOOT_MOVE,
     }
 	
 	static boolean bugOverride = false;
@@ -15,6 +16,7 @@ public class LauncherStrategy {
     static MapLocation hqLoc;
 	static MapLocation nextLoc;
     static LauncherState state = null;
+    static Team opponent;
 
     /**
      * Run a single turn for a Launcher.
@@ -22,7 +24,9 @@ public class LauncherStrategy {
      */
     static void runLauncher(RobotController rc) throws GameActionException {
         // Scan robots
-        Team opponent = rc.getTeam().opponent();
+        if (opponent == null) {
+            opponent = rc.getTeam().opponent();
+        }
         RobotInfo[] robots = rc.senseNearbyRobots();
         
         if (hqLoc == null) {
@@ -41,10 +45,87 @@ public class LauncherStrategy {
         }
 
         // TARGETING
+        bugOverride = robots.length > BUG_OVERRIDE_THRESH;
+        RobotInfo target = getTargetSetDanger(rc, robots);
+        if (target != null) {
+            state = LauncherState.SHOOT_MOVE;
+        }
+
+        // MOVING
+        boolean foundObsoleteEnemyOnly = Communication.clearObsoleteEnemies(rc); // used to ignore obsolete enemies
+
+        switch (state) {
+            case DEFAULT:
+                break;
+            case OFFENSE:
+                // go to nearest island, with priority for visible enemy island
+                // Sense nearby islands and see if there are any visible squares on that island
+                // If we don't sense an island nearby, check communications for islands
+                boolean attackingIsland = false;
+                int[] ids = rc.senseNearbyIslands();
+                for (int id : ids) {
+                    if (rc.senseTeamOccupyingIsland(id) == opponent) {
+                        MapLocation[] locs = rc.senseNearbyIslandLocations(id);
+                        if (locs.length > 0) {
+                            nextLoc = locs[0];
+                            attackingIsland = true;
+                        }
+                    }
+                    rc.setIndicatorString("sensed " + id);
+                    Communication.updateIslandInfo(rc, id);
+                }
+                if (!attackingIsland) {
+                    MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
+                    if (closestIslandLoc != null) {
+                        nextLoc = closestIslandLoc;
+                    }
+                    MapLocation closestEnemyLoc = Communication.getClosestEnemy(rc);
+                    if (closestEnemyLoc != null && !foundObsoleteEnemyOnly) {
+                        nextLoc = closestEnemyLoc;
+                    }
+                }
+                break;
+            case DANGER:
+                break;
+            case SHOOT_MOVE:
+                if (target != null) shootTarget(rc, target);
+                break;
+        }
+
+        Communication.tryWriteMessages(rc);
+        
+        // Execute Movement
+        if (nextLoc == null) {
+        	RobotPlayer.moveRandom(rc);
+        } else {
+        	Pathing.moveTowards(rc, nextLoc, bugOverride, false);
+        	rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 255, 0);
+//            rc.setIndicatorString(nextLoc + " " + rc.getLocation());
+        }
+
+        if (rc.isActionReady()) {
+            robots = rc.senseNearbyRobots();
+            target = getTargetSetDanger(rc, robots);
+            if (target != null) {
+                shootTarget(rc, target);
+                rc.setIndicatorString("move shooting" + target.getLocation());
+            }
+        }
+    }
+    
+    /* -------------------------------- */
+
+    /**
+     * gets the closest target to shoot at and also sets the state to danger
+     * if multiple targets are equally the close the one with the least health is prioritized
+     * @param rc
+     * @param robots
+     * @return the target to shoot at
+     */
+    static RobotInfo getTargetSetDanger(RobotController rc, RobotInfo[] robots) {
+        RobotInfo target = null;
         int lowestHealth = 1000;
         int smallestDistance = 100;
-        RobotInfo target = null;
-        bugOverride = robots.length > BUG_OVERRIDE_THRESH;
         for (RobotInfo enemy : robots) {
             if (enemy.getTeam() != opponent) {
                 continue;
@@ -68,6 +149,7 @@ public class LauncherStrategy {
                 target = enemy;
                 lowestHealth = enemyHealth;
             }
+            // previous code prioritized lower health enemies over closer enemies
 //            if (enemyHealth < lowestHealth) {
 //                target = enemy;
 //                lowestHealth = enemyHealth;
@@ -79,67 +161,19 @@ public class LauncherStrategy {
 //                }
 //            }
         }
+        return target;
+    }
 
-        // MOVING
-        boolean foundObsoleteEnemyOnly = Communication.clearObsoleteEnemies(rc); // used to ignore obsolete enemies
-        
-        if (target != null) {
-            MapLocation targetLoc = target.getLocation();
-            if (rc.canAttack(targetLoc)) {
-            	rc.attack(targetLoc);
-            } else {
-            	rc.setIndicatorString("Failed to attack");
-            }
-            if (targetLoc.distanceSquaredTo(rc.getLocation()) <= 20) {
-                Direction d = targetLoc.directionTo(rc.getLocation());
-                nextLoc = rc.getLocation().add(d).add(d);
-            }
-        } else if (state == LauncherState.OFFENSE) {// go to nearest island, with priority for visible enemy island
-            boolean attackingIsland = false;
-            // Sense nearby islands and see if there are any visible squares on that island
-            int[] ids = rc.senseNearbyIslands();
-            for (int id : ids) {
-                if (rc.senseTeamOccupyingIsland(id) == opponent) {
-                    MapLocation[] locs = rc.senseNearbyIslandLocations(id);
-                    if (locs.length > 0) {
-                        nextLoc = locs[0];
-                        attackingIsland = true;
-                    } 
-                }
-                rc.setIndicatorString("sensed " + id);
-                Communication.updateIslandInfo(rc, id);
-            }
-            // If we don't sense an island nearby, check communications for islands
-            if (!attackingIsland) {
-            	MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
-                if (closestIslandLoc != null) {
-                    nextLoc = closestIslandLoc;
-                }
-                MapLocation closestEnemyLoc = Communication.getClosestEnemy(rc);
-                if (closestEnemyLoc != null && !foundObsoleteEnemyOnly) {
-                    nextLoc = closestEnemyLoc;
-                }
-            }
-        }
-
-        Communication.tryWriteMessages(rc);
-        
-        // Execute Movement
-        if (nextLoc == null) {
-        	RobotPlayer.moveRandom(rc);
+    static void shootTarget(RobotController rc, RobotInfo target) throws GameActionException {
+        MapLocation targetLoc = target.getLocation();
+        if (rc.canAttack(targetLoc)) {
+            rc.attack(targetLoc);
         } else {
-//        	Direction overrideDirection = Pathing.avoidVisibleHQ(rc);
-//        	if (overrideDirection == Direction.CENTER) { overrideDirection = Pathing.avoidCongestedHQ(rc); }
-//
-//        	if (overrideDirection != Direction.CENTER) {
-//        		// don't go anywhere near a congested HQ; this would interfere with carriers
-//        		nextLoc = rc.getLocation().add(overrideDirection).add(overrideDirection);
-//        	}
-        	Pathing.moveTowards(rc, nextLoc, bugOverride, false);
-        	rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 255, 0);
-//            rc.setIndicatorString(nextLoc + " " + rc.getLocation());
+            rc.setIndicatorString("Failed to attack");
+        }
+        if (targetLoc.distanceSquaredTo(rc.getLocation()) <= 20) {
+            Direction d = targetLoc.directionTo(rc.getLocation());
+            nextLoc = rc.getLocation().add(d).add(d);
         }
     }
-    
-    /* -------------------------------- */
 }
