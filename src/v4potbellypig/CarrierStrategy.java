@@ -24,6 +24,7 @@ public class CarrierStrategy {
     static CarrierState state = CarrierState.DEFAULT;
     static boolean bugOverride = false;
     static final int BUG_OVERRIDE_THRESH = 20;
+    static final int DANGER_HQ_PROX_OVERRIDE_RADIUS = 100;
 
     static MapLocation wellLoc;
     static MapLocation adWellLoc;
@@ -227,6 +228,9 @@ public class CarrierStrategy {
                     }
                 }
                 nextLoc = Pathing.reportAndPlaySafe(rc, robots, 2);
+                if (rc.getLocation().isWithinDistanceSquared(hqLoc, DANGER_HQ_PROX_OVERRIDE_RADIUS)) {
+                	nextLoc = hqLoc;
+                }
                 break;
             case ANCHOR:
                 rc.setIndicatorDot(rc.getLocation(), 1, 0, 0);
