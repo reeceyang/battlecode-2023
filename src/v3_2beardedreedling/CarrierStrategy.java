@@ -133,25 +133,24 @@ public class CarrierStrategy {
             if (nextLoc == null && islandLoc == null) {
                 nextLoc = null;
                 rc.setIndicatorString("going to island " + nextLoc);
-            } else if (currentIslandId != -1 && ((rc.canSenseLocation(islandLoc) && rc.senseTeamOccupyingIsland(currentIslandId) == ownTeam) || (nextLoc != null && rc.canSenseLocation(nextLoc) && rc.senseIsland(nextLoc) == -1))) {
-                Direction dir = hqLoc.directionTo(rc.getLocation());
-                Direction dir1 = dir.rotateLeft();
-                Direction dir2 = dir.rotateRight();
-                switch (rc.getID() % 3) {
-                    case 0: nextLoc = rc.getLocation().add(dir); break;
-                    case 1: nextLoc = rc.getLocation().add(dir1); break;
-                    case 2: nextLoc = rc.getLocation().add(dir2); break;
-                }
-                if (rc.canSenseLocation(islandLoc) && rc.senseTeamOccupyingIsland(currentIslandId) == ownTeam) {
-                    rc.setIndicatorString("condition 1");
-                }
-                if (rc.canSenseLocation(nextLoc) && rc.senseIsland(nextLoc) == -1 || !rc.onTheMap(nextLoc)) {
-                    rc.setIndicatorString("condition 2");
-                    if (!rc.onTheMap(nextLoc)) {
-                        switch (rc.getID() % 3) {
-                            case 0: nextLoc = nextLoc.add(dir1).add(dir1); break;
-                            case 1: nextLoc = nextLoc.add(dir2); break;
-                            case 2: nextLoc = nextLoc.add(dir1); break;
+            } else if (currentIslandId != -1 && ((rc.canSenseLocation(islandLoc) && rc.senseTeamOccupyingIsland(currentIslandId) == ownTeam) || nextLoc != null)) {
+                if (Communication.findSymmetry(rc) != 0) {
+                    nextLoc = Communication.getSymLoc(rc, islandLoc);
+                } else {
+                    if (Communication.readHQStatus(rc, "nx") == 1) {
+                        switch (rc.getID() % 2) {
+                            case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, islandLoc)); break;
+                            case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, islandLoc)); break;
+                        }
+                    } else if (Communication.readHQStatus(rc, "ny") == 1) {
+                        switch (rc.getID() % 2) {
+                            case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, islandLoc)); break;
+                            case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, islandLoc)); break;
+                        }
+                    } else {
+                        switch (rc.getID() % 2) {
+                            case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, islandLoc)); break;
+                            case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, islandLoc)); break;
                         }
                     }
                 }
