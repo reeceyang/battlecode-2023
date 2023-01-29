@@ -103,8 +103,12 @@ public strictfp class RobotPlayer {
         Direction dir = directions[rng.nextInt(directions.length)];
         if(rc.canMove(dir)) rc.move(dir);
     }
-    static int distSquaredLoc(MapLocation loc1, MapLocation loc2) {
-        return (loc1.x - loc2.x) * (loc1.x - loc2.x) + (loc1.y - loc2.y) * (loc1.y - loc2.y);
+    static MapLocation shiftByAmount(RobotController rc, MapLocation start, Direction dir, int amount) {
+    	MapLocation answer = new MapLocation(start.x, start.y);
+    	for (int i = amount; i >= 0; i--) {
+    		answer = answer.add(dir);
+    	}
+    	return answer;
     }
 
     static int yReflect(RobotController rc, MapLocation loc) {

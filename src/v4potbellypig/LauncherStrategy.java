@@ -104,6 +104,7 @@ public class LauncherStrategy {
                         nextLoc = locs[0];
                         attackingIsland = true;
                     } else {
+                    	// no visible enemy islands
                         MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
                         if (closestIslandLoc != null) {
                             nextLoc = closestIslandLoc;
