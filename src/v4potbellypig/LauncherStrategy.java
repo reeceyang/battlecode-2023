@@ -2,8 +2,6 @@ package v4potbellypig;
 
 import battlecode.common.*;
 
-import java.util.Map;
-
 public class LauncherStrategy {
 
     enum LauncherState {
@@ -137,7 +135,7 @@ public class LauncherStrategy {
 //        		// don't go anywhere near a congested HQ; this would interfere with carriers
 //        		nextLoc = rc.getLocation().add(overrideDirection).add(overrideDirection);
 //        	}
-        	Pathing.moveTowards(rc, nextLoc, bugOverride);
+        	Pathing.moveTowards(rc, nextLoc, bugOverride, false);
         	rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 255, 0);
 //            rc.setIndicatorString(nextLoc + " " + rc.getLocation());
         }

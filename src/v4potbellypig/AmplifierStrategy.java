@@ -109,7 +109,7 @@ public class AmplifierStrategy {
                 // don't go anywhere near a congested HQ; this would interfere with carriers
                 nextLoc = rc.getLocation().add(overrideDirection).add(overrideDirection);
             }
-            Pathing.moveTowards(rc, nextLoc, false);
+            Pathing.moveTowards(rc, nextLoc, false, false);
         }
 
 

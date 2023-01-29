@@ -103,11 +103,14 @@ def relax_graph(iterations):
                 s += f'new{COST}{x}{y} = minCost;\n'
 
         # swap the costs with the new costs at the end of the iteration
+        for x in range(SIZE):
+            for y in range(SIZE):
+                s += f'{COST}{x}{y} = new{COST}{x}{y};\n'
         # don't need to swap costs the last iteration - just use new costs for calculating best direction
-        if _ != iterations - 1:
-            for x in range(SIZE):
-                for y in range(SIZE):
-                    s += f'{COST}{x}{y} = new{COST}{x}{y};\n'
+        # if _ != iterations - 1:
+        #     for x in range(SIZE):
+        #         for y in range(SIZE):
+        #             s += f'{COST}{x}{y} = new{COST}{x}{y};\n'
     return s
 
 def choose_best_dir():
@@ -119,12 +122,40 @@ int bestCost = {MAX_V};
         neigh_x = HOME + dx
         neigh_y = HOME + dy
         s += f"""if ({OPEN}{neigh_x}{neigh_y} && {CURR}{neigh_x}{neigh_y} != {OPPOSITE[dir]}) {{
-    if (new{COST}{neigh_x}{neigh_y} < bestCost) {{
-        bestCost = new{COST}{neigh_x}{neigh_y};
+    if ({COST}{neigh_x}{neigh_y} < bestCost) {{
+        bestCost = {COST}{neigh_x}{neigh_y};
         bestDir = {dir};
     }}
 }}
 """
+    return s
+
+def move_again():
+    s = f'bestCost = {MAX_V};\n'
+    for dir in DIRS:
+        dx, dy = DIR_TO_D[dir]
+        x = HOME + dx
+        y = HOME + dy
+        s += f"""if (bestDir == {dir}) {{
+    bestDir = Direction.CENTER;
+"""
+        for next_dir in DIRS:
+            neigh_x = x + dx
+            neigh_y = y + dy
+            s += f"""if ({OPEN}{neigh_x}{neigh_y} && {CURR}{neigh_x}{neigh_y} != {OPPOSITE[next_dir]}) {{
+    if ({COST}{neigh_x}{neigh_y} < bestCost) {{
+        bestCost = {COST}{neigh_x}{neigh_y};
+        bestDir = {dir};
+    }}
+}}
+"""
+        s += f"""if (rc.canMove(bestDir)) {{
+        rc.move(bestDir);
+        return true;
+    }}
+    return false;
+}}\n"""
+
     return s
 
 
@@ -134,7 +165,7 @@ def make_method(package):
 import battlecode.common.*;
 
 public class BellmanFord {{
-public static void doBellmanFord(RobotController rc, MapLocation target) throws GameActionException {{
+public static boolean doBellmanFord(RobotController rc, MapLocation target, boolean moveTwice) throws GameActionException {{
     {def_vars()}
     {relax_graph(3)}
     {choose_best_dir()}
@@ -142,9 +173,14 @@ public static void doBellmanFord(RobotController rc, MapLocation target) throws 
     if (rc.canMove(bestDir)) {{
         rc.move(bestDir);
     }}
+    
+    if (rc.isMovementReady() && moveTwice) {{
+        {move_again()}
+    }}
+    return false;
 }}
 }}
 """
 
 
-print(make_method('v3_2beardedreedling'))
+print(make_method('v4potbellypig'))
