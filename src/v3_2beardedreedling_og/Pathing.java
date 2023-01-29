@@ -1,4 +1,4 @@
-package v3_2beardedreedling;
+package v3_2beardedreedling_og;
 
 import battlecode.common.*;
 
@@ -105,7 +105,6 @@ public class Pathing {
     	int nEnemy = 0;
     	int nFriendly = 0;
     	boolean outnumbered = false;
-		int onIsland = rc.senseIsland(rc.getLocation());
         Team opponent = rc.getTeam().opponent();
         // Report and get average location of enemies and of friendlies	
         for (RobotInfo robot : robots) {
@@ -125,16 +124,6 @@ public class Pathing {
         		yFriendlyAvg += robot.getLocation().y;
         		nFriendly++;
         	}
-
-			// AVOIDING BLOCKING CARRIERS FROM ISLANDS
-
-//			if (onIsland != -1 && robot.getNumAnchors(Anchor.STANDARD) == 1 && robot.type == RobotType.CARRIER) {
-//				// move away from an island if currently on island and sensed nearby carrier with anchor
-//				rc.setIndicatorString("moving away from island");
-//				xFriendlyAvg -= robot.getLocation().x;
-//				yFriendlyAvg -= robot.getLocation().y;
-//			}
-
         }    
         if (nEnemy != 0) { 
         	enemyAvg = new MapLocation(xEnemyAvg / nEnemy, yEnemyAvg / nEnemy);

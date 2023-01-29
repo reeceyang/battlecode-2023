@@ -1,4 +1,4 @@
-package v3_2beardedreedling;
+package v3_2beardedreedling_og;
 
 import battlecode.common.*;
 
@@ -13,6 +13,7 @@ public class LauncherStrategy {
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void runLauncher(RobotController rc) throws GameActionException {
+        boolean bornToSquat = (rc.getID() % 10 == 1);
 
         // Scan robots
         Team opponent = rc.getTeam().opponent();
@@ -27,8 +28,6 @@ public class LauncherStrategy {
         if (RobotPlayer.isSmallMap) {
             nextLoc = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
         }
-
-
 
         // Targeting
         RobotInfo[] enemies = rc.senseNearbyRobots(16, opponent); // Optimize this out if possible
@@ -80,17 +79,20 @@ public class LauncherStrategy {
         	// go patrol a nearby well or island
             int[] ids = rc.senseNearbyIslands();
             for(int id : ids) {
+                if(rc.senseTeamOccupyingIsland(id) == Team.NEUTRAL) {
+                    MapLocation[] locs = rc.senseNearbyIslandLocations(id);
+//                    if(locs.length > 0) {
+//                        islandLoc = locs[0];
+//                    }
+                }
                 rc.setIndicatorString("sensed " + id);
                 Communication.updateIslandInfo(rc, id);
             }
             MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
             if (closestIslandLoc != null) {
-                Direction dir = hqLoc.directionTo(closestIslandLoc);
-                nextLoc = closestIslandLoc.add(dir).add(dir);
+                nextLoc = closestIslandLoc;
             }
         }
-
-
 
         Communication.clearObsoleteEnemies(rc);
         Communication.tryWriteMessages(rc);
@@ -106,10 +108,6 @@ public class LauncherStrategy {
 //        		// don't go anywhere near a congested HQ; this would interfere with carriers
 //        		nextLoc = rc.getLocation().add(overrideDirection).add(overrideDirection);
 //        	}
-            // MOVING OFF WELLS
-//            if (rc.canSenseLocation(nextLoc) && rc.senseWell(nextLoc) != null) {
-//                nextLoc = nextLoc.add(hqLoc.directionTo(nextLoc));
-//            }
         	Pathing.moveTowards(rc, nextLoc);
         	rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 255, 0);
         }

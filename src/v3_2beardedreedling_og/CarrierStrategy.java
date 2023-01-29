@@ -1,4 +1,4 @@
-package v3_2beardedreedling;
+package v3_2beardedreedling_og;
 
 import battlecode.common.*;
 
@@ -12,7 +12,6 @@ public class CarrierStrategy {
     static MapLocation wellLoc;
     static MapLocation islandLoc;
     static ResourceType demanded = null;
-    static int currentIslandId = -1;
 
     static MapLocation nextLoc;
     static boolean anchorMode = false;
@@ -27,9 +26,7 @@ public class CarrierStrategy {
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void runCarrier(RobotController rc) throws GameActionException {
-        Team ownTeam = rc.getTeam();
-
-        if (hqLoc == null) scanHQ(rc); // get the home hq and set hqIdx
+    	if (hqLoc == null) scanHQ(rc); // get the home hq and set hqIdx
     	else if (hqIdx == -1) {
     		hqIdx = Communication.getIdxHQbyLocation(rc, hqLoc);
     		rc.setIndicatorString("Checking HQ");
@@ -89,12 +86,13 @@ public class CarrierStrategy {
     	
         if (wellLoc == null || RobotPlayer.turnCount % 5 == 0) scanWellsSelective(rc, demanded);
 
-        scanIslands(rc, ownTeam);
+        scanIslands(rc);
 
         // Enemies and scouting
         int radius = rc.getType().visionRadiusSquared;
         int radiusAct = rc.getType().actionRadiusSquared;
-        RobotInfo[] enemies = rc.senseNearbyRobots(radius, ownTeam.opponent());
+        Team opponent = rc.getTeam().opponent();
+        RobotInfo[] enemies = rc.senseNearbyRobots(radius, opponent);
         
         int lowestHealth = 1000;
         int smallestDistance = 100;
@@ -129,55 +127,18 @@ public class CarrierStrategy {
         }
         
         if(anchorMode) {
-            rc.setIndicatorDot(rc.getLocation(), 255,0,0);
-            if (nextLoc == null && islandLoc == null) {
-                nextLoc = null;
-                rc.setIndicatorString("going to island " + nextLoc);
-            } else if (currentIslandId != -1 && ((rc.canSenseLocation(islandLoc) && rc.senseTeamOccupyingIsland(currentIslandId) == ownTeam) || (nextLoc != null && rc.canSenseLocation(nextLoc) && rc.senseIsland(nextLoc) == -1))) {
-                Direction dir = hqLoc.directionTo(rc.getLocation());
-                Direction dir1 = dir.rotateLeft();
-                Direction dir2 = dir.rotateRight();
-                switch (rc.getID() % 3) {
-                    case 0: nextLoc = rc.getLocation().add(dir); break;
-                    case 1: nextLoc = rc.getLocation().add(dir1); break;
-                    case 2: nextLoc = rc.getLocation().add(dir2); break;
-                }
-                if (rc.canSenseLocation(islandLoc) && rc.senseTeamOccupyingIsland(currentIslandId) == ownTeam) {
-                    rc.setIndicatorString("condition 1");
-                }
-                if (rc.canSenseLocation(nextLoc) && rc.senseIsland(nextLoc) == -1 || !rc.onTheMap(nextLoc)) {
-                    rc.setIndicatorString("condition 2");
-                    if (!rc.onTheMap(nextLoc)) {
-                        switch (rc.getID() % 3) {
-                            case 0: nextLoc = nextLoc.add(dir1).add(dir1); break;
-                            case 1: nextLoc = nextLoc.add(dir2); break;
-                            case 2: nextLoc = nextLoc.add(dir1); break;
-                        }
-                    }
-                }
-                if (scanNearbyIslands(rc, ownTeam) != null) {
-                    rc.setIndicatorString("i am imposter");
-                    nextLoc = islandLoc;
-                }
-            } else {
-                scanIslands(rc, ownTeam); // implementing this should make it so carriers continually look for optimal island to place anchor on?
+            rc.setIndicatorDot(rc.getLocation(), 1,0,0);
+            if(islandLoc == null) nextLoc = null;
+            else {
+                scanIslands(rc); // implementing this should make it so carriers continually look for optimal island to place anchor on?
                 nextLoc = islandLoc;
-                rc.setIndicatorString("going to island " + nextLoc);
             }
+            rc.setIndicatorString("going to island " + nextLoc);
 
-            if (rc.canPlaceAnchor() && rc.senseTeamOccupyingIsland(rc.senseIsland(rc.getLocation())) == Team.NEUTRAL) {
+            if(rc.canPlaceAnchor() && rc.senseTeamOccupyingIsland(rc.senseIsland(rc.getLocation())) == Team.NEUTRAL) {
                 rc.placeAnchor();
                 anchorMode = false;
             }
-
-            if (rc.getHealth() < 31) rc.setIndicatorString("health low");
-
-            if ((islandLoc == null || rc.getLocation().distanceSquaredTo(islandLoc) > 20) && rc.getHealth() < 31) {
-                rc.setIndicatorString("trying to attacc");
-                if (rc.canAttack(enemies[0].getLocation())) rc.attack(enemies[0].getLocation());
-                rc.setIndicatorString("attacc");
-            }
-
         } else if (reportMode) {
             nextLoc = hqLoc;
         } else {
@@ -190,8 +151,6 @@ public class CarrierStrategy {
                         nextLoc = Pathing.findManaWell(rc, wellLoc);
                         wellLoc = null;
                     }
-                } else if (rc.getLocation().equals(wellLoc)) {
-                    nextLoc = nextWellLoc(rc, wellLoc);
                 } else if (wellLoc != null) {
                     nextLoc = wellLoc;
                 } else nextLoc = null;
@@ -207,7 +166,7 @@ public class CarrierStrategy {
         	if (target != null){
                 if (rc.canAttack(target.getLocation()))
                     rc.attack(target.getLocation());
-//                	rc.setIndicatorString("AHHHHH");
+                	rc.setIndicatorString("AHHHHH");
             }
         }
         
@@ -315,158 +274,88 @@ public class CarrierStrategy {
         MapLocation[] adjacentPositions = new MapLocation[]{null, null, null, null, null, null, null, null};
         int index = 0;
 
-        for (Direction d : RobotPlayer.directions) {
-            if (!rc.isLocationOccupied(wellLoc.add(d)) && rc.sensePassability(wellLoc.add(d))) {
-                adjacentPositions[index] = wellLoc.add(d);
+        for (Direction dir : RobotPlayer.directions) {
+            if (!rc.isLocationOccupied(wellLoc.add(dir)) && rc.sensePassability(wellLoc.add(dir))) {
+                adjacentPositions[index] = wellLoc.add(dir);
                 index++;
             }
         }
 
-//        int closest = 3600;
-//        int closest_idx = 0;
-//        int closest_temp = 0;
-//
-//        if (adjacentPositions[0] != null) adjacentPositionOpen = true;
-//
-//        if (adjacentPositionOpen) {
-//            for (MapLocation position : adjacentPositions) {
-//                int dist = 0;
-//                if (position != null) {
-//                    dist = rc.getLocation().distanceSquaredTo(position);
-//                }
-//                if (dist < closest) {
-//                    closest = dist;
-//                    closest_idx = closest_temp;
-//                }
-//                closest_temp++;
-//            }
-//        }
+        int closest = 3600;
+        int closest_idx = 0;
+        int closest_temp = 0;
+
+        if (adjacentPositions[0] != null) adjacentPositionOpen = true;
+
+        if (adjacentPositionOpen) {
+            for (MapLocation position : adjacentPositions) {
+                int dist = 0;
+                if (position != null) {
+                    dist = rc.getLocation().distanceSquaredTo(position);
+                }
+                if (dist < closest) {
+                    closest = dist;
+                    closest_idx = closest_temp;
+                }
+                closest_temp++;
+            }
+        }
 
 //        if (rc.getLocation().isAdjacentTo(wellLoc) && rc.canSenseRobotAtLocation(wellLoc)) {
 //            return rc.getLocation();
 //        }
 
-        if (rc.getResourceAmount(ResourceType.MANA) + rc.getResourceAmount(ResourceType.ADAMANTIUM) > 35) {
+        if (rc.getLocation().equals(wellLoc) && (rc.getResourceAmount(ResourceType.MANA) + rc.getResourceAmount(ResourceType.ADAMANTIUM) > 30)) {
             // return an open position adjacent to well
             if (adjacentPositionOpen) {
                 rc.setIndicatorString("Moving away from center");
-                return adjacentPositions[0];
+//                return adjacentPositions[0];
+            } else {
+                rc.setIndicatorString("Trying to move away from center");
+                return wellLoc;
             }
         }
 
-//        if ((!rc.getLocation().equals(wellLoc) && rc.canSenseRobotAtLocation(wellLoc)) || (rc.getResourceAmount(ResourceType.MANA) + rc.getResourceAmount(ResourceType.ADAMANTIUM) > 30)) {
-//            // return closest open position adjacent to well
-////            if (adjacentPositionOpen) {
-////                rc.setIndicatorString("Moving adjacent to well");
-////                return adjacentPositions[closest_idx];
-////            }
-//        } else if (!rc.canSenseRobotAtLocation(wellLoc)) {
-//            rc.setIndicatorString("Moving into center");
-//            return wellLoc;
-//        }
+        if ((!rc.getLocation().equals(wellLoc) && rc.canSenseRobotAtLocation(wellLoc)) || (rc.getResourceAmount(ResourceType.MANA) + rc.getResourceAmount(ResourceType.ADAMANTIUM) > 30)) {
+            // return closest open position adjacent to well
+//            if (adjacentPositionOpen) {
+//                rc.setIndicatorString("Moving adjacent to well");
+//                return adjacentPositions[closest_idx];
+//            }
+        } else if (!rc.canSenseRobotAtLocation(wellLoc)) {
+            rc.setIndicatorString("Moving into center");
+            return wellLoc;
+        }
 
         return wellLoc;
     }
 
-    static void scanIslands(RobotController rc, Team ownTeam) throws GameActionException {
+    static void scanIslands(RobotController rc) throws GameActionException {
         int[] ids = rc.senseNearbyIslands();
         for(int id : ids) {
             if(rc.senseTeamOccupyingIsland(id) == Team.NEUTRAL) {
                 MapLocation[] locs = rc.senseNearbyIslandLocations(id);
                 if(locs.length > 0) {
                     islandLoc = locs[0];
-                    currentIslandId = id;
-                    rc.setIndicatorString("Going to sensed island");
 //                    if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("nearest unoccupied island sensed is "+islandLoc);
                 }
             }
             Communication.updateIslandInfo(rc, id);
         }
-        if (islandLoc == null) {
-            int islandCount = rc.getIslandCount();
-            int closest = 3600;
-            for (int id = 1; id < islandCount; id++) {
-                if (Communication.readTeamHoldingIsland(rc, id) == Team.NEUTRAL) {
-                    MapLocation loc = Communication.readIslandLocation(rc, id);
-                    if (loc != null) {
-                        int locDist = loc.distanceSquaredTo(rc.getLocation());
-                        if (locDist < closest) {
-                            closest = locDist;
-                            islandLoc = loc;
-                            currentIslandId = id;
-                            rc.setIndicatorString("Going to island from shared array");
-                        }
-                    }
-                }
-            }
-        }
-
-        if (islandLoc == null) {
-            for(int id : ids) {
-                if(rc.senseTeamOccupyingIsland(id) == ownTeam.opponent()) {
-                    MapLocation[] locs = rc.senseNearbyIslandLocations(id);
-                    if(locs.length > 0) {
-                        islandLoc = locs[0];
-                        currentIslandId = id;
-                        rc.setIndicatorString("Going to sensed island");
-//                    if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("nearest unoccupied island sensed is "+islandLoc);
-                    }
-                }
-                Communication.updateIslandInfo(rc, id);
-            }
-        }
-
-        if (islandLoc == null) {
-            int islandCount = rc.getIslandCount();
-            int closest = 3600;
-            for (int id = 1; id < islandCount; id++) {
-                if (Communication.readTeamHoldingIsland(rc, id) == ownTeam.opponent()) {
-                    MapLocation loc = Communication.readIslandLocation(rc, id);
-                    if (loc != null) {
-                        int locDist = loc.distanceSquaredTo(rc.getLocation());
-                        if (locDist < closest) {
-                            closest = locDist;
-                            islandLoc = loc;
-                            currentIslandId = id;
-                            rc.setIndicatorString("Going to island from shared array");
-                        }
+        int islandCount = rc.getIslandCount();
+        int closest = 3600;
+        for(int id = 1; id < islandCount; id++) {
+            if(Communication.readTeamHoldingIsland(rc, id) == Team.NEUTRAL) {
+                MapLocation loc = Communication.readIslandLocation(rc, id);
+                if (loc != null) {
+                    int locDist = loc.distanceSquaredTo(rc.getLocation());
+                    if (locDist < closest) {
+                        closest = locDist;
+                        islandLoc = loc;
                     }
                 }
             }
         }
 //        if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("ultimate island decided upon is "+islandLoc);
-    }
-
-    static MapLocation scanNearbyIslands(RobotController rc, Team ownTeam) throws GameActionException {
-        int[] ids = rc.senseNearbyIslands();
-        for(int id : ids) {
-            if(rc.senseTeamOccupyingIsland(id) == Team.NEUTRAL) {
-                MapLocation[] locs = rc.senseNearbyIslandLocations(id);
-                if(locs.length > 0) {
-                    currentIslandId = id;
-                    rc.setIndicatorString("Going to sensed island");
-                    return locs[0];
-//                    if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("nearest unoccupied island sensed is "+islandLoc);
-                }
-            }
-            Communication.updateIslandInfo(rc, id);
-        }
-
-        if (islandLoc == null) {
-            for(int id : ids) {
-                if(rc.senseTeamOccupyingIsland(id) == ownTeam.opponent()) {
-                    MapLocation[] locs = rc.senseNearbyIslandLocations(id);
-                    if(locs.length > 0) {
-                        currentIslandId = id;
-                        rc.setIndicatorString("Going to sensed island");
-                        return locs[0];
-//                    if (rc.getNumAnchors(Anchor.STANDARD) > 0) System.out.println("nearest unoccupied island sensed is "+islandLoc);
-                    }
-                }
-                Communication.updateIslandInfo(rc, id);
-            }
-        }
-
-        return null;
     }
 }
