@@ -271,7 +271,8 @@ class Communication {
     }
 
 
-    static void clearObsoleteEnemies(RobotController rc) {
+    static boolean clearObsoleteEnemies(RobotController rc) {
+    	boolean foundObsoleteEnemyOnly = false;
         for (int i = STARTING_ENEMY_IDX; i < STARTING_WELL_IDX; i++) {
             try {
                 MapLocation mapLoc = intToLocation(rc, rc.readSharedArray(i));
@@ -281,11 +282,13 @@ class Communication {
                 if (rc.canSenseLocation(mapLoc) && rc.senseNearbyRobots(mapLoc, AREA_RADIUS, rc.getTeam().opponent()).length == 0) {
                     Message msg = new Message(i, locationToInt(rc, null), RobotPlayer.turnCount);
                     messagesQueue.add(msg);
+                    foundObsoleteEnemyOnly = true;
                 }
             } catch (GameActionException e) {
                 continue;
-            }
+            }    
         }
+        return foundObsoleteEnemyOnly;
     }
 
     static void reportEnemy(RobotController rc, MapLocation enemy) {
