@@ -16,6 +16,7 @@ public class CarrierStrategy {
 
     static MapLocation nextLoc;
     static boolean anchorMode = false;
+    static boolean reportMode = false;
 
     // storing well info
     static MapLocation[] wellLocs = new MapLocation[]{null, null, null, null, null};
@@ -50,6 +51,14 @@ public class CarrierStrategy {
                         break;
                     }
                 }
+                reportMode = true;
+            }
+        }
+
+        if (reportMode) {
+            nextLoc = hqLoc;
+            if (Communication.isWellWritten(rc, wellLocs[0])) {
+                reportMode = false;
             }
         }
 

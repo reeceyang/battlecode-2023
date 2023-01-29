@@ -1,9 +1,10 @@
-package v3beardedreedling;
+package v3_3beardedreedling;
 
 import battlecode.common.*;
 
 public class AmplifierStrategy {
     static boolean combatmode = false;
+    static boolean bugOverride = false;
     static MapLocation nextLoc;
 
     /**
@@ -13,9 +14,8 @@ public class AmplifierStrategy {
     static void runAmplifier(RobotController rc) throws GameActionException {
         Team enemyTeam = rc.getTeam().opponent();
 
-        rc.senseNearbyWells();
         for (WellInfo well : rc.senseNearbyWells()) {
-            Communication.addWell(rc, well.getResourceType(), well.getMapLocation());
+            Communication.addWell(rc, well.getMapLocation(), well.getResourceType());
         }
 
         int[] hqLoc = new int[]{Communication.locationToInt(rc, Communication.readHeadquarterLocation(rc, 2)),
@@ -24,6 +24,8 @@ public class AmplifierStrategy {
                 Communication.locationToInt(rc, Communication.readHeadquarterLocation(rc, 5))};
 
         RobotInfo[] robots = rc.senseNearbyRobots();
+        bugOverride = robots.length > 10;
+        
         // report any enemies, and either follow friendlies or avoid enemies
         nextLoc = Pathing.reportAndPlaySafe(rc, robots, 1);
 
@@ -62,7 +64,7 @@ public class AmplifierStrategy {
                 // don't go anywhere near a congested HQ; this would interfere with carriers
                 nextLoc = rc.getLocation().add(overrideDirection).add(overrideDirection);
             }
-            Pathing.moveTowards(rc, nextLoc);
+            Pathing.moveTowards(rc, nextLoc, bugOverride);
         }
 
 
@@ -148,7 +150,7 @@ public class AmplifierStrategy {
                 MapLocation target_yloc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, hq));
                 if (rc.canSenseLocation(target_yloc)) {
                     if (rc.canSenseRobotAtLocation((target_yloc))) {
-                        if (rc.senseRobotAtLocation(target_yloc).type != RobotType.HEADQUARTERS || rc.senseRobotAtLocation(target_xloc).team == rc.getTeam()) {
+                        if (rc.senseRobotAtLocation(target_yloc).type != RobotType.HEADQUARTERS || rc.senseRobotAtLocation(target_yloc).team == rc.getTeam()) {
                             rc.setIndicatorString("ny");
                             Communication.updateHQStatus(rc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
                         }
