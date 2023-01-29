@@ -1,13 +1,8 @@
-package v2hognosebellplayer;
+package v3beardedreedling;
 
 import battlecode.common.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * RobotPlayer is the class that describes your main robot strategy.
@@ -34,6 +29,8 @@ public strictfp class RobotPlayer {
         Direction.NORTHWEST,
     };
 
+    static boolean isSmallMap;
+
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
      * It is like the main function for your robot. If this method returns, the robot dies!
@@ -44,6 +41,7 @@ public strictfp class RobotPlayer {
     @SuppressWarnings("unused")
     public static void run(RobotController rc) throws GameActionException {
         rng = new Random(rc.getID());
+        isSmallMap = rc.getMapWidth() * rc.getMapHeight() < 600;
         while (true) {
 
             turnCount += 1;  // We have now been alive for one more turn!
@@ -88,5 +86,22 @@ public strictfp class RobotPlayer {
         Direction dir = directions[rng.nextInt(directions.length)];
         if(rc.canMove(dir)) rc.move(dir);
     }
+    static int distSquaredLoc(MapLocation loc1, MapLocation loc2) {
+        return (loc1.x - loc2.x) * (loc1.x - loc2.x) + (loc1.y - loc2.y) * (loc1.y - loc2.y);
+    }
 
+    static int yReflect(RobotController rc, MapLocation loc) {
+        MapLocation newloc = new MapLocation(loc.x, rc.getMapHeight() - loc.y - 1);
+        return Communication.locationToInt(rc, newloc);
+    }
+
+    static int xReflect(RobotController rc, MapLocation loc) {
+        MapLocation newloc = new MapLocation(rc.getMapWidth() - loc.x - 1, loc.y);
+        return Communication.locationToInt(rc, newloc);
+    }
+
+    static int diagReflect(RobotController rc, MapLocation loc) {
+        MapLocation newloc = new MapLocation(rc.getMapWidth() - loc.x - 1, rc.getMapHeight() - loc.y - 1);
+        return Communication.locationToInt(rc, newloc);
+    }
 }

@@ -1,21 +1,26 @@
-package v2hognosebellplayer;
+package v3beardedreedling;
 
 import battlecode.common.*;
 
+import static v3beardedreedling.Communication.headquarterLocs;
+
 public class CarrierStrategy {
 	
-	static final int WELL_CONGESTION_MAX = 4;
+	static final int WELL_CONGESTION_MAX = 8;
 	static final int ATTACK_HEALTH_THRESH = 51;
     
     static MapLocation hqLoc;
     static int hqIdx = -1; // index into shared array
     static MapLocation wellLoc;
     static MapLocation islandLoc;
-    static ResourceType demanded;
+    static ResourceType demanded = null;
 
     static MapLocation nextLoc;
     static boolean anchorMode = false;
     static boolean inDanger = false;
+
+    static MapLocation[] wellLocs = new MapLocation[]{null, null, null, null, null};
+    static ResourceType[] wellTypes = new ResourceType[]{null, null, null, null, null};
 
     /**
      * Run a single turn for a Carrier.
@@ -23,27 +28,67 @@ public class CarrierStrategy {
      */
     static void runCarrier(RobotController rc) throws GameActionException {
     	if (hqLoc == null) scanHQ(rc); // get the home hq and set hqIdx
-    	else if (hqIdx == -1) { 
-    		hqIdx = Communication.getIdxHQbyLocation(rc, hqLoc); 
-    		rc.setIndicatorString("Checking HQ"); 
+    	else if (hqIdx == -1) {
+    		hqIdx = Communication.getIdxHQbyLocation(rc, hqLoc);
+    		rc.setIndicatorString("Checking HQ");
     		// check for what HQ wants once idx is known
-        	if (demanded == null) {
-    	    	if ((rc.readSharedArray(hqIdx) & Communication.MA_AD_MASK) == 0) {
-    	    		demanded = ResourceType.ADAMANTIUM;
-    	    	} else {
-    	    		demanded = ResourceType.MANA;		
-    	    	}
-        	}
+//        	if (demanded == null) {
+//    	    	if ((rc.readSharedArray(hqIdx) & Communication.MA_AD_MASK) == 0) {
+//    	    		demanded = ResourceType.ADAMANTIUM;
+//    	    	} else {
+//    	    		demanded = ResourceType.MANA;
+//    	    	}
+//        	}
     	}
-    	
+        if (demanded == null) {
+            if (rc.getRoundNum() < 100) {
+                if (rc.getID() % 100 > 30) {
+                    demanded = ResourceType.MANA;
+                } else {
+                    demanded = ResourceType.ADAMANTIUM;
+                }
+            }
+            else {
+                if (rc.getID() % 100 > 20) {
+                    demanded = ResourceType.MANA;
+                } else {
+                    demanded = ResourceType.ADAMANTIUM;
+                }
+            }
+        }
+
+        rc.senseNearbyWells();
+        for (WellInfo well : rc.senseNearbyWells()) {
+            if (!Communication.isWellWritten(rc, well.getMapLocation())) {
+                for (int i=0; i < wellLocs.length; i++) {
+                    if (wellLocs[i] == null) {
+                        wellLocs[i] = well.getMapLocation();
+                        wellTypes[i] = well.getResourceType();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (rc.canWriteSharedArray(0,0)) {
+            for (int j=0; j < wellLocs.length; j++) {
+                if (wellLocs[j] != null) {
+                    Communication.addWell(rc, wellTypes[j], wellLocs[j]);
+//                    System.out.println("Added well at "+wellLocs[j]+" to shared array");
+                }
+            }
+            wellLocs = new MapLocation[]{null, null, null, null, null};
+            wellTypes = new ResourceType[]{null, null, null, null, null};
+        }
+
     	// for debugging
-    	/*if (demanded == ResourceType.ADAMANTIUM) {
-    		rc.setIndicatorString("Looking for Ad well");
-    	} else { rc.setIndicatorString("Looking for Mana well"); }*/
+    	if (demanded == ResourceType.ADAMANTIUM) {
+    		rc.setIndicatorString("Looking for Ad well " + wellLoc);
+    	} else { rc.setIndicatorString("Looking for Mana well" + wellLoc); }
     	
-        if(wellLoc == null || RobotPlayer.turnCount % 10 == 0) scanWellsSelective(rc, demanded);
+        if(wellLoc == null || RobotPlayer.turnCount % 5 == 0) scanWellsSelective(rc, demanded);
         scanIslands(rc);
-        
+
         // Enemies and scouting
         int radius = rc.getType().visionRadiusSquared;
         int radiusAct = rc.getType().actionRadiusSquared;
@@ -79,14 +124,17 @@ public class CarrierStrategy {
         depositResource(rc, ResourceType.ADAMANTIUM);
         depositResource(rc, ResourceType.MANA);
 
-        if(rc.canTakeAnchor(hqLoc, Anchor.STANDARD)) {
+        if(islandLoc != null && rc.canTakeAnchor(hqLoc, Anchor.STANDARD)) {
+            System.out.println("took the anchor");
             rc.takeAnchor(hqLoc, Anchor.STANDARD);
             anchorMode = true;
         }
         
         if(anchorMode) {
+            rc.setIndicatorDot(rc.getLocation(), 1,0,0);
             if(islandLoc == null) nextLoc = null;
-            else nextLoc = islandLoc; 
+            else nextLoc = islandLoc;
+            rc.setIndicatorString("going to island " + nextLoc);
 
             if(rc.canPlaceAnchor() && rc.senseTeamOccupyingIsland(rc.senseIsland(rc.getLocation())) == Team.NEUTRAL) {
                 rc.placeAnchor();
@@ -116,11 +164,12 @@ public class CarrierStrategy {
         }
         
         // run from enemies
-//        if (enemies.length > 0) {
-//        	nextLoc = Pathing.reportAndPlaySafe(rc, enemies, 2);
-//        	rc.setIndicatorString("AH");
-//        	inDanger = true;
-//        }
+        if (RobotPlayer.isSmallMap && enemies.length > 0) {
+        	nextLoc = Pathing.reportAndPlaySafe(rc, enemies, 2);
+//            nextLoc = hqLoc;
+        	rc.setIndicatorString("AH");
+        	inDanger = true;
+        }
         
         Communication.tryWriteMessages(rc);
         
@@ -182,6 +231,13 @@ public class CarrierStrategy {
         	}
         }
         wellLoc = best;
+        if (wellLoc == null) {
+            if (demanded != null) {
+                wellLoc = Communication.getNearestWellOfType(rc, demanded);
+            } else {
+                wellLoc = Communication.getNearestWellOfType(rc, ResourceType.MANA);
+            }
+        }
     }
 
     static void depositResource(RobotController rc, ResourceType type) throws GameActionException {
@@ -207,10 +263,23 @@ public class CarrierStrategy {
                 MapLocation[] locs = rc.senseNearbyIslandLocations(id);
                 if(locs.length > 0) {
                     islandLoc = locs[0];
-                    break;
                 }
             }
             Communication.updateIslandInfo(rc, id);
+        }
+        int islandCount = rc.getIslandCount();
+        int closest = 3600;
+        for(int id = 1; id < islandCount; id++) {
+            if(Communication.readTeamHoldingIsland(rc, id) == Team.NEUTRAL) {
+                MapLocation loc = Communication.readIslandLocation(rc, id);
+                if (loc != null) {
+                    int locDist = loc.distanceSquaredTo(rc.getLocation());
+                    if (locDist < closest) {
+                        closest = locDist;
+                        islandLoc = loc;
+                    }
+                }
+            }
         }
     }
 }

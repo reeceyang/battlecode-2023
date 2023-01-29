@@ -1,6 +1,8 @@
-package v2hognosebellplayer;
+package v3beardedreedling;
 
 import battlecode.common.*;
+
+import static v3beardedreedling.Communication.headquarterLocs;
 
 public class HQStrategy {
 	static int selfidx = 0;
@@ -20,10 +22,11 @@ public class HQStrategy {
 	static int adTarget = 50;
 	static int manaTarget = 60;
 	static float mapCharacteristic = 1; // a characteristic dimension of the map, recalculated on turn 1. Is 1 when map is 60x60
-	static float AdToMana = (float) (mapCharacteristic + 0.3); // updated on turn 1, sets which resource to prioritize
-	static final int congestionMax = 40;
+	static float AdToMana = 1; // updated on turn 1, sets which resource to prioritize
+	static final int congestionMax = 30;
 	static final int congestionMax2 = 69;
 	static final int ANCHOR_LIMIT = 2;
+	static final double ANCHOR_MAP_FRAC = 0.1; // the portion of the map to cover before building anchors
 	
 	static MapLocation buildTarget;
 
@@ -35,13 +38,12 @@ public class HQStrategy {
 		// INITIALIZATION
 		if (RobotPlayer.turnCount == 1) {
 			Communication.addHeadquarter(rc);
-			mapCharacteristic = (float) Math.sqrt(rc.getMapWidth() * rc.getMapHeight()) / 60; // max map size; bigger map -> more Ad
+			mapCharacteristic = (float) Math.sqrt(rc.getMapWidth() * rc.getMapHeight()) / 120; // max map size; bigger map -> more Ad
 			AdToMana = (float) (mapCharacteristic + 0.3);
 		} else if (RobotPlayer.turnCount == 2) {
 			Communication.updateHeadquarterInfo(rc);
 			selfidx = Communication.getIdxHQbyLocation(rc, rc.getLocation());
 		}
-
 		// TRAFFIC MANAGEMENT
 		// Check number of ally robots every 10 turns
 		if (RobotPlayer.turnCount % 10 == 0) {
@@ -71,7 +73,7 @@ public class HQStrategy {
 		Ad = AdNew;
 		Ma = MaNew;
 		// Decide which resource to prioritize
-		if ((float) AdNew / (float) MaNew > AdToMana && AdNew > adTarget) {
+		if ((float) AdNew / (float) MaNew > AdToMana) {
 			// we have too much Ad
 			needMana = true;
 			//rc.setIndicatorString("Asking for mana");
@@ -89,6 +91,8 @@ public class HQStrategy {
 
 		// ATTACK/DEFENSE MANAGEMENT
 		// TODO:
+		RobotInfo[] robots = rc.senseNearbyRobots();
+		Pathing.reportAndPlaySafe(rc, robots, 0);
 
 		// COMMUNICATION
 		int stateInt = Communication.bitPackHQInfo(rc, needMana, false, false, congested);
@@ -122,7 +126,10 @@ public class HQStrategy {
 	}
 	
 	static void buildStuff(RobotController rc, MapLocation[] newLocs) throws GameActionException {
-		boolean launcherCluster = (rc.getResourceAmount(ResourceType.MANA) > 239); // whether we can make 4+ launchers
+		boolean launcherCluster = (rc.getResourceAmount(ResourceType.MANA) > (RobotPlayer.isSmallMap ? 239 : 179)) || (RobotPlayer.turnCount < 2 && !RobotPlayer.isSmallMap); // whether we can make 4+ launchers
+		boolean saveForAnchor = (RobotPlayer.turnCount > 1000
+				|| rc.getRobotCount() > rc.getMapWidth() * rc.getMapHeight() * ANCHOR_MAP_FRAC)
+				&& rc.getNumAnchors(Anchor.STANDARD) < ANCHOR_LIMIT;
 		for (MapLocation newLoc : newLocs) {
 			if (newLoc == null) {
 				continue;
@@ -146,16 +153,19 @@ public class HQStrategy {
 			}
 
 			// Otherwise, build anchor after early game if resource rich
-			if (RobotPlayer.turnCount % 50 == 0 && !starving && rc.canBuildAnchor(Anchor.STANDARD) && rc.getNumAnchors(Anchor.STANDARD) < ANCHOR_LIMIT) {
+			if (saveForAnchor && rc.canBuildAnchor(Anchor.STANDARD)) {
 				rc.buildAnchor(Anchor.STANDARD);
-			} 
-		
+				saveForAnchor = false;
+				System.out.println("built an anchor");
+			}
+
 			// Otherwise, build carriers continuously if starving and not superCongested
-			if ((starving || rc.getResourceAmount(ResourceType.ADAMANTIUM) > 100) && !congested) {
+			if (!congested && !saveForAnchor) {
 				if (rc.canBuildRobot(RobotType.CARRIER, newLoc)) {
 					rc.buildRobot(RobotType.CARRIER, newLoc);
 				}
 			}
+
 		}
 		if (launcherCluster) { launcherClustersMade += 1; }
 	}

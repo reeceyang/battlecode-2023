@@ -1,10 +1,11 @@
-package v2hognosebellplayer;
+package v3beardedreedling;
 
 import battlecode.common.*;
 
 public class LauncherStrategy {
 	
-	static boolean attackmode = true;
+	static boolean attackmode = RobotPlayer.isSmallMap;
+    static MapLocation hqLoc;
 	static MapLocation nextLoc;
 
     /**
@@ -15,8 +16,17 @@ public class LauncherStrategy {
         // Scan robots
         Team opponent = rc.getTeam().opponent();
         RobotInfo[] robots = rc.senseNearbyRobots();
+        if (hqLoc == null) {
+            hqLoc = rc.getLocation();
+        }
+        if (!RobotPlayer.isSmallMap) {
+            attackmode = rc.getRoundNum() > 50;
+        }
         nextLoc = Pathing.reportAndPlaySafe(rc, robots, 0);
-        
+        if (RobotPlayer.isSmallMap) {
+            nextLoc = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
+        }
+
         // Targeting
         RobotInfo[] enemies = rc.senseNearbyRobots(16, opponent); // Optimize this out if possible
         int lowestHealth = 1000;
@@ -47,44 +57,38 @@ public class LauncherStrategy {
                 }
             }
         }
-        
-        boolean patrolmode = false;
+
+        // keep the launchers at the hq for the first 50 turns
         if (target != null) {
             if (rc.canAttack(target.getLocation())) {
             	rc.attack(target.getLocation());
             } else {
             	rc.setIndicatorString("Failed to attack");
             }
-        } else if (attackmode) {
-            	// go to nearest reported enemy
-            	MapLocation closest = Communication.getClosestEnemy(rc);
-            	if (closest != null) {
-            		nextLoc = closest;
-            	} else {
-            		patrolmode = true;
-            	}
-        } else {
-        	patrolmode = true;
+        } else if (attackmode && enemies.length == 0) {
+            // go to nearest reported enemy
+            MapLocation closest = Communication.getClosestEnemy(rc);
+            if (closest != null) {
+                nextLoc = closest;
+            }
         }
-        
-        if (patrolmode) {
+
+        if (!attackmode) {
         	// go patrol a nearby well or island
-            WellInfo[] wells = rc.senseNearbyWells();
-            if (wells.length > 0){
-            	int closestDistSq = 4000;
-            	MapLocation closestWellLoc = null;
-            	for (WellInfo well : wells) {
-            		MapLocation wellLoc = well.getMapLocation();
-            		int d2 = rc.getLocation().distanceSquaredTo(wellLoc);
-            		if (d2 < closestDistSq) {
-            			closestDistSq = d2;
-            			closestWellLoc = wellLoc;
-            		}
-            	}
-                nextLoc = closestWellLoc;
-            } else {
-            	MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
-            	if (closestIslandLoc != null) { nextLoc = closestIslandLoc; }
+            int[] ids = rc.senseNearbyIslands();
+            for(int id : ids) {
+                if(rc.senseTeamOccupyingIsland(id) == Team.NEUTRAL) {
+                    MapLocation[] locs = rc.senseNearbyIslandLocations(id);
+//                    if(locs.length > 0) {
+//                        islandLoc = locs[0];
+//                    }
+                }
+                rc.setIndicatorString("sensed " + id);
+                Communication.updateIslandInfo(rc, id);
+            }
+            MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
+            if (closestIslandLoc != null) {
+                nextLoc = closestIslandLoc;
             }
         }
         

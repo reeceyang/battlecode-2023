@@ -1,6 +1,7 @@
-package v2hognosebellplayer;
+package v3_3_1beardedreedling;
 
 import battlecode.common.*;
+import v3_2beardedreedling.RobotPlayer;
 
 public class Pathing {
 	
@@ -18,18 +19,7 @@ public class Pathing {
 	static boolean bugMode = false;
 	static final int BUG_MODE_TIME_LIMIT = 100;
 
-    static void moveTowards(RobotController rc, MapLocation target) throws GameActionException {
-    	// get turn count and check if we've gotten stuck
-    	/* For some reason this doesn't seem to work, so I'm commenting it out
-    	if ((RobotPlayer.turnCount + rc.getID()) % 20 == 0) {
-    		rc.setIndicatorString("Checking stuckness");
-    		if (rc.getLocation().isWithinDistanceSquared(pastLoc, STUCK_RADIUS_SQ)) {
-    			leftHanded = !leftHanded;
-    			rc.setIndicatorString("Switching handedness");
-    			pastLoc = rc.getLocation();
-    		}
-    	}
-    	*/
+    static void moveTowards(RobotController rc, MapLocation target, boolean bugOverride) throws GameActionException {
     	
         if (rc.getLocation().equals(target)) {
             return;
@@ -43,12 +33,15 @@ public class Pathing {
 			bugMode = false;
 			progressCountdown = TIME_LIMIT;
 		}
+		// apply bug mode override
+		if (bugOverride) bugMode = true;
+		
 		if (!bugMode) {
-			int before = Clock.getBytecodesLeft();
+			//int before = Clock.getBytecodesLeft();
 			BellmanFord.doBellmanFord(rc, target);
-			rc.setIndicatorString("bellman ford used " + (before - Clock.getBytecodesLeft()));
+//			rc.setIndicatorString("bellman ford used " + (before - Clock.getBytecodesLeft()));
 		} else {
-			rc.setIndicatorString("bug mode " + progressCountdown + " left");
+			//rc.setIndicatorString("bug mode " + progressCountdown + " left");
 			Direction d = rc.getLocation().directionTo(target);
 			if (rc.canMove(d)) {
 				rc.move(d);
@@ -108,14 +101,18 @@ public class Pathing {
         Team opponent = rc.getTeam().opponent();
         // Report and get average location of enemies and of friendlies	
         for (RobotInfo robot : robots) {
-        	if (robot.getTeam() == opponent && robot.getType() != RobotType.HEADQUARTERS) {
+        	if (robot.getTeam() == opponent) {
+				if (robot.getType() == RobotType.HEADQUARTERS) {
+					nEnemy = 50; // headquarters are extremely dangerous
+					continue;
+				}
         		Communication.reportEnemy(rc, robot.getLocation());
         		if (robot.getType() == RobotType.LAUNCHER || robot.getType() == RobotType.DESTABILIZER) {
 	        		xEnemyAvg += robot.getLocation().x;
 	        		yEnemyAvg += robot.getLocation().y;
 	        		nEnemy++;
         		}
-        	} else if (safetyLevel < 2 && robot.getType() == RobotType.LAUNCHER || robot.getType() == RobotType.DESTABILIZER) {
+			} else if (safetyLevel < 2 && robot.getType() == RobotType.LAUNCHER || robot.getType() == RobotType.DESTABILIZER) {
         		xFriendlyAvg += robot.getLocation().x;
         		yFriendlyAvg += robot.getLocation().y;
         		nFriendly++;
@@ -199,4 +196,34 @@ public class Pathing {
     	}
     	return answer;
     }
+    
+    static MapLocation findManaWell(RobotController rc, MapLocation adWell, MapLocation hqLoc) throws GameActionException {
+		if (adWell == null) {
+			return null;
+		}
+    	if (rc.getLocation().distanceSquaredTo(adWell) > 36) {
+			rc.setIndicatorString("Going towards Ad well "+adWell);
+			return adWell;
+		} else {
+			Direction d = hqLoc.directionTo(adWell);
+			switch (rc.getID() % 3) {
+				case 0:
+					d = d.rotateLeft();
+					break;
+				case 1:
+					break;
+				case 2:
+					d = d.rotateRight();
+					break;
+			}
+			return rc.getLocation().add(d);
+//			MapLocation[] nearbyClouds = rc.senseNearbyCloudLocations(adWell, 100);
+//			if (nearbyClouds.length > 0) {
+//				rc.setIndicatorString("Going towards cloud "+nearbyClouds[0]);
+//				return nearbyClouds[0]; // need better strategy so it doesn't get stuck in a cloud forever ;-;
+//			} else {
+//				rc.setIndicatorString("Going around Ad well "+adWell);
+//			}
+		}
+	}
 }
