@@ -199,7 +199,7 @@ public class HQStrategy {
 		MaSpent = 0;
 		turns_since_anchor++;
 		boolean launcherCluster = (rc.getResourceAmount(ResourceType.MANA) > 179) || (RobotPlayer.turnCount < 2 && !RobotPlayer.isSmallMap); // whether we can make 4+ launchers
-		boolean saveForAnchor = (turns_since_anchor > TURNS_PER_ANCHOR)
+		boolean saveForAnchor = rc.getNumAnchors(Anchor.STANDARD) < ANCHOR_LIMIT && (turns_since_anchor > TURNS_PER_ANCHOR)
 				&& (RobotPlayer.turnCount > 1000 || rc.getRobotCount() > rc.getMapWidth() * rc.getMapHeight() * ANCHOR_MAP_FRAC);
 		for (MapLocation newLoc : newLocs) {
 			if (newLoc == null) {
