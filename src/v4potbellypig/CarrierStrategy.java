@@ -35,6 +35,11 @@ public class CarrierStrategy {
     static final int WELLLOC_MAX_IDX = 4; // change this if length of wellLocs is changed
 	static int currentIslandId = -1; // the id of the island currently being targeted
     static boolean keepExploring = false;
+    public static boolean findNewWell = false;
+    public static MapLocation badWell = null;
+    static boolean startedCountingTurns = false;
+    static int wellStart = 0;
+    static MapLocation locStart = null;
     /**
      * Run a single turn for a Carrier.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
@@ -74,13 +79,17 @@ public class CarrierStrategy {
 //        }
 
         // Scan wells, update local well cache, scan islands, and set wellLoc
-        if (state == CarrierState.MAKE_ELIXIR) {
-            scanWellsSelective(rc, elixirTargetNeed);
-        } else {
-            scanWellsSelective(rc, RobotPlayer.demanded);
-        }
+
+        scanWellsSelective(rc, RobotPlayer.demanded);
+
         if (wellLoc == null) {
             state = CarrierState.SEARCH;
+        } else {
+            if (!startedCountingTurns) {
+                wellStart = rc.getRoundNum();
+                locStart = rc.getLocation();
+            }
+            startedCountingTurns = true;
         }
         islandLoc = null;
         scanIslands(rc, rc.getTeam(), keepExploring);
@@ -159,6 +168,12 @@ public class CarrierStrategy {
         int total = getTotalResources(rc);
         switch (state) {
             case DEFAULT:
+                if (total < 39 && (rc.getRoundNum() - wellStart > 30) && rc.getLocation().isWithinDistanceSquared(locStart, 40) && !rc.canCollectResource(wellLoc, -1)) {
+                    System.out.println("can't collect from "+wellLoc);
+                    badWell = wellLoc;
+                    findNewWell = true;
+                    startedCountingTurns = false;
+                }
                 if (wellLoc != null && rc.canCollectResource(wellLoc, -1)) {
                     rc.collectResource(wellLoc, -1);
                 }
@@ -173,33 +188,11 @@ public class CarrierStrategy {
 					}
                 } else if (total > 38) {
                     //move towards HQ
+                    startedCountingTurns = false;
                     nextLoc = hqLoc;
                 }
+//                System.out.println(startedCountingTurns);
                 break;
-//            case MAKE_ELIXIR:
-//                if (wellLoc != null && rc.canCollectResource(wellLoc, -1)) {
-//                    rc.collectResource(wellLoc, -1);
-//                }
-//                if (total < 39) {
-//                    //move towards well or search for well
-//                    if (wellLoc == null) nextLoc = null;
-//                    else if (!rc.getLocation().isAdjacentTo(wellLoc)) nextLoc = wellLoc;
-//                } else if (total > 38) {
-//                    MapLocation targetLoc = Communication.readWellLocation(rc, elixirTargetIdx);
-//                    nextLoc = targetLoc;
-//                    // check if the well is converted already
-//                    if (rc.canSenseLocation(targetLoc)) {
-//                        if (rc.senseWell(targetLoc).getResourceType() == ResourceType.ELIXIR) {
-//                            Communication.unsetElixirTargetStatus(rc, elixirTargetIdx);
-//                            foundElixir = true;
-//                        } else {
-//                            // deposit resources into well
-//                            depositResource(rc, ResourceType.MANA, targetLoc);
-//                            depositResource(rc, ResourceType.ADAMANTIUM, targetLoc);
-//                        }
-//                    }
-//                }
-//                break;
             case SEARCH:
                 if (wellLoc != null && rc.canCollectResource(wellLoc, -1)) {
                     rc.collectResource(wellLoc, -1);
@@ -243,21 +236,26 @@ public class CarrierStrategy {
                     keepExploring = false;
                 } else if (keepExploring) {
 //                    rc.setIndicatorString("keep exploring" + islandLoc);
-
-                    if (Communication.readHQStatus(rc, "nx") == 1) {
-                        switch (rc.getID() % 2) {
-                            case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, islandLoc)); break;
-                            case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, islandLoc)); break;
-                        }
-                    } else if (Communication.readHQStatus(rc, "ny") == 1) {
-                        switch (rc.getID() % 2) {
-                            case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, islandLoc)); break;
-                            case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, islandLoc)); break;
-                        }
-                    } else if (Communication.readHQStatus(rc, "nr") == 1) {
-                        switch (rc.getID() % 2) {
-                            case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, islandLoc)); break;
-                            case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, islandLoc)); break;
+                    if (islandLoc != null) {
+                        if (Communication.readHQStatus(rc, "nx") == 1) {
+                            switch (rc.getID() % 2) {
+                                case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, islandLoc)); break;
+                                case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, islandLoc)); break;
+                            }
+                        } else if (Communication.readHQStatus(rc, "ny") == 1) {
+                            switch (rc.getID() % 2) {
+                                case 0: nextLoc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, islandLoc)); break;
+                                case 1: nextLoc = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, islandLoc)); break;
+                            }
+                        } else if (Communication.readHQStatus(rc, "nr") == 1) {
+                            switch (rc.getID() % 2) {
+                                case 0:
+                                    nextLoc = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, islandLoc));
+                                    break;
+                                case 1:
+                                    nextLoc = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, islandLoc));
+                                    break;
+                            }
                         }
                     } else {
                         Direction dir = hqLoc.directionTo(rc.getLocation());
@@ -289,11 +287,13 @@ public class CarrierStrategy {
 
 				if ((islandLoc == null || rc.getLocation().distanceSquaredTo(islandLoc) > 20) && rc.getHealth() < 31) {
 					rc.setIndicatorString("trying to attacc");
-					if (rc.canAttack(target.getLocation())) rc.attack(target.getLocation());
+					if (target != null && rc.canAttack(target.getLocation())) rc.attack(target.getLocation());
 					rc.setIndicatorString("attacc");
 				}
                 break;
         }
+
+        rc.setIndicatorString(startedCountingTurns + " ");
 
 //        rc.setIndicatorString(state.toString());
 
@@ -302,7 +302,7 @@ public class CarrierStrategy {
             RobotPlayer.moveRandom(rc);
         } else {
             Pathing.moveTowards(rc, nextLoc, bugOverride);
-            rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 0, 1);
+            rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 0, 255);
         }
 
     }
@@ -329,7 +329,7 @@ public class CarrierStrategy {
         if (wells.length > 0) {
             for (WellInfo well : wells) {
                 // Add to local well cache
-                if (!Communication.isWellWritten(rc, well.getMapLocation())) {
+                if (!Communication.isWellWritten(rc, well.getMapLocation()) && !(findNewWell && well.getMapLocation().equals(badWell))) {
                     for (int i = 0; i < wellLocs.length; i++) {
                         if (wellLocs[i] == null) {
                             wellLocs[i] = well.getMapLocation();
@@ -375,6 +375,7 @@ public class CarrierStrategy {
         if (amount > 0) {
             if (rc.canTransferResource(target, type, amount)) {
                 rc.transferResource(target, type, amount);
+                startedCountingTurns = false;
             }
         }
     }

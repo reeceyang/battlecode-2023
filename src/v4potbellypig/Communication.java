@@ -438,7 +438,7 @@ class Communication {
         MapLocation[] locs = new MapLocation[5];
 
         for (int j=STARTING_WELL_IDX; j<GameConstants.SHARED_ARRAY_LENGTH; j++) {
-            if (rc.readSharedArray(j) != 0 && getWellType(rc, j) == r) {
+            if (rc.readSharedArray(j) != 0 && getWellType(rc, j) == r && !(CarrierStrategy.findNewWell && readWellLocation(rc, j).equals(CarrierStrategy.badWell))) {
                 dists[j-STARTING_WELL_IDX] = RobotPlayer.distSquaredLoc(rc.getLocation(), readWellLocation(rc, j)) * (1 + isWellCongested(rc, j)); // weighted such that a non-congested well at any distance less than 2x the distance of a congested well will be prioritized
                 locs[j-STARTING_WELL_IDX] = readWellLocation(rc, j);
                 if (findSymmetry(rc) != 0) {

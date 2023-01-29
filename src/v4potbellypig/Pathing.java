@@ -1,7 +1,6 @@
 package v4potbellypig;
 
 import battlecode.common.*;
-import v3_2beardedreedling.RobotPlayer;
 
 public class Pathing {
 	

@@ -83,7 +83,7 @@ public class AmplifierStrategy {
                             break;
                         }
                     }
-                    if (!isEmpty && rc.senseWell(loc) == null && rc.senseIsland(loc) == -1) {
+                    if (!isEmpty && rc.senseWell(loc) == null && rc.senseIsland(loc) == -1 && emptyIndex < emptyClouds.length) {
                         emptyClouds[emptyIndex] = loc;
                         System.out.println(emptyIndex + " " + loc);
                         emptyIndex++;
