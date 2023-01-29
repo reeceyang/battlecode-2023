@@ -162,7 +162,7 @@ public class HQStrategy {
 		}
 		
 		// Bait launchers out into the world
-		if (RobotPlayer.turnCount < 100 && RobotPlayer.turnCount % 30 == 0 || RobotPlayer.isSmallMap && RobotPlayer.turnCount == 10) {
+		if (RobotPlayer.turnCount < 100 && RobotPlayer.turnCount % 30 == 0 || RobotPlayer.isSmallMap && RobotPlayer.turnCount == 3) {
 			baitFriendlyLaunchers(rc);
 		}
 				
@@ -207,7 +207,7 @@ public class HQStrategy {
 			}
 
 			// If we've made launchers, make one amplifier
-			if (launcherClustersMade > 1) {
+			if (launcherClustersMade > 2) {
 				if (rc.canBuildRobot(RobotType.AMPLIFIER, newLoc)) {
 					rc.buildRobot(RobotType.AMPLIFIER, newLoc);
 					AdSpent += 30;
