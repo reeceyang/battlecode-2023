@@ -24,7 +24,7 @@ public class Pathing {
         if (rc.getLocation().equals(target)) {
             return;
         }
-        if (!rc.isActionReady()) {
+        if (!rc.isMovementReady()) {
             return;
         }
 		if (target != previousTarget) {

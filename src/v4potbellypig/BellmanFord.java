@@ -3,7 +3,7 @@ package v4potbellypig;
 import battlecode.common.*;
 
 public class BellmanFord {
-    public static void doBellmanFord(RobotController rc, MapLocation target) throws GameActionException {
+    public static boolean doBellmanFord(RobotController rc, MapLocation target, boolean moveTwice) throws GameActionException {
         MapLocation bot = rc.getLocation();
         MapLocation pos;
         Direction currentDir;
@@ -404,484 +404,484 @@ public class BellmanFord {
         int newcost43 = 2147483647;
         int newcost44 = 2147483647;
         minCost = cost00;
-        if (open01 && (current01 == null || current01 != Direction.SOUTH)) {
+        if (open01 && current01 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost01 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.SOUTHWEST)) {
+        if (open11 && current11 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.WEST)) {
+        if (open10 && current10 != Direction.WEST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
         newcost00 = minCost;
         minCost = cost01;
-        if (open02 && (current02 == null || current02 != Direction.SOUTH)) {
+        if (open02 && current02 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost02 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.SOUTHWEST)) {
+        if (open12 && current12 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.WEST)) {
+        if (open11 && current11 != Direction.WEST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.NORTHWEST)) {
+        if (open10 && current10 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open00 && (current00 == null || current00 != Direction.NORTH)) {
+        if (open00 && current00 != Direction.NORTH) {
             minCost = Math.min(minCost, cost00 + 1);
         }
         newcost01 = minCost;
         minCost = cost02;
-        if (open03 && (current03 == null || current03 != Direction.SOUTH)) {
+        if (open03 && current03 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost03 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.SOUTHWEST)) {
+        if (open13 && current13 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.WEST)) {
+        if (open12 && current12 != Direction.WEST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.NORTHWEST)) {
+        if (open11 && current11 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.NORTH)) {
+        if (open01 && current01 != Direction.NORTH) {
             minCost = Math.min(minCost, cost01 + 1);
         }
         newcost02 = minCost;
         minCost = cost03;
-        if (open04 && (current04 == null || current04 != Direction.SOUTH)) {
+        if (open04 && current04 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost04 + 1);
         }
-        if (open14 && (current14 == null || current14 != Direction.SOUTHWEST)) {
+        if (open14 && current14 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.WEST)) {
+        if (open13 && current13 != Direction.WEST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.NORTHWEST)) {
+        if (open12 && current12 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.NORTH)) {
+        if (open02 && current02 != Direction.NORTH) {
             minCost = Math.min(minCost, cost02 + 1);
         }
         newcost03 = minCost;
         minCost = cost04;
-        if (open14 && (current14 == null || current14 != Direction.WEST)) {
+        if (open14 && current14 != Direction.WEST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.NORTHWEST)) {
+        if (open13 && current13 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.NORTH)) {
+        if (open03 && current03 != Direction.NORTH) {
             minCost = Math.min(minCost, cost03 + 1);
         }
         newcost04 = minCost;
         minCost = cost10;
-        if (open11 && (current11 == null || current11 != Direction.SOUTH)) {
+        if (open11 && current11 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.SOUTHWEST)) {
+        if (open21 && current21 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.WEST)) {
+        if (open20 && current20 != Direction.WEST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open00 && (current00 == null || current00 != Direction.EAST)) {
+        if (open00 && current00 != Direction.EAST) {
             minCost = Math.min(minCost, cost00 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.SOUTHEAST)) {
+        if (open01 && current01 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost01 + 1);
         }
         newcost10 = minCost;
         minCost = cost11;
-        if (open12 && (current12 == null || current12 != Direction.SOUTH)) {
+        if (open12 && current12 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.SOUTHWEST)) {
+        if (open22 && current22 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.WEST)) {
+        if (open21 && current21 != Direction.WEST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.NORTHWEST)) {
+        if (open20 && current20 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.NORTH)) {
+        if (open10 && current10 != Direction.NORTH) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open00 && (current00 == null || current00 != Direction.NORTHEAST)) {
+        if (open00 && current00 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost00 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.EAST)) {
+        if (open01 && current01 != Direction.EAST) {
             minCost = Math.min(minCost, cost01 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.SOUTHEAST)) {
+        if (open02 && current02 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost02 + 1);
         }
         newcost11 = minCost;
         minCost = cost12;
-        if (open13 && (current13 == null || current13 != Direction.SOUTH)) {
+        if (open13 && current13 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.SOUTHWEST)) {
+        if (open23 && current23 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.WEST)) {
+        if (open22 && current22 != Direction.WEST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.NORTHWEST)) {
+        if (open21 && current21 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.NORTH)) {
+        if (open11 && current11 != Direction.NORTH) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.NORTHEAST)) {
+        if (open01 && current01 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost01 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.EAST)) {
+        if (open02 && current02 != Direction.EAST) {
             minCost = Math.min(minCost, cost02 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.SOUTHEAST)) {
+        if (open03 && current03 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost03 + 1);
         }
         newcost12 = minCost;
         minCost = cost13;
-        if (open14 && (current14 == null || current14 != Direction.SOUTH)) {
+        if (open14 && current14 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost14 + 1);
         }
-        if (open24 && (current24 == null || current24 != Direction.SOUTHWEST)) {
+        if (open24 && current24 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.WEST)) {
+        if (open23 && current23 != Direction.WEST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.NORTHWEST)) {
+        if (open22 && current22 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.NORTH)) {
+        if (open12 && current12 != Direction.NORTH) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.NORTHEAST)) {
+        if (open02 && current02 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost02 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.EAST)) {
+        if (open03 && current03 != Direction.EAST) {
             minCost = Math.min(minCost, cost03 + 1);
         }
-        if (open04 && (current04 == null || current04 != Direction.SOUTHEAST)) {
+        if (open04 && current04 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost04 + 1);
         }
         newcost13 = minCost;
         minCost = cost14;
-        if (open24 && (current24 == null || current24 != Direction.WEST)) {
+        if (open24 && current24 != Direction.WEST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.NORTHWEST)) {
+        if (open23 && current23 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.NORTH)) {
+        if (open13 && current13 != Direction.NORTH) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.NORTHEAST)) {
+        if (open03 && current03 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost03 + 1);
         }
-        if (open04 && (current04 == null || current04 != Direction.EAST)) {
+        if (open04 && current04 != Direction.EAST) {
             minCost = Math.min(minCost, cost04 + 1);
         }
         newcost14 = minCost;
         minCost = cost20;
-        if (open21 && (current21 == null || current21 != Direction.SOUTH)) {
+        if (open21 && current21 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.SOUTHWEST)) {
+        if (open31 && current31 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.WEST)) {
+        if (open30 && current30 != Direction.WEST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.EAST)) {
+        if (open10 && current10 != Direction.EAST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.SOUTHEAST)) {
+        if (open11 && current11 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
         newcost20 = minCost;
         minCost = cost21;
-        if (open22 && (current22 == null || current22 != Direction.SOUTH)) {
+        if (open22 && current22 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.SOUTHWEST)) {
+        if (open32 && current32 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.WEST)) {
+        if (open31 && current31 != Direction.WEST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.NORTHWEST)) {
+        if (open30 && current30 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.NORTH)) {
+        if (open20 && current20 != Direction.NORTH) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.NORTHEAST)) {
+        if (open10 && current10 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.EAST)) {
+        if (open11 && current11 != Direction.EAST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.SOUTHEAST)) {
+        if (open12 && current12 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
         newcost21 = minCost;
         minCost = cost22;
-        if (open23 && (current23 == null || current23 != Direction.SOUTH)) {
+        if (open23 && current23 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.SOUTHWEST)) {
+        if (open33 && current33 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.WEST)) {
+        if (open32 && current32 != Direction.WEST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.NORTHWEST)) {
+        if (open31 && current31 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.NORTH)) {
+        if (open21 && current21 != Direction.NORTH) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.NORTHEAST)) {
+        if (open11 && current11 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.EAST)) {
+        if (open12 && current12 != Direction.EAST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.SOUTHEAST)) {
+        if (open13 && current13 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
         newcost22 = minCost;
         minCost = cost23;
-        if (open24 && (current24 == null || current24 != Direction.SOUTH)) {
+        if (open24 && current24 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost24 + 1);
         }
-        if (open34 && (current34 == null || current34 != Direction.SOUTHWEST)) {
+        if (open34 && current34 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.WEST)) {
+        if (open33 && current33 != Direction.WEST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.NORTHWEST)) {
+        if (open32 && current32 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.NORTH)) {
+        if (open22 && current22 != Direction.NORTH) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.NORTHEAST)) {
+        if (open12 && current12 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.EAST)) {
+        if (open13 && current13 != Direction.EAST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open14 && (current14 == null || current14 != Direction.SOUTHEAST)) {
+        if (open14 && current14 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
         newcost23 = minCost;
         minCost = cost24;
-        if (open34 && (current34 == null || current34 != Direction.WEST)) {
+        if (open34 && current34 != Direction.WEST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.NORTHWEST)) {
+        if (open33 && current33 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.NORTH)) {
+        if (open23 && current23 != Direction.NORTH) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.NORTHEAST)) {
+        if (open13 && current13 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open14 && (current14 == null || current14 != Direction.EAST)) {
+        if (open14 && current14 != Direction.EAST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
         newcost24 = minCost;
         minCost = cost30;
-        if (open31 && (current31 == null || current31 != Direction.SOUTH)) {
+        if (open31 && current31 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.SOUTHWEST)) {
+        if (open41 && current41 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open40 && (current40 == null || current40 != Direction.WEST)) {
+        if (open40 && current40 != Direction.WEST) {
             minCost = Math.min(minCost, cost40 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.EAST)) {
+        if (open20 && current20 != Direction.EAST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.SOUTHEAST)) {
+        if (open21 && current21 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
         newcost30 = minCost;
         minCost = cost31;
-        if (open32 && (current32 == null || current32 != Direction.SOUTH)) {
+        if (open32 && current32 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.SOUTHWEST)) {
+        if (open42 && current42 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.WEST)) {
+        if (open41 && current41 != Direction.WEST) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open40 && (current40 == null || current40 != Direction.NORTHWEST)) {
+        if (open40 && current40 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost40 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.NORTH)) {
+        if (open30 && current30 != Direction.NORTH) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.NORTHEAST)) {
+        if (open20 && current20 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.EAST)) {
+        if (open21 && current21 != Direction.EAST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.SOUTHEAST)) {
+        if (open22 && current22 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
         newcost31 = minCost;
         minCost = cost32;
-        if (open33 && (current33 == null || current33 != Direction.SOUTH)) {
+        if (open33 && current33 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open43 && (current43 == null || current43 != Direction.SOUTHWEST)) {
+        if (open43 && current43 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.WEST)) {
+        if (open42 && current42 != Direction.WEST) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.NORTHWEST)) {
+        if (open41 && current41 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.NORTH)) {
+        if (open31 && current31 != Direction.NORTH) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.NORTHEAST)) {
+        if (open21 && current21 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.EAST)) {
+        if (open22 && current22 != Direction.EAST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.SOUTHEAST)) {
+        if (open23 && current23 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
         newcost32 = minCost;
         minCost = cost33;
-        if (open34 && (current34 == null || current34 != Direction.SOUTH)) {
+        if (open34 && current34 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost34 + 1);
         }
-        if (open44 && (current44 == null || current44 != Direction.SOUTHWEST)) {
+        if (open44 && current44 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost44 + 1);
         }
-        if (open43 && (current43 == null || current43 != Direction.WEST)) {
+        if (open43 && current43 != Direction.WEST) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.NORTHWEST)) {
+        if (open42 && current42 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.NORTH)) {
+        if (open32 && current32 != Direction.NORTH) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.NORTHEAST)) {
+        if (open22 && current22 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.EAST)) {
+        if (open23 && current23 != Direction.EAST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open24 && (current24 == null || current24 != Direction.SOUTHEAST)) {
+        if (open24 && current24 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
         newcost33 = minCost;
         minCost = cost34;
-        if (open44 && (current44 == null || current44 != Direction.WEST)) {
+        if (open44 && current44 != Direction.WEST) {
             minCost = Math.min(minCost, cost44 + 1);
         }
-        if (open43 && (current43 == null || current43 != Direction.NORTHWEST)) {
+        if (open43 && current43 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.NORTH)) {
+        if (open33 && current33 != Direction.NORTH) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.NORTHEAST)) {
+        if (open23 && current23 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open24 && (current24 == null || current24 != Direction.EAST)) {
+        if (open24 && current24 != Direction.EAST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
         newcost34 = minCost;
         minCost = cost40;
-        if (open41 && (current41 == null || current41 != Direction.SOUTH)) {
+        if (open41 && current41 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.EAST)) {
+        if (open30 && current30 != Direction.EAST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.SOUTHEAST)) {
+        if (open31 && current31 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
         newcost40 = minCost;
         minCost = cost41;
-        if (open42 && (current42 == null || current42 != Direction.SOUTH)) {
+        if (open42 && current42 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open40 && (current40 == null || current40 != Direction.NORTH)) {
+        if (open40 && current40 != Direction.NORTH) {
             minCost = Math.min(minCost, cost40 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.NORTHEAST)) {
+        if (open30 && current30 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.EAST)) {
+        if (open31 && current31 != Direction.EAST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.SOUTHEAST)) {
+        if (open32 && current32 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
         newcost41 = minCost;
         minCost = cost42;
-        if (open43 && (current43 == null || current43 != Direction.SOUTH)) {
+        if (open43 && current43 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.NORTH)) {
+        if (open41 && current41 != Direction.NORTH) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.NORTHEAST)) {
+        if (open31 && current31 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.EAST)) {
+        if (open32 && current32 != Direction.EAST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.SOUTHEAST)) {
+        if (open33 && current33 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
         newcost42 = minCost;
         minCost = cost43;
-        if (open44 && (current44 == null || current44 != Direction.SOUTH)) {
+        if (open44 && current44 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost44 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.NORTH)) {
+        if (open42 && current42 != Direction.NORTH) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.NORTHEAST)) {
+        if (open32 && current32 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.EAST)) {
+        if (open33 && current33 != Direction.EAST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open34 && (current34 == null || current34 != Direction.SOUTHEAST)) {
+        if (open34 && current34 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
         newcost43 = minCost;
         minCost = cost44;
-        if (open43 && (current43 == null || current43 != Direction.NORTH)) {
+        if (open43 && current43 != Direction.NORTH) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.NORTHEAST)) {
+        if (open33 && current33 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open34 && (current34 == null || current34 != Direction.EAST)) {
+        if (open34 && current34 != Direction.EAST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
         newcost44 = minCost;
@@ -911,484 +911,484 @@ public class BellmanFord {
         cost43 = newcost43;
         cost44 = newcost44;
         minCost = cost00;
-        if (open01 && (current01 == null || current01 != Direction.SOUTH)) {
+        if (open01 && current01 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost01 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.SOUTHWEST)) {
+        if (open11 && current11 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.WEST)) {
+        if (open10 && current10 != Direction.WEST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
         newcost00 = minCost;
         minCost = cost01;
-        if (open02 && (current02 == null || current02 != Direction.SOUTH)) {
+        if (open02 && current02 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost02 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.SOUTHWEST)) {
+        if (open12 && current12 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.WEST)) {
+        if (open11 && current11 != Direction.WEST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.NORTHWEST)) {
+        if (open10 && current10 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open00 && (current00 == null || current00 != Direction.NORTH)) {
+        if (open00 && current00 != Direction.NORTH) {
             minCost = Math.min(minCost, cost00 + 1);
         }
         newcost01 = minCost;
         minCost = cost02;
-        if (open03 && (current03 == null || current03 != Direction.SOUTH)) {
+        if (open03 && current03 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost03 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.SOUTHWEST)) {
+        if (open13 && current13 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.WEST)) {
+        if (open12 && current12 != Direction.WEST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.NORTHWEST)) {
+        if (open11 && current11 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.NORTH)) {
+        if (open01 && current01 != Direction.NORTH) {
             minCost = Math.min(minCost, cost01 + 1);
         }
         newcost02 = minCost;
         minCost = cost03;
-        if (open04 && (current04 == null || current04 != Direction.SOUTH)) {
+        if (open04 && current04 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost04 + 1);
         }
-        if (open14 && (current14 == null || current14 != Direction.SOUTHWEST)) {
+        if (open14 && current14 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.WEST)) {
+        if (open13 && current13 != Direction.WEST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.NORTHWEST)) {
+        if (open12 && current12 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.NORTH)) {
+        if (open02 && current02 != Direction.NORTH) {
             minCost = Math.min(minCost, cost02 + 1);
         }
         newcost03 = minCost;
         minCost = cost04;
-        if (open14 && (current14 == null || current14 != Direction.WEST)) {
+        if (open14 && current14 != Direction.WEST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.NORTHWEST)) {
+        if (open13 && current13 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.NORTH)) {
+        if (open03 && current03 != Direction.NORTH) {
             minCost = Math.min(minCost, cost03 + 1);
         }
         newcost04 = minCost;
         minCost = cost10;
-        if (open11 && (current11 == null || current11 != Direction.SOUTH)) {
+        if (open11 && current11 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.SOUTHWEST)) {
+        if (open21 && current21 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.WEST)) {
+        if (open20 && current20 != Direction.WEST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open00 && (current00 == null || current00 != Direction.EAST)) {
+        if (open00 && current00 != Direction.EAST) {
             minCost = Math.min(minCost, cost00 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.SOUTHEAST)) {
+        if (open01 && current01 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost01 + 1);
         }
         newcost10 = minCost;
         minCost = cost11;
-        if (open12 && (current12 == null || current12 != Direction.SOUTH)) {
+        if (open12 && current12 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.SOUTHWEST)) {
+        if (open22 && current22 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.WEST)) {
+        if (open21 && current21 != Direction.WEST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.NORTHWEST)) {
+        if (open20 && current20 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.NORTH)) {
+        if (open10 && current10 != Direction.NORTH) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open00 && (current00 == null || current00 != Direction.NORTHEAST)) {
+        if (open00 && current00 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost00 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.EAST)) {
+        if (open01 && current01 != Direction.EAST) {
             minCost = Math.min(minCost, cost01 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.SOUTHEAST)) {
+        if (open02 && current02 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost02 + 1);
         }
         newcost11 = minCost;
         minCost = cost12;
-        if (open13 && (current13 == null || current13 != Direction.SOUTH)) {
+        if (open13 && current13 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.SOUTHWEST)) {
+        if (open23 && current23 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.WEST)) {
+        if (open22 && current22 != Direction.WEST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.NORTHWEST)) {
+        if (open21 && current21 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.NORTH)) {
+        if (open11 && current11 != Direction.NORTH) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.NORTHEAST)) {
+        if (open01 && current01 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost01 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.EAST)) {
+        if (open02 && current02 != Direction.EAST) {
             minCost = Math.min(minCost, cost02 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.SOUTHEAST)) {
+        if (open03 && current03 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost03 + 1);
         }
         newcost12 = minCost;
         minCost = cost13;
-        if (open14 && (current14 == null || current14 != Direction.SOUTH)) {
+        if (open14 && current14 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost14 + 1);
         }
-        if (open24 && (current24 == null || current24 != Direction.SOUTHWEST)) {
+        if (open24 && current24 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.WEST)) {
+        if (open23 && current23 != Direction.WEST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.NORTHWEST)) {
+        if (open22 && current22 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.NORTH)) {
+        if (open12 && current12 != Direction.NORTH) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.NORTHEAST)) {
+        if (open02 && current02 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost02 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.EAST)) {
+        if (open03 && current03 != Direction.EAST) {
             minCost = Math.min(minCost, cost03 + 1);
         }
-        if (open04 && (current04 == null || current04 != Direction.SOUTHEAST)) {
+        if (open04 && current04 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost04 + 1);
         }
         newcost13 = minCost;
         minCost = cost14;
-        if (open24 && (current24 == null || current24 != Direction.WEST)) {
+        if (open24 && current24 != Direction.WEST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.NORTHWEST)) {
+        if (open23 && current23 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.NORTH)) {
+        if (open13 && current13 != Direction.NORTH) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.NORTHEAST)) {
+        if (open03 && current03 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost03 + 1);
         }
-        if (open04 && (current04 == null || current04 != Direction.EAST)) {
+        if (open04 && current04 != Direction.EAST) {
             minCost = Math.min(minCost, cost04 + 1);
         }
         newcost14 = minCost;
         minCost = cost20;
-        if (open21 && (current21 == null || current21 != Direction.SOUTH)) {
+        if (open21 && current21 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.SOUTHWEST)) {
+        if (open31 && current31 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.WEST)) {
+        if (open30 && current30 != Direction.WEST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.EAST)) {
+        if (open10 && current10 != Direction.EAST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.SOUTHEAST)) {
+        if (open11 && current11 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
         newcost20 = minCost;
         minCost = cost21;
-        if (open22 && (current22 == null || current22 != Direction.SOUTH)) {
+        if (open22 && current22 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.SOUTHWEST)) {
+        if (open32 && current32 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.WEST)) {
+        if (open31 && current31 != Direction.WEST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.NORTHWEST)) {
+        if (open30 && current30 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.NORTH)) {
+        if (open20 && current20 != Direction.NORTH) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.NORTHEAST)) {
+        if (open10 && current10 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.EAST)) {
+        if (open11 && current11 != Direction.EAST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.SOUTHEAST)) {
+        if (open12 && current12 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
         newcost21 = minCost;
         minCost = cost22;
-        if (open23 && (current23 == null || current23 != Direction.SOUTH)) {
+        if (open23 && current23 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.SOUTHWEST)) {
+        if (open33 && current33 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.WEST)) {
+        if (open32 && current32 != Direction.WEST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.NORTHWEST)) {
+        if (open31 && current31 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.NORTH)) {
+        if (open21 && current21 != Direction.NORTH) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.NORTHEAST)) {
+        if (open11 && current11 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.EAST)) {
+        if (open12 && current12 != Direction.EAST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.SOUTHEAST)) {
+        if (open13 && current13 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
         newcost22 = minCost;
         minCost = cost23;
-        if (open24 && (current24 == null || current24 != Direction.SOUTH)) {
+        if (open24 && current24 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost24 + 1);
         }
-        if (open34 && (current34 == null || current34 != Direction.SOUTHWEST)) {
+        if (open34 && current34 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.WEST)) {
+        if (open33 && current33 != Direction.WEST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.NORTHWEST)) {
+        if (open32 && current32 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.NORTH)) {
+        if (open22 && current22 != Direction.NORTH) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.NORTHEAST)) {
+        if (open12 && current12 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.EAST)) {
+        if (open13 && current13 != Direction.EAST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open14 && (current14 == null || current14 != Direction.SOUTHEAST)) {
+        if (open14 && current14 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
         newcost23 = minCost;
         minCost = cost24;
-        if (open34 && (current34 == null || current34 != Direction.WEST)) {
+        if (open34 && current34 != Direction.WEST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.NORTHWEST)) {
+        if (open33 && current33 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.NORTH)) {
+        if (open23 && current23 != Direction.NORTH) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.NORTHEAST)) {
+        if (open13 && current13 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open14 && (current14 == null || current14 != Direction.EAST)) {
+        if (open14 && current14 != Direction.EAST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
         newcost24 = minCost;
         minCost = cost30;
-        if (open31 && (current31 == null || current31 != Direction.SOUTH)) {
+        if (open31 && current31 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.SOUTHWEST)) {
+        if (open41 && current41 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open40 && (current40 == null || current40 != Direction.WEST)) {
+        if (open40 && current40 != Direction.WEST) {
             minCost = Math.min(minCost, cost40 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.EAST)) {
+        if (open20 && current20 != Direction.EAST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.SOUTHEAST)) {
+        if (open21 && current21 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
         newcost30 = minCost;
         minCost = cost31;
-        if (open32 && (current32 == null || current32 != Direction.SOUTH)) {
+        if (open32 && current32 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.SOUTHWEST)) {
+        if (open42 && current42 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.WEST)) {
+        if (open41 && current41 != Direction.WEST) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open40 && (current40 == null || current40 != Direction.NORTHWEST)) {
+        if (open40 && current40 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost40 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.NORTH)) {
+        if (open30 && current30 != Direction.NORTH) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.NORTHEAST)) {
+        if (open20 && current20 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.EAST)) {
+        if (open21 && current21 != Direction.EAST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.SOUTHEAST)) {
+        if (open22 && current22 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
         newcost31 = minCost;
         minCost = cost32;
-        if (open33 && (current33 == null || current33 != Direction.SOUTH)) {
+        if (open33 && current33 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open43 && (current43 == null || current43 != Direction.SOUTHWEST)) {
+        if (open43 && current43 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.WEST)) {
+        if (open42 && current42 != Direction.WEST) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.NORTHWEST)) {
+        if (open41 && current41 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.NORTH)) {
+        if (open31 && current31 != Direction.NORTH) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.NORTHEAST)) {
+        if (open21 && current21 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.EAST)) {
+        if (open22 && current22 != Direction.EAST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.SOUTHEAST)) {
+        if (open23 && current23 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
         newcost32 = minCost;
         minCost = cost33;
-        if (open34 && (current34 == null || current34 != Direction.SOUTH)) {
+        if (open34 && current34 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost34 + 1);
         }
-        if (open44 && (current44 == null || current44 != Direction.SOUTHWEST)) {
+        if (open44 && current44 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost44 + 1);
         }
-        if (open43 && (current43 == null || current43 != Direction.WEST)) {
+        if (open43 && current43 != Direction.WEST) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.NORTHWEST)) {
+        if (open42 && current42 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.NORTH)) {
+        if (open32 && current32 != Direction.NORTH) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.NORTHEAST)) {
+        if (open22 && current22 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.EAST)) {
+        if (open23 && current23 != Direction.EAST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open24 && (current24 == null || current24 != Direction.SOUTHEAST)) {
+        if (open24 && current24 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
         newcost33 = minCost;
         minCost = cost34;
-        if (open44 && (current44 == null || current44 != Direction.WEST)) {
+        if (open44 && current44 != Direction.WEST) {
             minCost = Math.min(minCost, cost44 + 1);
         }
-        if (open43 && (current43 == null || current43 != Direction.NORTHWEST)) {
+        if (open43 && current43 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.NORTH)) {
+        if (open33 && current33 != Direction.NORTH) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.NORTHEAST)) {
+        if (open23 && current23 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open24 && (current24 == null || current24 != Direction.EAST)) {
+        if (open24 && current24 != Direction.EAST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
         newcost34 = minCost;
         minCost = cost40;
-        if (open41 && (current41 == null || current41 != Direction.SOUTH)) {
+        if (open41 && current41 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.EAST)) {
+        if (open30 && current30 != Direction.EAST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.SOUTHEAST)) {
+        if (open31 && current31 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
         newcost40 = minCost;
         minCost = cost41;
-        if (open42 && (current42 == null || current42 != Direction.SOUTH)) {
+        if (open42 && current42 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open40 && (current40 == null || current40 != Direction.NORTH)) {
+        if (open40 && current40 != Direction.NORTH) {
             minCost = Math.min(minCost, cost40 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.NORTHEAST)) {
+        if (open30 && current30 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.EAST)) {
+        if (open31 && current31 != Direction.EAST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.SOUTHEAST)) {
+        if (open32 && current32 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
         newcost41 = minCost;
         minCost = cost42;
-        if (open43 && (current43 == null || current43 != Direction.SOUTH)) {
+        if (open43 && current43 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.NORTH)) {
+        if (open41 && current41 != Direction.NORTH) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.NORTHEAST)) {
+        if (open31 && current31 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.EAST)) {
+        if (open32 && current32 != Direction.EAST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.SOUTHEAST)) {
+        if (open33 && current33 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
         newcost42 = minCost;
         minCost = cost43;
-        if (open44 && (current44 == null || current44 != Direction.SOUTH)) {
+        if (open44 && current44 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost44 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.NORTH)) {
+        if (open42 && current42 != Direction.NORTH) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.NORTHEAST)) {
+        if (open32 && current32 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.EAST)) {
+        if (open33 && current33 != Direction.EAST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open34 && (current34 == null || current34 != Direction.SOUTHEAST)) {
+        if (open34 && current34 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
         newcost43 = minCost;
         minCost = cost44;
-        if (open43 && (current43 == null || current43 != Direction.NORTH)) {
+        if (open43 && current43 != Direction.NORTH) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.NORTHEAST)) {
+        if (open33 && current33 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open34 && (current34 == null || current34 != Direction.EAST)) {
+        if (open34 && current34 != Direction.EAST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
         newcost44 = minCost;
@@ -1418,484 +1418,484 @@ public class BellmanFord {
         cost43 = newcost43;
         cost44 = newcost44;
         minCost = cost00;
-        if (open01 && (current01 == null || current01 != Direction.SOUTH)) {
+        if (open01 && current01 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost01 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.SOUTHWEST)) {
+        if (open11 && current11 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.WEST)) {
+        if (open10 && current10 != Direction.WEST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
         newcost00 = minCost;
         minCost = cost01;
-        if (open02 && (current02 == null || current02 != Direction.SOUTH)) {
+        if (open02 && current02 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost02 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.SOUTHWEST)) {
+        if (open12 && current12 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.WEST)) {
+        if (open11 && current11 != Direction.WEST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.NORTHWEST)) {
+        if (open10 && current10 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open00 && (current00 == null || current00 != Direction.NORTH)) {
+        if (open00 && current00 != Direction.NORTH) {
             minCost = Math.min(minCost, cost00 + 1);
         }
         newcost01 = minCost;
         minCost = cost02;
-        if (open03 && (current03 == null || current03 != Direction.SOUTH)) {
+        if (open03 && current03 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost03 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.SOUTHWEST)) {
+        if (open13 && current13 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.WEST)) {
+        if (open12 && current12 != Direction.WEST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.NORTHWEST)) {
+        if (open11 && current11 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.NORTH)) {
+        if (open01 && current01 != Direction.NORTH) {
             minCost = Math.min(minCost, cost01 + 1);
         }
         newcost02 = minCost;
         minCost = cost03;
-        if (open04 && (current04 == null || current04 != Direction.SOUTH)) {
+        if (open04 && current04 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost04 + 1);
         }
-        if (open14 && (current14 == null || current14 != Direction.SOUTHWEST)) {
+        if (open14 && current14 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.WEST)) {
+        if (open13 && current13 != Direction.WEST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.NORTHWEST)) {
+        if (open12 && current12 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.NORTH)) {
+        if (open02 && current02 != Direction.NORTH) {
             minCost = Math.min(minCost, cost02 + 1);
         }
         newcost03 = minCost;
         minCost = cost04;
-        if (open14 && (current14 == null || current14 != Direction.WEST)) {
+        if (open14 && current14 != Direction.WEST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.NORTHWEST)) {
+        if (open13 && current13 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.NORTH)) {
+        if (open03 && current03 != Direction.NORTH) {
             minCost = Math.min(minCost, cost03 + 1);
         }
         newcost04 = minCost;
         minCost = cost10;
-        if (open11 && (current11 == null || current11 != Direction.SOUTH)) {
+        if (open11 && current11 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.SOUTHWEST)) {
+        if (open21 && current21 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.WEST)) {
+        if (open20 && current20 != Direction.WEST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open00 && (current00 == null || current00 != Direction.EAST)) {
+        if (open00 && current00 != Direction.EAST) {
             minCost = Math.min(minCost, cost00 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.SOUTHEAST)) {
+        if (open01 && current01 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost01 + 1);
         }
         newcost10 = minCost;
         minCost = cost11;
-        if (open12 && (current12 == null || current12 != Direction.SOUTH)) {
+        if (open12 && current12 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.SOUTHWEST)) {
+        if (open22 && current22 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.WEST)) {
+        if (open21 && current21 != Direction.WEST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.NORTHWEST)) {
+        if (open20 && current20 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.NORTH)) {
+        if (open10 && current10 != Direction.NORTH) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open00 && (current00 == null || current00 != Direction.NORTHEAST)) {
+        if (open00 && current00 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost00 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.EAST)) {
+        if (open01 && current01 != Direction.EAST) {
             minCost = Math.min(minCost, cost01 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.SOUTHEAST)) {
+        if (open02 && current02 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost02 + 1);
         }
         newcost11 = minCost;
         minCost = cost12;
-        if (open13 && (current13 == null || current13 != Direction.SOUTH)) {
+        if (open13 && current13 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.SOUTHWEST)) {
+        if (open23 && current23 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.WEST)) {
+        if (open22 && current22 != Direction.WEST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.NORTHWEST)) {
+        if (open21 && current21 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.NORTH)) {
+        if (open11 && current11 != Direction.NORTH) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open01 && (current01 == null || current01 != Direction.NORTHEAST)) {
+        if (open01 && current01 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost01 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.EAST)) {
+        if (open02 && current02 != Direction.EAST) {
             minCost = Math.min(minCost, cost02 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.SOUTHEAST)) {
+        if (open03 && current03 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost03 + 1);
         }
         newcost12 = minCost;
         minCost = cost13;
-        if (open14 && (current14 == null || current14 != Direction.SOUTH)) {
+        if (open14 && current14 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost14 + 1);
         }
-        if (open24 && (current24 == null || current24 != Direction.SOUTHWEST)) {
+        if (open24 && current24 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.WEST)) {
+        if (open23 && current23 != Direction.WEST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.NORTHWEST)) {
+        if (open22 && current22 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.NORTH)) {
+        if (open12 && current12 != Direction.NORTH) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open02 && (current02 == null || current02 != Direction.NORTHEAST)) {
+        if (open02 && current02 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost02 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.EAST)) {
+        if (open03 && current03 != Direction.EAST) {
             minCost = Math.min(minCost, cost03 + 1);
         }
-        if (open04 && (current04 == null || current04 != Direction.SOUTHEAST)) {
+        if (open04 && current04 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost04 + 1);
         }
         newcost13 = minCost;
         minCost = cost14;
-        if (open24 && (current24 == null || current24 != Direction.WEST)) {
+        if (open24 && current24 != Direction.WEST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.NORTHWEST)) {
+        if (open23 && current23 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.NORTH)) {
+        if (open13 && current13 != Direction.NORTH) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open03 && (current03 == null || current03 != Direction.NORTHEAST)) {
+        if (open03 && current03 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost03 + 1);
         }
-        if (open04 && (current04 == null || current04 != Direction.EAST)) {
+        if (open04 && current04 != Direction.EAST) {
             minCost = Math.min(minCost, cost04 + 1);
         }
         newcost14 = minCost;
         minCost = cost20;
-        if (open21 && (current21 == null || current21 != Direction.SOUTH)) {
+        if (open21 && current21 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.SOUTHWEST)) {
+        if (open31 && current31 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.WEST)) {
+        if (open30 && current30 != Direction.WEST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.EAST)) {
+        if (open10 && current10 != Direction.EAST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.SOUTHEAST)) {
+        if (open11 && current11 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
         newcost20 = minCost;
         minCost = cost21;
-        if (open22 && (current22 == null || current22 != Direction.SOUTH)) {
+        if (open22 && current22 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.SOUTHWEST)) {
+        if (open32 && current32 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.WEST)) {
+        if (open31 && current31 != Direction.WEST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.NORTHWEST)) {
+        if (open30 && current30 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.NORTH)) {
+        if (open20 && current20 != Direction.NORTH) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open10 && (current10 == null || current10 != Direction.NORTHEAST)) {
+        if (open10 && current10 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost10 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.EAST)) {
+        if (open11 && current11 != Direction.EAST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.SOUTHEAST)) {
+        if (open12 && current12 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
         newcost21 = minCost;
         minCost = cost22;
-        if (open23 && (current23 == null || current23 != Direction.SOUTH)) {
+        if (open23 && current23 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.SOUTHWEST)) {
+        if (open33 && current33 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.WEST)) {
+        if (open32 && current32 != Direction.WEST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.NORTHWEST)) {
+        if (open31 && current31 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.NORTH)) {
+        if (open21 && current21 != Direction.NORTH) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open11 && (current11 == null || current11 != Direction.NORTHEAST)) {
+        if (open11 && current11 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost11 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.EAST)) {
+        if (open12 && current12 != Direction.EAST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.SOUTHEAST)) {
+        if (open13 && current13 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
         newcost22 = minCost;
         minCost = cost23;
-        if (open24 && (current24 == null || current24 != Direction.SOUTH)) {
+        if (open24 && current24 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost24 + 1);
         }
-        if (open34 && (current34 == null || current34 != Direction.SOUTHWEST)) {
+        if (open34 && current34 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.WEST)) {
+        if (open33 && current33 != Direction.WEST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.NORTHWEST)) {
+        if (open32 && current32 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.NORTH)) {
+        if (open22 && current22 != Direction.NORTH) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open12 && (current12 == null || current12 != Direction.NORTHEAST)) {
+        if (open12 && current12 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost12 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.EAST)) {
+        if (open13 && current13 != Direction.EAST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open14 && (current14 == null || current14 != Direction.SOUTHEAST)) {
+        if (open14 && current14 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
         newcost23 = minCost;
         minCost = cost24;
-        if (open34 && (current34 == null || current34 != Direction.WEST)) {
+        if (open34 && current34 != Direction.WEST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.NORTHWEST)) {
+        if (open33 && current33 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.NORTH)) {
+        if (open23 && current23 != Direction.NORTH) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open13 && (current13 == null || current13 != Direction.NORTHEAST)) {
+        if (open13 && current13 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost13 + 1);
         }
-        if (open14 && (current14 == null || current14 != Direction.EAST)) {
+        if (open14 && current14 != Direction.EAST) {
             minCost = Math.min(minCost, cost14 + 1);
         }
         newcost24 = minCost;
         minCost = cost30;
-        if (open31 && (current31 == null || current31 != Direction.SOUTH)) {
+        if (open31 && current31 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.SOUTHWEST)) {
+        if (open41 && current41 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open40 && (current40 == null || current40 != Direction.WEST)) {
+        if (open40 && current40 != Direction.WEST) {
             minCost = Math.min(minCost, cost40 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.EAST)) {
+        if (open20 && current20 != Direction.EAST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.SOUTHEAST)) {
+        if (open21 && current21 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
         newcost30 = minCost;
         minCost = cost31;
-        if (open32 && (current32 == null || current32 != Direction.SOUTH)) {
+        if (open32 && current32 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.SOUTHWEST)) {
+        if (open42 && current42 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.WEST)) {
+        if (open41 && current41 != Direction.WEST) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open40 && (current40 == null || current40 != Direction.NORTHWEST)) {
+        if (open40 && current40 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost40 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.NORTH)) {
+        if (open30 && current30 != Direction.NORTH) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open20 && (current20 == null || current20 != Direction.NORTHEAST)) {
+        if (open20 && current20 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost20 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.EAST)) {
+        if (open21 && current21 != Direction.EAST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.SOUTHEAST)) {
+        if (open22 && current22 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
         newcost31 = minCost;
         minCost = cost32;
-        if (open33 && (current33 == null || current33 != Direction.SOUTH)) {
+        if (open33 && current33 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open43 && (current43 == null || current43 != Direction.SOUTHWEST)) {
+        if (open43 && current43 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.WEST)) {
+        if (open42 && current42 != Direction.WEST) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.NORTHWEST)) {
+        if (open41 && current41 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.NORTH)) {
+        if (open31 && current31 != Direction.NORTH) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open21 && (current21 == null || current21 != Direction.NORTHEAST)) {
+        if (open21 && current21 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost21 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.EAST)) {
+        if (open22 && current22 != Direction.EAST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.SOUTHEAST)) {
+        if (open23 && current23 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
         newcost32 = minCost;
         minCost = cost33;
-        if (open34 && (current34 == null || current34 != Direction.SOUTH)) {
+        if (open34 && current34 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost34 + 1);
         }
-        if (open44 && (current44 == null || current44 != Direction.SOUTHWEST)) {
+        if (open44 && current44 != Direction.SOUTHWEST) {
             minCost = Math.min(minCost, cost44 + 1);
         }
-        if (open43 && (current43 == null || current43 != Direction.WEST)) {
+        if (open43 && current43 != Direction.WEST) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.NORTHWEST)) {
+        if (open42 && current42 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.NORTH)) {
+        if (open32 && current32 != Direction.NORTH) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open22 && (current22 == null || current22 != Direction.NORTHEAST)) {
+        if (open22 && current22 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost22 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.EAST)) {
+        if (open23 && current23 != Direction.EAST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open24 && (current24 == null || current24 != Direction.SOUTHEAST)) {
+        if (open24 && current24 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
         newcost33 = minCost;
         minCost = cost34;
-        if (open44 && (current44 == null || current44 != Direction.WEST)) {
+        if (open44 && current44 != Direction.WEST) {
             minCost = Math.min(minCost, cost44 + 1);
         }
-        if (open43 && (current43 == null || current43 != Direction.NORTHWEST)) {
+        if (open43 && current43 != Direction.NORTHWEST) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.NORTH)) {
+        if (open33 && current33 != Direction.NORTH) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open23 && (current23 == null || current23 != Direction.NORTHEAST)) {
+        if (open23 && current23 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost23 + 1);
         }
-        if (open24 && (current24 == null || current24 != Direction.EAST)) {
+        if (open24 && current24 != Direction.EAST) {
             minCost = Math.min(minCost, cost24 + 1);
         }
         newcost34 = minCost;
         minCost = cost40;
-        if (open41 && (current41 == null || current41 != Direction.SOUTH)) {
+        if (open41 && current41 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.EAST)) {
+        if (open30 && current30 != Direction.EAST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.SOUTHEAST)) {
+        if (open31 && current31 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
         newcost40 = minCost;
         minCost = cost41;
-        if (open42 && (current42 == null || current42 != Direction.SOUTH)) {
+        if (open42 && current42 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open40 && (current40 == null || current40 != Direction.NORTH)) {
+        if (open40 && current40 != Direction.NORTH) {
             minCost = Math.min(minCost, cost40 + 1);
         }
-        if (open30 && (current30 == null || current30 != Direction.NORTHEAST)) {
+        if (open30 && current30 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost30 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.EAST)) {
+        if (open31 && current31 != Direction.EAST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.SOUTHEAST)) {
+        if (open32 && current32 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
         newcost41 = minCost;
         minCost = cost42;
-        if (open43 && (current43 == null || current43 != Direction.SOUTH)) {
+        if (open43 && current43 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open41 && (current41 == null || current41 != Direction.NORTH)) {
+        if (open41 && current41 != Direction.NORTH) {
             minCost = Math.min(minCost, cost41 + 1);
         }
-        if (open31 && (current31 == null || current31 != Direction.NORTHEAST)) {
+        if (open31 && current31 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost31 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.EAST)) {
+        if (open32 && current32 != Direction.EAST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.SOUTHEAST)) {
+        if (open33 && current33 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
         newcost42 = minCost;
         minCost = cost43;
-        if (open44 && (current44 == null || current44 != Direction.SOUTH)) {
+        if (open44 && current44 != Direction.SOUTH) {
             minCost = Math.min(minCost, cost44 + 1);
         }
-        if (open42 && (current42 == null || current42 != Direction.NORTH)) {
+        if (open42 && current42 != Direction.NORTH) {
             minCost = Math.min(minCost, cost42 + 1);
         }
-        if (open32 && (current32 == null || current32 != Direction.NORTHEAST)) {
+        if (open32 && current32 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost32 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.EAST)) {
+        if (open33 && current33 != Direction.EAST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open34 && (current34 == null || current34 != Direction.SOUTHEAST)) {
+        if (open34 && current34 != Direction.SOUTHEAST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
         newcost43 = minCost;
         minCost = cost44;
-        if (open43 && (current43 == null || current43 != Direction.NORTH)) {
+        if (open43 && current43 != Direction.NORTH) {
             minCost = Math.min(minCost, cost43 + 1);
         }
-        if (open33 && (current33 == null || current33 != Direction.NORTHEAST)) {
+        if (open33 && current33 != Direction.NORTHEAST) {
             minCost = Math.min(minCost, cost33 + 1);
         }
-        if (open34 && (current34 == null || current34 != Direction.EAST)) {
+        if (open34 && current34 != Direction.EAST) {
             minCost = Math.min(minCost, cost34 + 1);
         }
         newcost44 = minCost;
@@ -1927,49 +1927,49 @@ public class BellmanFord {
 
         Direction bestDir = Direction.CENTER;
         int bestCost = 2147483647;
-        if (open23 && (current23 == null || current23 != Direction.SOUTH)) {
+        if (open23 && current23 != Direction.SOUTH) {
             if (cost23 < bestCost) {
                 bestCost = cost23;
                 bestDir = Direction.NORTH;
             }
         }
-        if (open33 && (current33 == null || current33 != Direction.SOUTHWEST)) {
+        if (open33 && current33 != Direction.SOUTHWEST) {
             if (cost33 < bestCost) {
                 bestCost = cost33;
                 bestDir = Direction.NORTHEAST;
             }
         }
-        if (open32 && (current32 == null || current32 != Direction.WEST)) {
+        if (open32 && current32 != Direction.WEST) {
             if (cost32 < bestCost) {
                 bestCost = cost32;
                 bestDir = Direction.EAST;
             }
         }
-        if (open31 && (current31 == null || current31 != Direction.NORTHWEST)) {
+        if (open31 && current31 != Direction.NORTHWEST) {
             if (cost31 < bestCost) {
                 bestCost = cost31;
                 bestDir = Direction.SOUTHEAST;
             }
         }
-        if (open21 && (current21 == null || current21 != Direction.NORTH)) {
+        if (open21 && current21 != Direction.NORTH) {
             if (cost21 < bestCost) {
                 bestCost = cost21;
                 bestDir = Direction.SOUTH;
             }
         }
-        if (open11 && (current11 == null || current11 != Direction.NORTHEAST)) {
+        if (open11 && current11 != Direction.NORTHEAST) {
             if (cost11 < bestCost) {
                 bestCost = cost11;
                 bestDir = Direction.SOUTHWEST;
             }
         }
-        if (open12 && (current12 == null || current12 != Direction.EAST)) {
+        if (open12 && current12 != Direction.EAST) {
             if (cost12 < bestCost) {
                 bestCost = cost12;
                 bestDir = Direction.WEST;
             }
         }
-        if (open13 && (current13 == null || current13 != Direction.SOUTHEAST)) {
+        if (open13 && current13 != Direction.SOUTHEAST) {
             if (cost13 < bestCost) {
                 bestCost = cost13;
                 bestDir = Direction.NORTHWEST;
@@ -1980,6 +1980,460 @@ public class BellmanFord {
         if (rc.canMove(bestDir)) {
             rc.move(bestDir);
         }
+
+        if (rc.isMovementReady() && moveTwice) {
+            bestCost = 2147483647;
+            if (bestDir == Direction.NORTH) {
+                bestDir = Direction.CENTER;
+                if (open24 && current24 != Direction.SOUTH) {
+                    if (cost24 < bestCost) {
+                        bestCost = cost24;
+                        bestDir = Direction.NORTH;
+                    }
+                }
+                if (open24 && current24 != Direction.SOUTHWEST) {
+                    if (cost24 < bestCost) {
+                        bestCost = cost24;
+                        bestDir = Direction.NORTH;
+                    }
+                }
+                if (open24 && current24 != Direction.WEST) {
+                    if (cost24 < bestCost) {
+                        bestCost = cost24;
+                        bestDir = Direction.NORTH;
+                    }
+                }
+                if (open24 && current24 != Direction.NORTHWEST) {
+                    if (cost24 < bestCost) {
+                        bestCost = cost24;
+                        bestDir = Direction.NORTH;
+                    }
+                }
+                if (open24 && current24 != Direction.NORTH) {
+                    if (cost24 < bestCost) {
+                        bestCost = cost24;
+                        bestDir = Direction.NORTH;
+                    }
+                }
+                if (open24 && current24 != Direction.NORTHEAST) {
+                    if (cost24 < bestCost) {
+                        bestCost = cost24;
+                        bestDir = Direction.NORTH;
+                    }
+                }
+                if (open24 && current24 != Direction.EAST) {
+                    if (cost24 < bestCost) {
+                        bestCost = cost24;
+                        bestDir = Direction.NORTH;
+                    }
+                }
+                if (open24 && current24 != Direction.SOUTHEAST) {
+                    if (cost24 < bestCost) {
+                        bestCost = cost24;
+                        bestDir = Direction.NORTH;
+                    }
+                }
+                if (rc.canMove(bestDir)) {
+                    rc.move(bestDir);
+                    return true;
+                }
+                return false;
+            }
+            if (bestDir == Direction.NORTHEAST) {
+                bestDir = Direction.CENTER;
+                if (open44 && current44 != Direction.SOUTH) {
+                    if (cost44 < bestCost) {
+                        bestCost = cost44;
+                        bestDir = Direction.NORTHEAST;
+                    }
+                }
+                if (open44 && current44 != Direction.SOUTHWEST) {
+                    if (cost44 < bestCost) {
+                        bestCost = cost44;
+                        bestDir = Direction.NORTHEAST;
+                    }
+                }
+                if (open44 && current44 != Direction.WEST) {
+                    if (cost44 < bestCost) {
+                        bestCost = cost44;
+                        bestDir = Direction.NORTHEAST;
+                    }
+                }
+                if (open44 && current44 != Direction.NORTHWEST) {
+                    if (cost44 < bestCost) {
+                        bestCost = cost44;
+                        bestDir = Direction.NORTHEAST;
+                    }
+                }
+                if (open44 && current44 != Direction.NORTH) {
+                    if (cost44 < bestCost) {
+                        bestCost = cost44;
+                        bestDir = Direction.NORTHEAST;
+                    }
+                }
+                if (open44 && current44 != Direction.NORTHEAST) {
+                    if (cost44 < bestCost) {
+                        bestCost = cost44;
+                        bestDir = Direction.NORTHEAST;
+                    }
+                }
+                if (open44 && current44 != Direction.EAST) {
+                    if (cost44 < bestCost) {
+                        bestCost = cost44;
+                        bestDir = Direction.NORTHEAST;
+                    }
+                }
+                if (open44 && current44 != Direction.SOUTHEAST) {
+                    if (cost44 < bestCost) {
+                        bestCost = cost44;
+                        bestDir = Direction.NORTHEAST;
+                    }
+                }
+                if (rc.canMove(bestDir)) {
+                    rc.move(bestDir);
+                    return true;
+                }
+                return false;
+            }
+            if (bestDir == Direction.EAST) {
+                bestDir = Direction.CENTER;
+                if (open42 && current42 != Direction.SOUTH) {
+                    if (cost42 < bestCost) {
+                        bestCost = cost42;
+                        bestDir = Direction.EAST;
+                    }
+                }
+                if (open42 && current42 != Direction.SOUTHWEST) {
+                    if (cost42 < bestCost) {
+                        bestCost = cost42;
+                        bestDir = Direction.EAST;
+                    }
+                }
+                if (open42 && current42 != Direction.WEST) {
+                    if (cost42 < bestCost) {
+                        bestCost = cost42;
+                        bestDir = Direction.EAST;
+                    }
+                }
+                if (open42 && current42 != Direction.NORTHWEST) {
+                    if (cost42 < bestCost) {
+                        bestCost = cost42;
+                        bestDir = Direction.EAST;
+                    }
+                }
+                if (open42 && current42 != Direction.NORTH) {
+                    if (cost42 < bestCost) {
+                        bestCost = cost42;
+                        bestDir = Direction.EAST;
+                    }
+                }
+                if (open42 && current42 != Direction.NORTHEAST) {
+                    if (cost42 < bestCost) {
+                        bestCost = cost42;
+                        bestDir = Direction.EAST;
+                    }
+                }
+                if (open42 && current42 != Direction.EAST) {
+                    if (cost42 < bestCost) {
+                        bestCost = cost42;
+                        bestDir = Direction.EAST;
+                    }
+                }
+                if (open42 && current42 != Direction.SOUTHEAST) {
+                    if (cost42 < bestCost) {
+                        bestCost = cost42;
+                        bestDir = Direction.EAST;
+                    }
+                }
+                if (rc.canMove(bestDir)) {
+                    rc.move(bestDir);
+                    return true;
+                }
+                return false;
+            }
+            if (bestDir == Direction.SOUTHEAST) {
+                bestDir = Direction.CENTER;
+                if (open40 && current40 != Direction.SOUTH) {
+                    if (cost40 < bestCost) {
+                        bestCost = cost40;
+                        bestDir = Direction.SOUTHEAST;
+                    }
+                }
+                if (open40 && current40 != Direction.SOUTHWEST) {
+                    if (cost40 < bestCost) {
+                        bestCost = cost40;
+                        bestDir = Direction.SOUTHEAST;
+                    }
+                }
+                if (open40 && current40 != Direction.WEST) {
+                    if (cost40 < bestCost) {
+                        bestCost = cost40;
+                        bestDir = Direction.SOUTHEAST;
+                    }
+                }
+                if (open40 && current40 != Direction.NORTHWEST) {
+                    if (cost40 < bestCost) {
+                        bestCost = cost40;
+                        bestDir = Direction.SOUTHEAST;
+                    }
+                }
+                if (open40 && current40 != Direction.NORTH) {
+                    if (cost40 < bestCost) {
+                        bestCost = cost40;
+                        bestDir = Direction.SOUTHEAST;
+                    }
+                }
+                if (open40 && current40 != Direction.NORTHEAST) {
+                    if (cost40 < bestCost) {
+                        bestCost = cost40;
+                        bestDir = Direction.SOUTHEAST;
+                    }
+                }
+                if (open40 && current40 != Direction.EAST) {
+                    if (cost40 < bestCost) {
+                        bestCost = cost40;
+                        bestDir = Direction.SOUTHEAST;
+                    }
+                }
+                if (open40 && current40 != Direction.SOUTHEAST) {
+                    if (cost40 < bestCost) {
+                        bestCost = cost40;
+                        bestDir = Direction.SOUTHEAST;
+                    }
+                }
+                if (rc.canMove(bestDir)) {
+                    rc.move(bestDir);
+                    return true;
+                }
+                return false;
+            }
+            if (bestDir == Direction.SOUTH) {
+                bestDir = Direction.CENTER;
+                if (open20 && current20 != Direction.SOUTH) {
+                    if (cost20 < bestCost) {
+                        bestCost = cost20;
+                        bestDir = Direction.SOUTH;
+                    }
+                }
+                if (open20 && current20 != Direction.SOUTHWEST) {
+                    if (cost20 < bestCost) {
+                        bestCost = cost20;
+                        bestDir = Direction.SOUTH;
+                    }
+                }
+                if (open20 && current20 != Direction.WEST) {
+                    if (cost20 < bestCost) {
+                        bestCost = cost20;
+                        bestDir = Direction.SOUTH;
+                    }
+                }
+                if (open20 && current20 != Direction.NORTHWEST) {
+                    if (cost20 < bestCost) {
+                        bestCost = cost20;
+                        bestDir = Direction.SOUTH;
+                    }
+                }
+                if (open20 && current20 != Direction.NORTH) {
+                    if (cost20 < bestCost) {
+                        bestCost = cost20;
+                        bestDir = Direction.SOUTH;
+                    }
+                }
+                if (open20 && current20 != Direction.NORTHEAST) {
+                    if (cost20 < bestCost) {
+                        bestCost = cost20;
+                        bestDir = Direction.SOUTH;
+                    }
+                }
+                if (open20 && current20 != Direction.EAST) {
+                    if (cost20 < bestCost) {
+                        bestCost = cost20;
+                        bestDir = Direction.SOUTH;
+                    }
+                }
+                if (open20 && current20 != Direction.SOUTHEAST) {
+                    if (cost20 < bestCost) {
+                        bestCost = cost20;
+                        bestDir = Direction.SOUTH;
+                    }
+                }
+                if (rc.canMove(bestDir)) {
+                    rc.move(bestDir);
+                    return true;
+                }
+                return false;
+            }
+            if (bestDir == Direction.SOUTHWEST) {
+                bestDir = Direction.CENTER;
+                if (open00 && current00 != Direction.SOUTH) {
+                    if (cost00 < bestCost) {
+                        bestCost = cost00;
+                        bestDir = Direction.SOUTHWEST;
+                    }
+                }
+                if (open00 && current00 != Direction.SOUTHWEST) {
+                    if (cost00 < bestCost) {
+                        bestCost = cost00;
+                        bestDir = Direction.SOUTHWEST;
+                    }
+                }
+                if (open00 && current00 != Direction.WEST) {
+                    if (cost00 < bestCost) {
+                        bestCost = cost00;
+                        bestDir = Direction.SOUTHWEST;
+                    }
+                }
+                if (open00 && current00 != Direction.NORTHWEST) {
+                    if (cost00 < bestCost) {
+                        bestCost = cost00;
+                        bestDir = Direction.SOUTHWEST;
+                    }
+                }
+                if (open00 && current00 != Direction.NORTH) {
+                    if (cost00 < bestCost) {
+                        bestCost = cost00;
+                        bestDir = Direction.SOUTHWEST;
+                    }
+                }
+                if (open00 && current00 != Direction.NORTHEAST) {
+                    if (cost00 < bestCost) {
+                        bestCost = cost00;
+                        bestDir = Direction.SOUTHWEST;
+                    }
+                }
+                if (open00 && current00 != Direction.EAST) {
+                    if (cost00 < bestCost) {
+                        bestCost = cost00;
+                        bestDir = Direction.SOUTHWEST;
+                    }
+                }
+                if (open00 && current00 != Direction.SOUTHEAST) {
+                    if (cost00 < bestCost) {
+                        bestCost = cost00;
+                        bestDir = Direction.SOUTHWEST;
+                    }
+                }
+                if (rc.canMove(bestDir)) {
+                    rc.move(bestDir);
+                    return true;
+                }
+                return false;
+            }
+            if (bestDir == Direction.WEST) {
+                bestDir = Direction.CENTER;
+                if (open02 && current02 != Direction.SOUTH) {
+                    if (cost02 < bestCost) {
+                        bestCost = cost02;
+                        bestDir = Direction.WEST;
+                    }
+                }
+                if (open02 && current02 != Direction.SOUTHWEST) {
+                    if (cost02 < bestCost) {
+                        bestCost = cost02;
+                        bestDir = Direction.WEST;
+                    }
+                }
+                if (open02 && current02 != Direction.WEST) {
+                    if (cost02 < bestCost) {
+                        bestCost = cost02;
+                        bestDir = Direction.WEST;
+                    }
+                }
+                if (open02 && current02 != Direction.NORTHWEST) {
+                    if (cost02 < bestCost) {
+                        bestCost = cost02;
+                        bestDir = Direction.WEST;
+                    }
+                }
+                if (open02 && current02 != Direction.NORTH) {
+                    if (cost02 < bestCost) {
+                        bestCost = cost02;
+                        bestDir = Direction.WEST;
+                    }
+                }
+                if (open02 && current02 != Direction.NORTHEAST) {
+                    if (cost02 < bestCost) {
+                        bestCost = cost02;
+                        bestDir = Direction.WEST;
+                    }
+                }
+                if (open02 && current02 != Direction.EAST) {
+                    if (cost02 < bestCost) {
+                        bestCost = cost02;
+                        bestDir = Direction.WEST;
+                    }
+                }
+                if (open02 && current02 != Direction.SOUTHEAST) {
+                    if (cost02 < bestCost) {
+                        bestCost = cost02;
+                        bestDir = Direction.WEST;
+                    }
+                }
+                if (rc.canMove(bestDir)) {
+                    rc.move(bestDir);
+                    return true;
+                }
+                return false;
+            }
+            if (bestDir == Direction.NORTHWEST) {
+                bestDir = Direction.CENTER;
+                if (open04 && current04 != Direction.SOUTH) {
+                    if (cost04 < bestCost) {
+                        bestCost = cost04;
+                        bestDir = Direction.NORTHWEST;
+                    }
+                }
+                if (open04 && current04 != Direction.SOUTHWEST) {
+                    if (cost04 < bestCost) {
+                        bestCost = cost04;
+                        bestDir = Direction.NORTHWEST;
+                    }
+                }
+                if (open04 && current04 != Direction.WEST) {
+                    if (cost04 < bestCost) {
+                        bestCost = cost04;
+                        bestDir = Direction.NORTHWEST;
+                    }
+                }
+                if (open04 && current04 != Direction.NORTHWEST) {
+                    if (cost04 < bestCost) {
+                        bestCost = cost04;
+                        bestDir = Direction.NORTHWEST;
+                    }
+                }
+                if (open04 && current04 != Direction.NORTH) {
+                    if (cost04 < bestCost) {
+                        bestCost = cost04;
+                        bestDir = Direction.NORTHWEST;
+                    }
+                }
+                if (open04 && current04 != Direction.NORTHEAST) {
+                    if (cost04 < bestCost) {
+                        bestCost = cost04;
+                        bestDir = Direction.NORTHWEST;
+                    }
+                }
+                if (open04 && current04 != Direction.EAST) {
+                    if (cost04 < bestCost) {
+                        bestCost = cost04;
+                        bestDir = Direction.NORTHWEST;
+                    }
+                }
+                if (open04 && current04 != Direction.SOUTHEAST) {
+                    if (cost04 < bestCost) {
+                        bestCost = cost04;
+                        bestDir = Direction.NORTHWEST;
+                    }
+                }
+                if (rc.canMove(bestDir)) {
+                    rc.move(bestDir);
+                    return true;
+                }
+                return false;
+            }
+
+        }
+        return false;
     }
 }
 

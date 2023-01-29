@@ -32,7 +32,7 @@ public class HQStrategy {
 	static final int ANCHOR_LIMIT = 2;
 	static final int TURNS_PER_ANCHOR = 80;
 	static final double ANCHOR_MAP_FRAC = 0.1; // the portion of the map to cover before building anchors
-	static final int ELIXIR_START_TURN = 500;
+	static final int ELIXIR_START_TURN = 5000;
 	static final int ELIXIR_RADIUS = 360;
 	
 	static MapLocation buildTarget;

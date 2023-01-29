@@ -93,7 +93,11 @@ public class CarrierStrategy {
         // If novel well, turn on reporting mode (sends carrier back to HQ to report finding)
         for (int i = WELLLOC_MAX_IDX; i >= 0; i--) {
             if (wellLocs[i] != null && !Communication.isWellWritten(rc, wellLocs[i])) { // if any location is not written, turn on reportMode to go back to hq
-                state = CarrierState.REPORT;
+                if (rc.readSharedArray(63) == 0) {
+                    state = CarrierState.REPORT;
+                } else {
+                    wellLoc = new MapLocation(wellLocs[i].x, wellLocs[i].y);
+                }
                 break;
             }
         }
@@ -154,14 +158,15 @@ public class CarrierStrategy {
         if (rc.getAnchor() != null) {
             state = CarrierState.ANCHOR;
         }
-
-        // MODE-BASED ACTIONS
         int total = getTotalResources(rc);
+        boolean collectedResource = false;
+        if (wellLoc != null && rc.canCollectResource(wellLoc, -1)) {
+            rc.collectResource(wellLoc, -1);
+            collectedResource = true;
+        }
+        // MODE-BASED ACTIONS
         switch (state) {
             case DEFAULT:
-                if (wellLoc != null && rc.canCollectResource(wellLoc, -1)) {
-                    rc.collectResource(wellLoc, -1);
-                }
                 if (total < 39) {
                     //move towards well or search for well
                     if (wellLoc == null) {
@@ -201,24 +206,15 @@ public class CarrierStrategy {
 //                }
 //                break;
             case SEARCH:
-                if (wellLoc != null && rc.canCollectResource(wellLoc, -1)) {
-                    rc.collectResource(wellLoc, -1);
-                }
                 if (adWellLoc != null) {
                     adWellLoc = Communication.getNearestWellOfType(rc, ResourceType.ADAMANTIUM);
                 }
                 nextLoc = Pathing.findManaWell(rc, adWellLoc, hqLoc);
                 break;
             case REPORT:
-                if (wellLoc != null && rc.canCollectResource(wellLoc, -1)) {
-                    rc.collectResource(wellLoc, -1);
-                }
                 nextLoc = hqLoc;
                 break;
             case DANGER:
-                if (wellLoc != null && rc.canCollectResource(wellLoc, -1)) {
-                    rc.collectResource(wellLoc, -1);
-                }
                 if (rc.getHealth() < ATTACK_HEALTH_THRESH) {
                     if (target != null) {
                         if (rc.canAttack(target.getLocation()))
@@ -279,13 +275,12 @@ public class CarrierStrategy {
                 break;
         }
 
-//        rc.setIndicatorString(state.toString());
-
+        boolean shouldMoveTwice = (state == CarrierState.DEFAULT && !collectedResource) || state == CarrierState.REPORT || state == CarrierState.SEARCH || state == CarrierState.DANGER;
         // PERFORM MOVEMENT
         if (nextLoc == null) {
             RobotPlayer.moveRandom(rc);
         } else {
-            Pathing.moveTowards(rc, nextLoc, bugOverride);
+            Pathing.moveTowards(rc, nextLoc, bugOverride, shouldMoveTwice);
             rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 0, 1);
         }
 
