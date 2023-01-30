@@ -171,6 +171,7 @@ public class LauncherStrategy {
         } else {
             rc.setIndicatorString("Failed to attack");
         }
+        // shoot-move (if doing move-shoot nextLoc gets reset the next turn)
         if (targetLoc.distanceSquaredTo(rc.getLocation()) <= 20) {
             Direction d = targetLoc.directionTo(rc.getLocation());
             nextLoc = rc.getLocation().add(d).add(d);

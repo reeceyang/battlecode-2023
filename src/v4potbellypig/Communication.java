@@ -47,7 +47,7 @@ class Communication {
     static final int RESOURCE_TYPE_MASK = 0b11;
     static final int CONGESTION_MASK = 0b100;
 
-    private static List<Message> messagesQueue = new ArrayList<>();
+    private static SusList messagesQueue = new SusList(OUTDATED_TURNS_AMOUNT, 100);
     public static MapLocation[] headquarterLocs = new MapLocation[GameConstants.MAX_STARTING_HEADQUARTERS];
 
 
@@ -157,15 +157,27 @@ class Communication {
     }
 
     static void tryWriteMessages(RobotController rc) throws GameActionException {
-        messagesQueue.removeIf(msg -> msg.turnAdded + OUTDATED_TURNS_AMOUNT < RobotPlayer.turnCount);
+//        messagesQueue.removeIf(msg -> msg.turnAdded + OUTDATED_TURNS_AMOUNT < RobotPlayer.turnCount);
         // Can always write (0, 0), so just checks are we in range to write
         if (rc.canWriteSharedArray(0, 0)) {
-            while (messagesQueue.size() > 0 ) {
-                Message msg = messagesQueue.remove(0);
-                if (rc.canWriteSharedArray(msg.idx, msg.value)) {
-                    rc.writeSharedArray(msg.idx, msg.value);
+            for (int i = 0; i < messagesQueue.LENGTH; i++) {
+                Message msg = messagesQueue.list[i];
+                if (msg == null) continue;
+                if (!(msg.turnAdded + OUTDATED_TURNS_AMOUNT < RobotPlayer.turnCount)) {
+                    // not outdated, write to shared array
+                    if (rc.canWriteSharedArray(msg.idx, msg.value)) {
+                        rc.writeSharedArray(msg.idx, msg.value);
+                    }
                 }
+                // clear the message
+                messagesQueue.list[i] = null;
             }
+//            while (messagesQueue.size() > 0 ) {
+//                Message msg = messagesQueue.remove(0);
+//                if (rc.canWriteSharedArray(msg.idx, msg.value)) {
+//                    rc.writeSharedArray(msg.idx, msg.value);
+//                }
+//            }
         }
     }
 
