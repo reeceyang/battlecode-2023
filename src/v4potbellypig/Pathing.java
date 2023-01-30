@@ -19,7 +19,7 @@ public class Pathing {
 	static final int BUG_MODE_TIME_LIMIT = 100;
 
     static void moveTowards(RobotController rc, MapLocation target, boolean bugOverride, boolean moveTwice) throws GameActionException {
-    	
+
         if (rc.getLocation().equals(target)) {
             return;
         }
@@ -29,10 +29,11 @@ public class Pathing {
 		if (target != previousTarget) {
 			previousTarget = target;
 			closest = Integer.MAX_VALUE;
+		}
+		if (rc.getLocation().isAdjacentTo(target)) {
 			bugMode = false;
 			progressCountdown = TIME_LIMIT;
 		}
-		moveTwice = false;
 		// apply bug mode override
 		if (bugOverride) bugMode = true;
 		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target);

@@ -48,8 +48,7 @@ public strictfp class RobotPlayer {
         if (turnCount == 1) {
             ISLAND_COUNT = rc.getIslandCount();
         }
-
-        if (rc.getRoundNum() < 100) {
+        if (rc.getRoundNum() < 60) {
             if ((7*rc.getID()) % 100 > 50) {
                 demanded = ResourceType.MANA;
             } else {
