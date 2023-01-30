@@ -29,7 +29,10 @@ public class Pathing {
 		if (target != previousTarget) {
 			previousTarget = target;
 			closest = Integer.MAX_VALUE;
+			bugMode = false;
+			progressCountdown = TIME_LIMIT;
 		}
+		moveTwice = false;
 		// apply bug mode override
 		if (bugOverride) bugMode = true;
 		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target);

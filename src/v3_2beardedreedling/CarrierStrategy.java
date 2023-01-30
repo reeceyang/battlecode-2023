@@ -36,14 +36,14 @@ public class CarrierStrategy {
     	}
         if (demanded == null) {
             if (rc.getRoundNum() < 100) {
-                if (rc.getID() % 100 > 30) {
+                if (rc.getID() % 100 > 50) {
                     demanded = ResourceType.MANA;
                 } else {
                     demanded = ResourceType.ADAMANTIUM;
                 }
             }
             else {
-                if (rc.getID() % 100 > 20) {
+                if (rc.getID() % 100 > 10) {
                     demanded = ResourceType.MANA;
                 } else {
                     demanded = ResourceType.ADAMANTIUM;

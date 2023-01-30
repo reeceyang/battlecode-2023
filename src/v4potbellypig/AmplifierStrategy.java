@@ -85,7 +85,7 @@ public class AmplifierStrategy {
                     }
                     if (!isEmpty && rc.senseWell(loc) == null && rc.senseIsland(loc) == -1 && emptyIndex < emptyClouds.length) {
                         emptyClouds[emptyIndex] = loc;
-                        System.out.println(emptyIndex + " " + loc);
+//                        System.out.println(emptyIndex + " " + loc);
                         emptyIndex++;
                     }
                 }
@@ -220,8 +220,8 @@ public class AmplifierStrategy {
                 }
             }
 
-            MapLocation[] adWellLocs = new MapLocation[]{null, null, null, null, null};
-            MapLocation[] manaWellLocs = new MapLocation[]{null, null, null, null, null};
+            MapLocation[] adWellLocs = new MapLocation[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
+            MapLocation[] manaWellLocs = new MapLocation[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
             for (int idx = Communication.STARTING_WELL_IDX; idx < GameConstants.SHARED_ARRAY_LENGTH; idx++) {
                 if (Communication.getWellType(rc, idx) == ResourceType.ADAMANTIUM) {
                     adWellLocs[idx - Communication.STARTING_WELL_IDX] = Communication.readWellLocation(rc, idx);
@@ -325,7 +325,7 @@ public class AmplifierStrategy {
                         int island = rc.senseIsland(target_xloc);
                         if (island == -1) {
                             rc.setIndicatorLine(target_xloc, Communication.readIslandLocation(rc, idx - Communication.STARTING_ISLAND_IDX),0, 0, 0);
-                            System.out.println(target_xloc);
+//                            System.out.println(target_xloc);
                             Communication.updateSymmetryInfo(rc, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
                         }
                     }

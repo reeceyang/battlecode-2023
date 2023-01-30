@@ -136,7 +136,7 @@ public class LauncherStrategy {
 //        		nextLoc = rc.getLocation().add(overrideDirection).add(overrideDirection);
 //        	}
         	Pathing.moveTowards(rc, nextLoc, bugOverride, false);
-        	rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 255, 0);
+//        	rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 255, 0);
 //            rc.setIndicatorString(nextLoc + " " + rc.getLocation());
         }
     }
