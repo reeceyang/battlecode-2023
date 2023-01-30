@@ -7,7 +7,7 @@ public class Pathing {
 	static final int baseExclusionRadius = 16;
     // Basic bug nav - Bug 0
 	
-	static boolean leftHanded = false;
+	public static boolean leftHanded = false;
 	static final int STUCK_RADIUS_SQ = 16;
 
     static Direction currentDirection = null;
@@ -28,7 +28,7 @@ public class Pathing {
         }
 		if (target != previousTarget) {
 			previousTarget = target;
-			closest = Integer.MAX_VALUE;
+			closest = rc.getLocation().distanceSquaredTo(target);
 		}
 		if (rc.getLocation().isAdjacentTo(target)) {
 			bugMode = false;
@@ -48,7 +48,7 @@ public class Pathing {
 			}
 		}
 		int currentDistance = rc.getLocation().distanceSquaredTo(target);
-		if (currentDistance <= closest) {
+		if (currentDistance < closest) {
 			closest = currentDistance;
 		} else {
 			progressCountdown--;
@@ -62,7 +62,12 @@ public class Pathing {
 	static void doBugMode(RobotController rc, MapLocation target) throws GameActionException {
 //rc.setIndicatorString("bug mode " + progressCountdown + " left");
 		Direction d = rc.getLocation().directionTo(target);
-		if (rc.canMove(d)) {
+		// this is the direction of the current on the next location
+		MapLocation next = rc.getLocation().add(d);
+		Direction current = null;
+		if (rc.canSenseLocation(next)) current = rc.senseMapInfo(next).getCurrentDirection();
+		// don't move into an opposing current
+		if (rc.canMove(d) && current != d.opposite()) {
 			rc.move(d);
 			currentDirection = null; // there is no obstacle we're going around
 		} else {
@@ -74,7 +79,10 @@ public class Pathing {
 			}
 			// Try to move in a way that keeps the obstacle on our right or left
 			for (int i = 0; i < 8; i++) {
-				if (rc.canMove(currentDirection)) {
+				// currentDirection is the direction we are considering going to, not the direction of the current!
+				current = null;
+				if (rc.canSenseLocation(next)) current = rc.senseMapInfo(next).getCurrentDirection();
+				if (rc.canMove(currentDirection) && current != currentDirection.opposite()) {
 					rc.move(currentDirection);
 					if (leftHanded) {
 						currentDirection = currentDirection.rotateRight();
