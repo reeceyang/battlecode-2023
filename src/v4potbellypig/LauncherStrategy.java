@@ -132,8 +132,9 @@ public class LauncherStrategy {
             }
             // Prioritize enemies by health and distance, but especially special units
             state = LauncherState.DANGER;
-            if (enemy.getType() == RobotType.HEADQUARTERS) {
-                continue;
+            // kite around the enemy headquarters if there's no other enemies
+            if (enemy.getType() == RobotType.HEADQUARTERS && target == null) {
+                target = enemy;
             }
             if (enemy.getType() == RobotType.DESTABILIZER) {
                 target = enemy;
@@ -166,11 +167,12 @@ public class LauncherStrategy {
 
     static void shootTarget(RobotController rc, RobotInfo target) throws GameActionException {
         MapLocation targetLoc = target.getLocation();
-        if (rc.canAttack(targetLoc)) {
+        if (rc.canAttack(targetLoc) && target.getType() != RobotType.HEADQUARTERS) {
             rc.attack(targetLoc);
         } else {
             rc.setIndicatorString("Failed to attack");
         }
+        // shoot-move (if doing move-shoot nextLoc gets reset the next turn)
         if (targetLoc.distanceSquaredTo(rc.getLocation()) <= 20) {
             Direction d = targetLoc.directionTo(rc.getLocation());
             nextLoc = rc.getLocation().add(d).add(d);

@@ -44,6 +44,7 @@ public strictfp class RobotPlayer {
     public static void run(RobotController rc) throws GameActionException {
         rng = new Random(rc.getID());
         isSmallMap = rc.getMapWidth() * rc.getMapHeight() < 600;
+        Pathing.leftHanded = rc.getID() % 2 == 0;
 
         if (turnCount == 1) {
             ISLAND_COUNT = rc.getIslandCount();
