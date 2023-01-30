@@ -153,8 +153,6 @@ public class CarrierStrategy {
                 bugOverride = false;
             }
         }
-        Communication.clearObsoleteEnemies(rc);
-        Communication.tryWriteMessages(rc);
 
         if (islandLoc != null && rc.canTakeAnchor(hqLoc, Anchor.STANDARD)) {
             System.out.println("took the anchor");
@@ -311,6 +309,20 @@ public class CarrierStrategy {
             if (robot.getTeam() == rc.getTeam() && robot.getType() == RobotType.HEADQUARTERS) {
                 hqLoc = robot.getLocation();
                 break;
+            }
+        }
+        if (hqLoc == null) {
+            int closest = 7200;
+            int temp = 7200;
+            for (int i = Communication.STARTING_HQ_IDX; i < Communication.STARTING_ISLAND_IDX; i++) {
+                MapLocation tempLoc = Communication.readHeadquarterLocation(rc, i);
+                if (tempLoc != null) {
+                    temp = rc.getLocation().distanceSquaredTo(tempLoc);
+                    if (temp < closest) {
+                        closest = temp;
+                        hqLoc = tempLoc;
+                    }
+                }
             }
         }
     }

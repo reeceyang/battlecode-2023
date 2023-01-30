@@ -24,7 +24,7 @@ class Communication {
     private static final int AREA_RADIUS = RobotType.CARRIER.visionRadiusSquared;
 
     // Maybe you want to change this based on exact amounts which you can get on turn 1
-    private static final int STARTING_HQ_IDX = 2;
+    public static final int STARTING_HQ_IDX = 2;
     public static final int STARTING_ISLAND_IDX = GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX;
     public static final int STARTING_ENEMY_IDX = RobotPlayer.ISLAND_COUNT + GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX;
     public static final int STARTING_WELL_IDX = STARTING_ENEMY_IDX + 16;
