@@ -28,12 +28,9 @@ public class CarrierStrategy {
 
     static MapLocation wellLoc;
     static MapLocation adWellLoc;
-    static int elixirTargetIdx = -1;
-    static ResourceType elixirTargetNeed;
-    static boolean foundElixir = false;
-    static MapLocation[] wellLocs = new MapLocation[]{null, null, null, null, null};
-    static ResourceType[] wellTypes = new ResourceType[]{null, null, null, null, null};
-    static final int WELLLOC_MAX_IDX = 4; // change this if length of wellLocs is changed
+    static MapLocation[] wellLocs = new MapLocation[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
+    static ResourceType[] wellTypes = new ResourceType[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
+    static final int WELLLOC_MAX_IDX = wellLocs.length - 1; // change this if length of wellLocs is changed
 	static int currentIslandId = -1; // the id of the island currently being targeted
     static boolean keepExploring = false;
     public static boolean findNewWell = false;
@@ -118,11 +115,10 @@ public class CarrierStrategy {
             for (int j = WELLLOC_MAX_IDX; j >= 0; j--) {
                 if (wellLocs[j] != null) {
                     Communication.addWell(rc, wellTypes[j], wellLocs[j]);
-//                    System.out.println("Added well at "+wellLocs[j]+" to shared array");
                 }
             }
-            wellLocs = new MapLocation[]{null, null, null, null, null};
-            wellTypes = new ResourceType[]{null, null, null, null, null};
+            wellLocs = new MapLocation[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
+            wellTypes = new ResourceType[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
         }
 
         // ENEMIES
@@ -178,7 +174,6 @@ public class CarrierStrategy {
         switch (state) {
             case DEFAULT:
                 if (total < 39 && (rc.getRoundNum() - wellStart > 30) && rc.getLocation().isWithinDistanceSquared(locStart, 40) && !rc.canCollectResource(wellLoc, -1)) {
-                    System.out.println("can't collect from "+wellLoc);
                     badWell = wellLoc;
                     findNewWell = true;
                     startedCountingTurns = false;
@@ -197,7 +192,6 @@ public class CarrierStrategy {
                     startedCountingTurns = false;
                     nextLoc = hqLoc;
                 }
-//                System.out.println(startedCountingTurns);
                 break;
             case SEARCH:
                 if (adWellLoc != null) {
@@ -222,7 +216,7 @@ public class CarrierStrategy {
                 }
                 break;
             case ANCHOR:
-                rc.setIndicatorDot(rc.getLocation(), 1, 0, 0);
+//                rc.setIndicatorDot(rc.getLocation(), 1, 0, 0);
                 nextLoc = islandLoc;
                 // check if the island it target was already taken
                 rc.setIndicatorString("currentislandid" + currentIslandId + " " + islandLoc);
@@ -303,7 +297,7 @@ public class CarrierStrategy {
             RobotPlayer.moveRandom(rc);
         } else {
             Pathing.moveTowards(rc, nextLoc, bugOverride, shouldMoveTwice);
-            rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 0, 255);
+//            rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 0, 255);
         }
 
     }

@@ -87,6 +87,10 @@ public class HQStrategy {
 		// Decide which resource to prioritize
 		needMana = true;
 
+		for (int wellIdx = Communication.STARTING_WELL_IDX; wellIdx < GameConstants.SHARED_ARRAY_LENGTH; wellIdx ++) {
+			if (rc.readSharedArray(wellIdx) != 0) rc.setIndicatorDot(Communication.readWellLocation(rc, wellIdx), 0, 255*(rc.getTeam()==Team.A ? 1 : 0), 0);
+		}
+
 		// ELIXIR CONVERSION MANAGEMENT
 //		if (rc.getRoundNum() == ELIXIR_START_TURN) {
 //			checkAllKnownWells(rc); // update known well locations and types
