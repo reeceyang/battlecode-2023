@@ -123,7 +123,7 @@ public class HQStrategy {
 		}
 		
 		// Bait launchers out into the world
-		if (RobotPlayer.turnCount < 200 && RobotPlayer.turnCount % 50 == 0 || RobotPlayer.isSmallMap && RobotPlayer.turnCount == 10) {
+		if ((RobotPlayer.turnCount < 200 && RobotPlayer.turnCount % 50 == 0) || (RobotPlayer.isSmallMap && RobotPlayer.turnCount == 10) || (RobotPlayer.turnCount >= 200 && RobotPlayer.turnCount % 150 == 0) ) {
 			baitFriendlyLaunchers2(rc);
 		}
 				
