@@ -1978,456 +1978,581 @@ public class BellmanFord {
 
 
         if (rc.canMove(bestDir)) {
-            rc.move(bestDir);
+            MapLocation next = rc.getLocation().add(bestDir);
+            Direction current = Direction.CENTER;
+            if (bestDir == Direction.NORTH) {
+                current = current23;
+            }
+            if (bestDir == Direction.NORTHEAST) {
+                current = current33;
+            }
+            if (bestDir == Direction.EAST) {
+                current = current32;
+            }
+            if (bestDir == Direction.SOUTHEAST) {
+                current = current31;
+            }
+            if (bestDir == Direction.SOUTH) {
+                current = current21;
+            }
+            if (bestDir == Direction.SOUTHWEST) {
+                current = current11;
+            }
+            if (bestDir == Direction.WEST) {
+                current = current12;
+            }
+            if (bestDir == Direction.NORTHWEST) {
+                current = current13;
+            }
+
+            if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {
+                rc.move(bestDir);
+            }
         }
 
         if (rc.isMovementReady() && moveTwice) {
             bestCost = 2147483647;
             if (bestDir == Direction.NORTH) {
                 bestDir = Direction.CENTER;
+                Direction current = Direction.CENTER;
                 if (open24 && current24 != Direction.SOUTH) {
                     if (cost24 < bestCost) {
                         bestCost = cost24;
                         bestDir = Direction.NORTH;
+                        if (current24 != null) current = current24;
                     }
                 }
                 if (open24 && current24 != Direction.SOUTHWEST) {
                     if (cost24 < bestCost) {
                         bestCost = cost24;
                         bestDir = Direction.NORTH;
+                        if (current24 != null) current = current24;
                     }
                 }
                 if (open24 && current24 != Direction.WEST) {
                     if (cost24 < bestCost) {
                         bestCost = cost24;
                         bestDir = Direction.NORTH;
+                        if (current24 != null) current = current24;
                     }
                 }
                 if (open24 && current24 != Direction.NORTHWEST) {
                     if (cost24 < bestCost) {
                         bestCost = cost24;
                         bestDir = Direction.NORTH;
+                        if (current24 != null) current = current24;
                     }
                 }
                 if (open24 && current24 != Direction.NORTH) {
                     if (cost24 < bestCost) {
                         bestCost = cost24;
                         bestDir = Direction.NORTH;
+                        if (current24 != null) current = current24;
                     }
                 }
                 if (open24 && current24 != Direction.NORTHEAST) {
                     if (cost24 < bestCost) {
                         bestCost = cost24;
                         bestDir = Direction.NORTH;
+                        if (current24 != null) current = current24;
                     }
                 }
                 if (open24 && current24 != Direction.EAST) {
                     if (cost24 < bestCost) {
                         bestCost = cost24;
                         bestDir = Direction.NORTH;
+                        if (current24 != null) current = current24;
                     }
                 }
                 if (open24 && current24 != Direction.SOUTHEAST) {
                     if (cost24 < bestCost) {
                         bestCost = cost24;
                         bestDir = Direction.NORTH;
+                        if (current24 != null) current = current24;
                     }
                 }
                 if (rc.canMove(bestDir)) {
-                    rc.move(bestDir);
-                    return true;
+                    MapLocation next = rc.getLocation().add(bestDir);
+                    if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {
+                        rc.move(bestDir);
+                        return true;
+                    }
                 }
                 return false;
             }
             if (bestDir == Direction.NORTHEAST) {
                 bestDir = Direction.CENTER;
+                Direction current = Direction.CENTER;
                 if (open44 && current44 != Direction.SOUTH) {
                     if (cost44 < bestCost) {
                         bestCost = cost44;
                         bestDir = Direction.NORTHEAST;
+                        if (current44 != null) current = current44;
                     }
                 }
                 if (open44 && current44 != Direction.SOUTHWEST) {
                     if (cost44 < bestCost) {
                         bestCost = cost44;
                         bestDir = Direction.NORTHEAST;
+                        if (current44 != null) current = current44;
                     }
                 }
                 if (open44 && current44 != Direction.WEST) {
                     if (cost44 < bestCost) {
                         bestCost = cost44;
                         bestDir = Direction.NORTHEAST;
+                        if (current44 != null) current = current44;
                     }
                 }
                 if (open44 && current44 != Direction.NORTHWEST) {
                     if (cost44 < bestCost) {
                         bestCost = cost44;
                         bestDir = Direction.NORTHEAST;
+                        if (current44 != null) current = current44;
                     }
                 }
                 if (open44 && current44 != Direction.NORTH) {
                     if (cost44 < bestCost) {
                         bestCost = cost44;
                         bestDir = Direction.NORTHEAST;
+                        if (current44 != null) current = current44;
                     }
                 }
                 if (open44 && current44 != Direction.NORTHEAST) {
                     if (cost44 < bestCost) {
                         bestCost = cost44;
                         bestDir = Direction.NORTHEAST;
+                        if (current44 != null) current = current44;
                     }
                 }
                 if (open44 && current44 != Direction.EAST) {
                     if (cost44 < bestCost) {
                         bestCost = cost44;
                         bestDir = Direction.NORTHEAST;
+                        if (current44 != null) current = current44;
                     }
                 }
                 if (open44 && current44 != Direction.SOUTHEAST) {
                     if (cost44 < bestCost) {
                         bestCost = cost44;
                         bestDir = Direction.NORTHEAST;
+                        if (current44 != null) current = current44;
                     }
                 }
                 if (rc.canMove(bestDir)) {
-                    rc.move(bestDir);
-                    return true;
+                    MapLocation next = rc.getLocation().add(bestDir);
+                    if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {
+                        rc.move(bestDir);
+                        return true;
+                    }
                 }
                 return false;
             }
             if (bestDir == Direction.EAST) {
                 bestDir = Direction.CENTER;
+                Direction current = Direction.CENTER;
                 if (open42 && current42 != Direction.SOUTH) {
                     if (cost42 < bestCost) {
                         bestCost = cost42;
                         bestDir = Direction.EAST;
+                        if (current42 != null) current = current42;
                     }
                 }
                 if (open42 && current42 != Direction.SOUTHWEST) {
                     if (cost42 < bestCost) {
                         bestCost = cost42;
                         bestDir = Direction.EAST;
+                        if (current42 != null) current = current42;
                     }
                 }
                 if (open42 && current42 != Direction.WEST) {
                     if (cost42 < bestCost) {
                         bestCost = cost42;
                         bestDir = Direction.EAST;
+                        if (current42 != null) current = current42;
                     }
                 }
                 if (open42 && current42 != Direction.NORTHWEST) {
                     if (cost42 < bestCost) {
                         bestCost = cost42;
                         bestDir = Direction.EAST;
+                        if (current42 != null) current = current42;
                     }
                 }
                 if (open42 && current42 != Direction.NORTH) {
                     if (cost42 < bestCost) {
                         bestCost = cost42;
                         bestDir = Direction.EAST;
+                        if (current42 != null) current = current42;
                     }
                 }
                 if (open42 && current42 != Direction.NORTHEAST) {
                     if (cost42 < bestCost) {
                         bestCost = cost42;
                         bestDir = Direction.EAST;
+                        if (current42 != null) current = current42;
                     }
                 }
                 if (open42 && current42 != Direction.EAST) {
                     if (cost42 < bestCost) {
                         bestCost = cost42;
                         bestDir = Direction.EAST;
+                        if (current42 != null) current = current42;
                     }
                 }
                 if (open42 && current42 != Direction.SOUTHEAST) {
                     if (cost42 < bestCost) {
                         bestCost = cost42;
                         bestDir = Direction.EAST;
+                        if (current42 != null) current = current42;
                     }
                 }
                 if (rc.canMove(bestDir)) {
-                    rc.move(bestDir);
-                    return true;
+                    MapLocation next = rc.getLocation().add(bestDir);
+                    if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {
+                        rc.move(bestDir);
+                        return true;
+                    }
                 }
                 return false;
             }
             if (bestDir == Direction.SOUTHEAST) {
                 bestDir = Direction.CENTER;
+                Direction current = Direction.CENTER;
                 if (open40 && current40 != Direction.SOUTH) {
                     if (cost40 < bestCost) {
                         bestCost = cost40;
                         bestDir = Direction.SOUTHEAST;
+                        if (current40 != null) current = current40;
                     }
                 }
                 if (open40 && current40 != Direction.SOUTHWEST) {
                     if (cost40 < bestCost) {
                         bestCost = cost40;
                         bestDir = Direction.SOUTHEAST;
+                        if (current40 != null) current = current40;
                     }
                 }
                 if (open40 && current40 != Direction.WEST) {
                     if (cost40 < bestCost) {
                         bestCost = cost40;
                         bestDir = Direction.SOUTHEAST;
+                        if (current40 != null) current = current40;
                     }
                 }
                 if (open40 && current40 != Direction.NORTHWEST) {
                     if (cost40 < bestCost) {
                         bestCost = cost40;
                         bestDir = Direction.SOUTHEAST;
+                        if (current40 != null) current = current40;
                     }
                 }
                 if (open40 && current40 != Direction.NORTH) {
                     if (cost40 < bestCost) {
                         bestCost = cost40;
                         bestDir = Direction.SOUTHEAST;
+                        if (current40 != null) current = current40;
                     }
                 }
                 if (open40 && current40 != Direction.NORTHEAST) {
                     if (cost40 < bestCost) {
                         bestCost = cost40;
                         bestDir = Direction.SOUTHEAST;
+                        if (current40 != null) current = current40;
                     }
                 }
                 if (open40 && current40 != Direction.EAST) {
                     if (cost40 < bestCost) {
                         bestCost = cost40;
                         bestDir = Direction.SOUTHEAST;
+                        if (current40 != null) current = current40;
                     }
                 }
                 if (open40 && current40 != Direction.SOUTHEAST) {
                     if (cost40 < bestCost) {
                         bestCost = cost40;
                         bestDir = Direction.SOUTHEAST;
+                        if (current40 != null) current = current40;
                     }
                 }
                 if (rc.canMove(bestDir)) {
-                    rc.move(bestDir);
-                    return true;
+                    MapLocation next = rc.getLocation().add(bestDir);
+                    if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {
+                        rc.move(bestDir);
+                        return true;
+                    }
                 }
                 return false;
             }
             if (bestDir == Direction.SOUTH) {
                 bestDir = Direction.CENTER;
+                Direction current = Direction.CENTER;
                 if (open20 && current20 != Direction.SOUTH) {
                     if (cost20 < bestCost) {
                         bestCost = cost20;
                         bestDir = Direction.SOUTH;
+                        if (current20 != null) current = current20;
                     }
                 }
                 if (open20 && current20 != Direction.SOUTHWEST) {
                     if (cost20 < bestCost) {
                         bestCost = cost20;
                         bestDir = Direction.SOUTH;
+                        if (current20 != null) current = current20;
                     }
                 }
                 if (open20 && current20 != Direction.WEST) {
                     if (cost20 < bestCost) {
                         bestCost = cost20;
                         bestDir = Direction.SOUTH;
+                        if (current20 != null) current = current20;
                     }
                 }
                 if (open20 && current20 != Direction.NORTHWEST) {
                     if (cost20 < bestCost) {
                         bestCost = cost20;
                         bestDir = Direction.SOUTH;
+                        if (current20 != null) current = current20;
                     }
                 }
                 if (open20 && current20 != Direction.NORTH) {
                     if (cost20 < bestCost) {
                         bestCost = cost20;
                         bestDir = Direction.SOUTH;
+                        if (current20 != null) current = current20;
                     }
                 }
                 if (open20 && current20 != Direction.NORTHEAST) {
                     if (cost20 < bestCost) {
                         bestCost = cost20;
                         bestDir = Direction.SOUTH;
+                        if (current20 != null) current = current20;
                     }
                 }
                 if (open20 && current20 != Direction.EAST) {
                     if (cost20 < bestCost) {
                         bestCost = cost20;
                         bestDir = Direction.SOUTH;
+                        if (current20 != null) current = current20;
                     }
                 }
                 if (open20 && current20 != Direction.SOUTHEAST) {
                     if (cost20 < bestCost) {
                         bestCost = cost20;
                         bestDir = Direction.SOUTH;
+                        if (current20 != null) current = current20;
                     }
                 }
                 if (rc.canMove(bestDir)) {
-                    rc.move(bestDir);
-                    return true;
+                    MapLocation next = rc.getLocation().add(bestDir);
+                    if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {
+                        rc.move(bestDir);
+                        return true;
+                    }
                 }
                 return false;
             }
             if (bestDir == Direction.SOUTHWEST) {
                 bestDir = Direction.CENTER;
+                Direction current = Direction.CENTER;
                 if (open00 && current00 != Direction.SOUTH) {
                     if (cost00 < bestCost) {
                         bestCost = cost00;
                         bestDir = Direction.SOUTHWEST;
+                        if (current00 != null) current = current00;
                     }
                 }
                 if (open00 && current00 != Direction.SOUTHWEST) {
                     if (cost00 < bestCost) {
                         bestCost = cost00;
                         bestDir = Direction.SOUTHWEST;
+                        if (current00 != null) current = current00;
                     }
                 }
                 if (open00 && current00 != Direction.WEST) {
                     if (cost00 < bestCost) {
                         bestCost = cost00;
                         bestDir = Direction.SOUTHWEST;
+                        if (current00 != null) current = current00;
                     }
                 }
                 if (open00 && current00 != Direction.NORTHWEST) {
                     if (cost00 < bestCost) {
                         bestCost = cost00;
                         bestDir = Direction.SOUTHWEST;
+                        if (current00 != null) current = current00;
                     }
                 }
                 if (open00 && current00 != Direction.NORTH) {
                     if (cost00 < bestCost) {
                         bestCost = cost00;
                         bestDir = Direction.SOUTHWEST;
+                        if (current00 != null) current = current00;
                     }
                 }
                 if (open00 && current00 != Direction.NORTHEAST) {
                     if (cost00 < bestCost) {
                         bestCost = cost00;
                         bestDir = Direction.SOUTHWEST;
+                        if (current00 != null) current = current00;
                     }
                 }
                 if (open00 && current00 != Direction.EAST) {
                     if (cost00 < bestCost) {
                         bestCost = cost00;
                         bestDir = Direction.SOUTHWEST;
+                        if (current00 != null) current = current00;
                     }
                 }
                 if (open00 && current00 != Direction.SOUTHEAST) {
                     if (cost00 < bestCost) {
                         bestCost = cost00;
                         bestDir = Direction.SOUTHWEST;
+                        if (current00 != null) current = current00;
                     }
                 }
                 if (rc.canMove(bestDir)) {
-                    rc.move(bestDir);
-                    return true;
+                    MapLocation next = rc.getLocation().add(bestDir);
+                    if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {
+                        rc.move(bestDir);
+                        return true;
+                    }
                 }
                 return false;
             }
             if (bestDir == Direction.WEST) {
                 bestDir = Direction.CENTER;
+                Direction current = Direction.CENTER;
                 if (open02 && current02 != Direction.SOUTH) {
                     if (cost02 < bestCost) {
                         bestCost = cost02;
                         bestDir = Direction.WEST;
+                        if (current02 != null) current = current02;
                     }
                 }
                 if (open02 && current02 != Direction.SOUTHWEST) {
                     if (cost02 < bestCost) {
                         bestCost = cost02;
                         bestDir = Direction.WEST;
+                        if (current02 != null) current = current02;
                     }
                 }
                 if (open02 && current02 != Direction.WEST) {
                     if (cost02 < bestCost) {
                         bestCost = cost02;
                         bestDir = Direction.WEST;
+                        if (current02 != null) current = current02;
                     }
                 }
                 if (open02 && current02 != Direction.NORTHWEST) {
                     if (cost02 < bestCost) {
                         bestCost = cost02;
                         bestDir = Direction.WEST;
+                        if (current02 != null) current = current02;
                     }
                 }
                 if (open02 && current02 != Direction.NORTH) {
                     if (cost02 < bestCost) {
                         bestCost = cost02;
                         bestDir = Direction.WEST;
+                        if (current02 != null) current = current02;
                     }
                 }
                 if (open02 && current02 != Direction.NORTHEAST) {
                     if (cost02 < bestCost) {
                         bestCost = cost02;
                         bestDir = Direction.WEST;
+                        if (current02 != null) current = current02;
                     }
                 }
                 if (open02 && current02 != Direction.EAST) {
                     if (cost02 < bestCost) {
                         bestCost = cost02;
                         bestDir = Direction.WEST;
+                        if (current02 != null) current = current02;
                     }
                 }
                 if (open02 && current02 != Direction.SOUTHEAST) {
                     if (cost02 < bestCost) {
                         bestCost = cost02;
                         bestDir = Direction.WEST;
+                        if (current02 != null) current = current02;
                     }
                 }
                 if (rc.canMove(bestDir)) {
-                    rc.move(bestDir);
-                    return true;
+                    MapLocation next = rc.getLocation().add(bestDir);
+                    if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {
+                        rc.move(bestDir);
+                        return true;
+                    }
                 }
                 return false;
             }
             if (bestDir == Direction.NORTHWEST) {
                 bestDir = Direction.CENTER;
+                Direction current = Direction.CENTER;
                 if (open04 && current04 != Direction.SOUTH) {
                     if (cost04 < bestCost) {
                         bestCost = cost04;
                         bestDir = Direction.NORTHWEST;
+                        if (current04 != null) current = current04;
                     }
                 }
                 if (open04 && current04 != Direction.SOUTHWEST) {
                     if (cost04 < bestCost) {
                         bestCost = cost04;
                         bestDir = Direction.NORTHWEST;
+                        if (current04 != null) current = current04;
                     }
                 }
                 if (open04 && current04 != Direction.WEST) {
                     if (cost04 < bestCost) {
                         bestCost = cost04;
                         bestDir = Direction.NORTHWEST;
+                        if (current04 != null) current = current04;
                     }
                 }
                 if (open04 && current04 != Direction.NORTHWEST) {
                     if (cost04 < bestCost) {
                         bestCost = cost04;
                         bestDir = Direction.NORTHWEST;
+                        if (current04 != null) current = current04;
                     }
                 }
                 if (open04 && current04 != Direction.NORTH) {
                     if (cost04 < bestCost) {
                         bestCost = cost04;
                         bestDir = Direction.NORTHWEST;
+                        if (current04 != null) current = current04;
                     }
                 }
                 if (open04 && current04 != Direction.NORTHEAST) {
                     if (cost04 < bestCost) {
                         bestCost = cost04;
                         bestDir = Direction.NORTHWEST;
+                        if (current04 != null) current = current04;
                     }
                 }
                 if (open04 && current04 != Direction.EAST) {
                     if (cost04 < bestCost) {
                         bestCost = cost04;
                         bestDir = Direction.NORTHWEST;
+                        if (current04 != null) current = current04;
                     }
                 }
                 if (open04 && current04 != Direction.SOUTHEAST) {
                     if (cost04 < bestCost) {
                         bestCost = cost04;
                         bestDir = Direction.NORTHWEST;
+                        if (current04 != null) current = current04;
                     }
                 }
                 if (rc.canMove(bestDir)) {
-                    rc.move(bestDir);
-                    return true;
+                    MapLocation next = rc.getLocation().add(bestDir);
+                    if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {
+                        rc.move(bestDir);
+                        return true;
+                    }
                 }
                 return false;
             }
