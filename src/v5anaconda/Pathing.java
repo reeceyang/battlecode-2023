@@ -16,7 +16,7 @@ public class Pathing {
 	static int progressCountdown = TIME_LIMIT;
 	static int closest = Integer.MAX_VALUE;
 	static boolean bugMode = false;
-	static final int BUG_MODE_TIME_LIMIT = 100;
+	public static int BUG_MODE_TIME_LIMIT;
 
     static void moveTowards(RobotController rc, MapLocation target, boolean bugOverride, boolean moveTwice) throws GameActionException {
 

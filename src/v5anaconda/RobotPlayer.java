@@ -46,6 +46,7 @@ public strictfp class RobotPlayer {
         rng = new Random(rc.getID());
         isSmallMap = rc.getMapWidth() * rc.getMapHeight() < SMALL_MAP_AREA;
         Pathing.leftHanded = rc.getID() % 2 == 0;
+        Pathing.BUG_MODE_TIME_LIMIT = (int) Math.sqrt(rc.getMapWidth() * rc.getMapHeight());
 
         if (turnCount == 1) {
             ISLAND_COUNT = rc.getIslandCount();
