@@ -162,14 +162,20 @@ public class LauncherStrategy {
             } else {
                 int closestCloudDist = 7200;
                 MapLocation targetCloud = null;
-                MapLocation[] nearbyClouds = rc.senseNearbyCloudLocations(ACTION_RADIUS);
-                for (MapLocation cloud : nearbyClouds) {
-                    int tempDist = rc.getLocation().distanceSquaredTo(cloud);
-                    if (tempDist < closestCloudDist) {
-                        closestCloudDist = tempDist;
-                        targetCloud = cloud;
+                if (rc.senseCloud(rc.getLocation())) {
+                    Direction randomDir = Direction.cardinalDirections()[RobotPlayer.rng.nextInt(4)];
+                    targetCloud = RobotPlayer.shiftByAmount(rc, rc.getLocation(), randomDir, 3);
+                } else {
+                    MapLocation[] nearbyClouds = rc.senseNearbyCloudLocations(ACTION_RADIUS);
+                    for (MapLocation cloud : nearbyClouds) {
+                        int tempDist = rc.getLocation().distanceSquaredTo(cloud);
+                        if (tempDist < closestCloudDist) {
+                            closestCloudDist = tempDist;
+                            targetCloud = cloud;
+                        }
                     }
                 }
+
                 if (targetCloud != null) shootCloud(rc, targetCloud);
             }
         }
