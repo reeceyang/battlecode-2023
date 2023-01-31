@@ -7,6 +7,8 @@ public class AmplifierStrategy {
     static MapLocation nextLoc;
     static MapLocation[] emptyClouds = new MapLocation[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
     static int emptyIndex = 0;
+    static MapLocation[] adWellLocs = new MapLocation[32];
+    static MapLocation[] manaWellLocs = new MapLocation[32];
     /**
      * Run a single turn for an Amplifier.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
@@ -115,27 +117,29 @@ public class AmplifierStrategy {
 
         /* -------------------------------- */
 
-        RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(-1, enemyTeam);
-        for (RobotInfo bot : nearbyEnemies) {
-            if (bot.getType() == RobotType.HEADQUARTERS) {
+        for (RobotInfo bot : robots) {
+            if (bot.getType() == RobotType.HEADQUARTERS && bot.getTeam() == enemyTeam) {
 
                 int hqId = 0;
 
                 // report its location to array
+                int xReflect = RobotPlayer.xReflect(rc, bot.location);
+                int yReflect = RobotPlayer.yReflect(rc, bot.location);
 
-                if (RobotPlayer.xReflect(rc, bot.location) == hqLoc[0]) {
+                // TODO: Make into a switch (xReflect) and switch (yReflect) statement
+                if (xReflect == hqLoc[0]) {
                     rc.setIndicatorString("x1");
                     hqId = 1;
                     Communication.updateSymmetryInfo(rc, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                } else if (hqLoc[1] != 0 && RobotPlayer.xReflect(rc, bot.location) == hqLoc[1]) {
+                } else if (xReflect == hqLoc[1]) {
                     rc.setIndicatorString("x2");
                     hqId = 2;
                     Communication.updateSymmetryInfo(rc, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                } else if (hqLoc[2] != 0 && RobotPlayer.xReflect(rc, bot.location) == hqLoc[2]) {
+                } else if (xReflect == hqLoc[2]) {
                     rc.setIndicatorString("x3");
                     hqId = 3;
                     Communication.updateSymmetryInfo(rc, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0);
-                } else if (hqLoc[3] != 0 && RobotPlayer.xReflect(rc, bot.location) == hqLoc[3]) {
+                } else if (xReflect == hqLoc[3]) {
                     rc.setIndicatorString("x4");
                     hqId = 4;
                     Communication.updateSymmetryInfo(rc, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
@@ -148,15 +152,15 @@ public class AmplifierStrategy {
                     rc.setIndicatorString("y1");
                     hqId = 1;
                     Communication.updateSymmetryInfo(rc, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0);
-                } else if (hqLoc[1] != 0 && RobotPlayer.yReflect(rc, bot.location) == hqLoc[1]) {
+                } else if (yReflect == hqLoc[1]) {
                     rc.setIndicatorString("y2");
                     hqId = 2;
                     Communication.updateSymmetryInfo(rc, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0);
-                } else if (hqLoc[2] != 0 && RobotPlayer.yReflect(rc, bot.location) == hqLoc[2]) {
+                } else if (yReflect == hqLoc[2]) {
                     rc.setIndicatorString("y3");
                     hqId = 3;
                     Communication.updateSymmetryInfo(rc, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0);
-                } else if (hqLoc[3] != 0 && RobotPlayer.yReflect(rc, bot.location) == hqLoc[3]) {
+                } else if (yReflect == hqLoc[3]) {
                     rc.setIndicatorString("y4");
                     hqId = 4;
                     Communication.updateSymmetryInfo(rc, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);
@@ -220,8 +224,6 @@ public class AmplifierStrategy {
                 }
             }
 
-            MapLocation[] adWellLocs = new MapLocation[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
-            MapLocation[] manaWellLocs = new MapLocation[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
             for (int idx = Communication.STARTING_WELL_IDX; idx < GameConstants.SHARED_ARRAY_LENGTH; idx++) {
                 if (Communication.getWellType(rc, idx) == ResourceType.ADAMANTIUM) {
                     adWellLocs[idx - Communication.STARTING_WELL_IDX] = Communication.readWellLocation(rc, idx);
