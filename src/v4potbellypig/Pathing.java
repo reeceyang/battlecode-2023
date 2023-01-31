@@ -46,7 +46,7 @@ public class Pathing {
 				doBugMode(rc, target);
 			}
 		}
-		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target + "left" + leftHanded + currentDirection);
+//		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target + "left" + leftHanded + currentDirection);
 		int currentDistance = rc.getLocation().distanceSquaredTo(target);
 		if (currentDistance < closest) {
 			closest = currentDistance;

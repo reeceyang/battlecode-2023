@@ -288,7 +288,7 @@ public class CarrierStrategy {
 
 //        rc.setIndicatorString(startedCountingTurns + " ");
 
-//        rc.setIndicatorString(state.toString());
+        rc.setIndicatorString(state.toString());
 
         boolean shouldMoveTwice = (state == CarrierState.DEFAULT && !collectedResource) || state == CarrierState.REPORT || state == CarrierState.SEARCH || state == CarrierState.DANGER;
         // PERFORM MOVEMENT
@@ -406,7 +406,7 @@ public class CarrierStrategy {
         int index = 0;
 
         for (Direction d : RobotPlayer.directions) {
-            if (!rc.isLocationOccupied(wellLoc.add(d)) && rc.sensePassability(wellLoc.add(d)) && rc.onTheMap(wellLoc.add(d))) {
+            if (rc.onTheMap(wellLoc.add(d)) && !rc.isLocationOccupied(wellLoc.add(d)) && rc.sensePassability(wellLoc.add(d))) {
                 adjacentPositions[index] = wellLoc.add(d);
                 index++;
             }

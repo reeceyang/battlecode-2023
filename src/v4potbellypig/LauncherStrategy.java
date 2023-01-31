@@ -18,6 +18,7 @@ public class LauncherStrategy {
 	static MapLocation nextLoc;
     static LauncherState state = null;
     static Team opponent;
+    static final int ACTION_RADIUS = 16;
 
     /**
      * Run a single turn for a Launcher.
@@ -48,7 +49,8 @@ public class LauncherStrategy {
         // TARGETING
         bugOverride = robots.length > BUG_OVERRIDE_THRESH;
         RobotInfo target = getTargetSetDanger(rc, robots);
-        if (target != null) {
+        // only shoot move if the target is within action radius
+        if (target != null && target.getLocation().distanceSquaredTo(rc.getLocation()) <= ACTION_RADIUS) {
             state = LauncherState.SHOOT_MOVE;
         }
 
@@ -113,7 +115,7 @@ public class LauncherStrategy {
             } else {
                 int closestCloudDist = 7200;
                 MapLocation targetCloud = null;
-                MapLocation[] nearbyClouds = rc.senseNearbyCloudLocations(16);
+                MapLocation[] nearbyClouds = rc.senseNearbyCloudLocations(ACTION_RADIUS);
                 for (MapLocation cloud : nearbyClouds) {
                     int tempDist = rc.getLocation().distanceSquaredTo(cloud);
                     if (tempDist < closestCloudDist) {
@@ -121,7 +123,7 @@ public class LauncherStrategy {
                         targetCloud = cloud;
                     }
                 }
-                if (targetCloud != null) shootTargetLoc(rc, targetCloud);
+                if (targetCloud != null) shootCloud(rc, targetCloud);
             }
         }
     }
@@ -190,24 +192,28 @@ public class LauncherStrategy {
         } else {
             rc.setIndicatorString("Failed to attack");
         }
+        // if we're shoot-moving and killed the current target, try to get another target
+        if (target.getType() != RobotType.HEADQUARTERS && target.getHealth() <= 20 && rc.isMovementReady()) {
+            RobotInfo[] robots = rc.senseNearbyRobots();
+            target = getTargetSetDanger(rc, robots);
+            if (target != null && target.getHealth() <= 0) {
+                System.out.println("target has health <= 0 bruh");
+            }
+            if (target != null) nextLoc = target.getLocation();
+            return;
+        }
         // shoot-move (if doing move-shoot nextLoc gets reset the next turn)
-        if (targetLoc.distanceSquaredTo(rc.getLocation()) <= 20) {
+        if (targetLoc.distanceSquaredTo(rc.getLocation()) <= ACTION_RADIUS) {
             Direction d = targetLoc.directionTo(rc.getLocation());
             nextLoc = rc.getLocation().add(d).add(d);
         }
     }
 
-    static void shootTargetLoc(RobotController rc, MapLocation target) throws GameActionException {
+    static void shootCloud(RobotController rc, MapLocation target) throws GameActionException {
         if (rc.canAttack(target)) {
             rc.attack(target);
         } else {
             rc.setIndicatorString("Failed to attack");
         }
-
-        if (target.distanceSquaredTo(rc.getLocation()) <= 20) {
-            Direction d = target.directionTo(rc.getLocation());
-            nextLoc = rc.getLocation().add(d).add(d);
-        }
-
     }
 }
