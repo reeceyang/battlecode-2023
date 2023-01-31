@@ -32,7 +32,7 @@ public strictfp class RobotPlayer {
 
     static boolean isSmallMap;
     public static int ISLAND_COUNT = 35;
-    static final int SMALL_MAP_AREA = 900;
+    static final int SMALL_MAP_AREA = 1200;
 
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.

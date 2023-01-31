@@ -151,7 +151,7 @@ public class LauncherStrategy {
             // but only if health is low
             if (enemy.getType() == RobotType.HEADQUARTERS) {
                 if (target == null && rc.getHealth() < HQ_KITE_THRESHOLD) {
-                    System.out.println(rc.getHealth() + "kiting" + enemy.getLocation());
+//                    System.out.println(rc.getHealth() + "kiting" + enemy.getLocation());
                     target = enemy;
                 }
                 continue;
