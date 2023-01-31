@@ -1,6 +1,5 @@
-package v3beardedreedling;
+package v5anaconda;
 
-import java.util.Arrays;
 import java.util.List;
 
 import java.util.ArrayList;
@@ -25,10 +24,10 @@ class Communication {
     private static final int AREA_RADIUS = RobotType.CARRIER.visionRadiusSquared;
 
     // Maybe you want to change this based on exact amounts which you can get on turn 1
-    private static final int STARTING_HQ_IDX = 2;
-    static final int STARTING_ISLAND_IDX = GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX;
-    private static final int STARTING_ENEMY_IDX = GameConstants.MAX_NUMBER_ISLANDS + GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX;
-    public static final int STARTING_WELL_IDX = 59; // there is no reason for this
+    public static final int STARTING_HQ_IDX = 2;
+    public static final int STARTING_ISLAND_IDX = GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX;
+    public static final int STARTING_ENEMY_IDX = RobotPlayer.ISLAND_COUNT + GameConstants.MAX_STARTING_HEADQUARTERS + STARTING_HQ_IDX;
+    public static final int STARTING_WELL_IDX = STARTING_ENEMY_IDX + 16;
     private static final int COUNT_IDX = 0;
     private static final int SYMMETRY_IDX = 1;
 
@@ -40,7 +39,6 @@ class Communication {
     private static final int HQ_COUNT_BITS = 2;
     private static final int RESOURCE_TYPE_BITS = 2;
     private static final int CONGESTION_BITS = 1;
-    private static int headquarterCount = 0;
 
     static final int HQ_COUNT_MASK = 0b11;
     static final int MA_AD_MASK = 0b1;
@@ -48,7 +46,7 @@ class Communication {
     static final int RESOURCE_TYPE_MASK = 0b11;
     static final int CONGESTION_MASK = 0b100;
 
-    private static List<Message> messagesQueue = new ArrayList<>();
+    private static SusList messagesQueue = new SusList(OUTDATED_TURNS_AMOUNT, 100);
     public static MapLocation[] headquarterLocs = new MapLocation[GameConstants.MAX_STARTING_HEADQUARTERS];
 
 
@@ -65,7 +63,7 @@ class Communication {
 
     static int increaseHeadquarterCount(RobotController rc) throws GameActionException {
         int curr = rc.readSharedArray(COUNT_IDX);
-        headquarterCount = (curr & HQ_COUNT_MASK) + 1;
+        int headquarterCount = (curr & HQ_COUNT_MASK) + 1;
         rc.writeSharedArray(COUNT_IDX, curr);
         return headquarterCount;
     }
@@ -129,9 +127,9 @@ class Communication {
         return 0;
     }
 
-    static void updateHQStatus(RobotController rc, int x1, int x2, int x3, int x4, int y1, int y2, int y3, int y4, int nx, int ny) {
+    static void updateSymmetryInfo(RobotController rc, int x1, int x2, int x3, int x4, int y1, int y2, int y3, int y4, int nx, int ny, int nr) {
         try {
-            int val = (x1*0b1000000000 + x2*0b100000000 + x3*0b10000000 + x4*0b1000000 + y1*0b100000 + y2*0b10000 + y3*0b1000 + y4*0b100 + nx*0b10 + ny*0b1) | rc.readSharedArray(SYMMETRY_IDX);
+            int val = (x1*0b10000000000 + x2*0b1000000000 + x3*0b100000000 + x4*0b10000000 + y1*0b1000000 + y2*0b100000 + y3*0b10000 + y4*0b1000 + nx*0b100 + ny*0b10 + nr*0b1) | rc.readSharedArray(SYMMETRY_IDX);
             rc.writeSharedArray(SYMMETRY_IDX, val);
         } catch (GameActionException e) {}
     }
@@ -139,16 +137,17 @@ class Communication {
     static int readHQStatus(RobotController rc, String j) {
         try {
             switch (j) {
-                case "x1": return (rc.readSharedArray(SYMMETRY_IDX) >> (9));
-                case "x2": return (rc.readSharedArray(SYMMETRY_IDX) >> (8)) % 0b10;
-                case "x3": return (rc.readSharedArray(SYMMETRY_IDX) >> (7)) % 0b10;
-                case "x4": return (rc.readSharedArray(SYMMETRY_IDX) >> (6)) % 0b10;
-                case "y1": return (rc.readSharedArray(SYMMETRY_IDX) >> (5)) % 0b10;
-                case "y2": return (rc.readSharedArray(SYMMETRY_IDX) >> (4)) % 0b10;
-                case "y3": return (rc.readSharedArray(SYMMETRY_IDX) >> (3)) % 0b10;
-                case "y4": return (rc.readSharedArray(SYMMETRY_IDX) >> (2)) % 0b10;
-                case "nx": return (rc.readSharedArray(SYMMETRY_IDX) >> (1)) % 0b10;
-                case "ny": return (rc.readSharedArray(SYMMETRY_IDX) >> (0)) % 0b10;
+                case "x1": return (rc.readSharedArray(SYMMETRY_IDX) >> (10));
+                case "x2": return (rc.readSharedArray(SYMMETRY_IDX) >> (9)) % 0b10;
+                case "x3": return (rc.readSharedArray(SYMMETRY_IDX) >> (8)) % 0b10;
+                case "x4": return (rc.readSharedArray(SYMMETRY_IDX) >> (7)) % 0b10;
+                case "y1": return (rc.readSharedArray(SYMMETRY_IDX) >> (6)) % 0b10;
+                case "y2": return (rc.readSharedArray(SYMMETRY_IDX) >> (5)) % 0b10;
+                case "y3": return (rc.readSharedArray(SYMMETRY_IDX) >> (4)) % 0b10;
+                case "y4": return (rc.readSharedArray(SYMMETRY_IDX) >> (3)) % 0b10;
+                case "nx": return (rc.readSharedArray(SYMMETRY_IDX) >> (2)) % 0b10;
+                case "ny": return (rc.readSharedArray(SYMMETRY_IDX) >> (1)) % 0b10;
+                case "nr": return (rc.readSharedArray(SYMMETRY_IDX) >> (0)) % 0b10;
             }
             return 2;
         } catch (GameActionException e) {
@@ -157,20 +156,32 @@ class Communication {
     }
 
     static void tryWriteMessages(RobotController rc) throws GameActionException {
-        messagesQueue.removeIf(msg -> msg.turnAdded + OUTDATED_TURNS_AMOUNT < RobotPlayer.turnCount);
+//        messagesQueue.removeIf(msg -> msg.turnAdded + OUTDATED_TURNS_AMOUNT < RobotPlayer.turnCount);
         // Can always write (0, 0), so just checks are we in range to write
         if (rc.canWriteSharedArray(0, 0)) {
-            while (messagesQueue.size() > 0 ) {
-                Message msg = messagesQueue.remove(0);
-                if (rc.canWriteSharedArray(msg.idx, msg.value)) {
-                    rc.writeSharedArray(msg.idx, msg.value);
+            for (int i = 0; i < messagesQueue.LENGTH; i++) {
+                Message msg = messagesQueue.list[i];
+                if (msg == null) continue;
+                if (!(msg.turnAdded + OUTDATED_TURNS_AMOUNT < RobotPlayer.turnCount)) {
+                    // not outdated, write to shared array
+                    if (rc.canWriteSharedArray(msg.idx, msg.value)) {
+                        rc.writeSharedArray(msg.idx, msg.value);
+                    }
                 }
+                // clear the message
+                messagesQueue.list[i] = null;
             }
+//            while (messagesQueue.size() > 0 ) {
+//                Message msg = messagesQueue.remove(0);
+//                if (rc.canWriteSharedArray(msg.idx, msg.value)) {
+//                    rc.writeSharedArray(msg.idx, msg.value);
+//                }
+//            }
         }
     }
 
     static void updateIslandCount(RobotController rc) throws GameActionException {
-        rc.writeSharedArray(COUNT_IDX, rc.getIslandCount() >> HQ_COUNT_BITS);
+        rc.writeSharedArray(COUNT_IDX, (rc.getIslandCount() << HQ_COUNT_BITS) | rc.readSharedArray(COUNT_IDX));
     }
 
     static void updateIslandInfo(RobotController rc, int id) throws GameActionException {
@@ -191,10 +202,15 @@ class Communication {
             // Remember reading is cheaper than writing so we don't want to write without knowing if it's helpful
             int idx = id + STARTING_ISLAND_IDX;
             int oldIslandValue = rc.readSharedArray(idx);
-            int updatedIslandValue = bitPackIslandInfo(rc, idx, islandLocs[0]);
+            int updatedIslandValue = bitPackIslandInfo(rc, id, islandLocs[0]);
             if (oldIslandValue != updatedIslandValue) {
+//                if (rc.getType() == RobotType.AMPLIFIER) {
+//                    rc.writeSharedArray(idx, updatedIslandValue);
+//                    System.out.println(oldIslandValue + " " + updatedIslandValue);
+//                } else {
                 Message msg = new Message(idx, updatedIslandValue, RobotPlayer.turnCount);
                 messagesQueue.add(msg);
+//                }
             }
         }
     }
@@ -203,8 +219,9 @@ class Communication {
         int islandInt = locationToInt(rc, closestLoc);
         islandInt = islandInt << (TOTAL_BITS - MAPLOC_BITS);
         try {
-            Team teamHolding = rc.senseTeamOccupyingIsland(islandId);
-            islandInt += teamHolding.ordinal() << (TOTAL_BITS - MAPLOC_BITS - TEAM_BITS);
+            int teamHolding = 0;
+            if (rc.senseTeamOccupyingIsland(islandId) == Team.B) teamHolding=1;
+            islandInt += teamHolding << (TOTAL_BITS - MAPLOC_BITS - TEAM_BITS);
             int islandHealth = rc.senseAnchorPlantedHealth(islandId);
             int healthEncoding = (int) Math.ceil((double) islandHealth / HEALTH_SIZE);
             islandInt += healthEncoding;
@@ -222,7 +239,10 @@ class Communication {
             int health = islandInt & healthMask;
             int team = (islandInt >> HEALTH_BITS) & 0b1;
             if (health > 0) {
-                return Team.values()[team];
+                switch (team) {
+                    case 0: return Team.A;
+                    case 1: return Team.B;
+                }
             }
         } catch (GameActionException e) {}
         return Team.NEUTRAL;
@@ -262,7 +282,8 @@ class Communication {
     }
 
 
-    static void clearObsoleteEnemies(RobotController rc) {
+    static boolean clearObsoleteEnemies(RobotController rc) {
+    	boolean foundObsoleteEnemyOnly = false;
         for (int i = STARTING_ENEMY_IDX; i < STARTING_WELL_IDX; i++) {
             try {
                 MapLocation mapLoc = intToLocation(rc, rc.readSharedArray(i));
@@ -272,11 +293,13 @@ class Communication {
                 if (rc.canSenseLocation(mapLoc) && rc.senseNearbyRobots(mapLoc, AREA_RADIUS, rc.getTeam().opponent()).length == 0) {
                     Message msg = new Message(i, locationToInt(rc, null), RobotPlayer.turnCount);
                     messagesQueue.add(msg);
+                    foundObsoleteEnemyOnly = true;
                 }
             } catch (GameActionException e) {
                 continue;
-            }
+            }    
         }
+        return foundObsoleteEnemyOnly;
     }
 
     static void reportEnemy(RobotController rc, MapLocation enemy) {
@@ -296,7 +319,7 @@ class Communication {
         }
         if (slot != -1) {
             Message msg = new Message(slot, locationToInt(rc, enemy), RobotPlayer.turnCount);
-            rc.setIndicatorDot(enemy, 255, 0, 0);
+//            rc.setIndicatorDot(enemy, 255, 0, 0);
             messagesQueue.add(msg);
         }
     }
@@ -329,75 +352,24 @@ class Communication {
                 }
 
                 // report congestion around well
-                RobotInfo[] robots = rc.senseNearbyRobots(-1, rc.getTeam());
-                int numberAdjacent = 0;
-                for (RobotInfo robot : robots) {
-                    if (robot.getLocation().isAdjacentTo(loc)) {
-                        numberAdjacent += 1;
-                    }
-                }
+//                RobotInfo[] robots = rc.senseNearbyRobots(-1, rc.getTeam());
+//                int numberAdjacent = 0;
+//                for (RobotInfo robot : robots) {
+//                    if (robot.getLocation().isAdjacentTo(loc)) {
+//                        numberAdjacent += 1;
+//                    }
+//                }
 
                 int congested = 0;
-                if (numberAdjacent > CarrierStrategy.WELL_CONGESTION_MAX) {
-                    congested = 1;
-                }
+//                if (numberAdjacent > CarrierStrategy.WELL_CONGESTION_MAX) {
+//                    congested = 1;
+//                }
                 val += congested << RESOURCE_TYPE_BITS;
-
-//                report HQ closest to well
-//                int[] dists = new int[]{3600, 3600, 3600, 3600};
-//                for (int j=STARTING_HQ_IDX; j<STARTING_ISLAND_IDX; j++) {
-//                    if (rc.readSharedArray(j) != 0) { //  && Communication.readNeedsLauncher(rc, i)==1
-//                        dists[j-STARTING_HQ_IDX] = RobotPlayer.distSquaredLoc(loc, readHeadquarterLocation(rc, j));
-//                    }
-//                }
-//
-//                int min1 = Math.min(dists[0], dists[1]);
-//                int min2 = Math.min(dists[2], dists[3]);
-//                int min = Math.min(min1, min2);
-//
-//                int hqId = 0;
-//                if (min != 3600) {
-//                    for (int k = 0; k < 4; k++) {
-//                        if (min == dists[k]) {
-//                            hqId = k+STARTING_HQ_IDX;
-//                            break;
-//                        }
-//                    }
-//                }
-//                val += (hqId << 1);
 
                 val += (Communication.locationToInt(rc, loc) << RESOURCE_TYPE_BITS + CONGESTION_BITS);
                 rc.writeSharedArray(i, val);
 
-                System.out.println(rc.readSharedArray(STARTING_WELL_IDX));
-                System.out.println(rc.readSharedArray(STARTING_WELL_IDX+1));
-                System.out.println(rc.readSharedArray(STARTING_WELL_IDX+2));
-                System.out.println(rc.readSharedArray(STARTING_WELL_IDX+3));
-                System.out.println(rc.readSharedArray(STARTING_WELL_IDX+4));
-
                 break;
-            } else if (rc.readSharedArray(i) != 0) {
-                RobotInfo[] robots = rc.senseNearbyRobots(-1, rc.getTeam());
-                int numberAdjacent = 0;
-                for (RobotInfo robot : robots) {
-                    if (robot.getLocation().isAdjacentTo(loc)) {
-                        numberAdjacent += 1;
-                    }
-                }
-
-                int congested = 0;
-                if (numberAdjacent > CarrierStrategy.WELL_CONGESTION_MAX) {
-                    congested = 1;
-                }
-
-                if (congested != isWellCongested(rc, i)) {
-                    int val = (rc.readSharedArray(i) & 0b111111111111000)
-                            + (congested << RESOURCE_TYPE_BITS)
-                            + (rc.readSharedArray(i) & RESOURCE_TYPE_MASK);
-                    rc.writeSharedArray(i, val);
-                }
-
-                // TODO: account for possibly erroneous congestion checks that only apply to one well and not its symmetrical counterpart
             }
         }
     }
@@ -425,51 +397,45 @@ class Communication {
 
     static MapLocation getNearestWellOfType(RobotController rc, ResourceType r) throws GameActionException {
 
-        int[] dists = new int[]{7200, 7200, 7200, 7200, 7200};
-        MapLocation[] locs = new MapLocation[5];
+        int closest = 7200;
+        int symClosest = 7200;
+        int idx = 0;
+        int symIdx = 0;
 
         for (int j=STARTING_WELL_IDX; j<GameConstants.SHARED_ARRAY_LENGTH; j++) {
             if (rc.readSharedArray(j) != 0 && getWellType(rc, j) == r) {
-                dists[j-STARTING_WELL_IDX] = RobotPlayer.distSquaredLoc(rc.getLocation(), readWellLocation(rc, j)) * (1 + isWellCongested(rc, j)); // weighted such that a non-congested well at any distance less than 2x the distance of a congested well will be prioritized
-                locs[j-STARTING_WELL_IDX] = readWellLocation(rc, j);
+                int temp = rc.getLocation().distanceSquaredTo(readWellLocation(rc, j));
+                if (temp < closest) {
+                    closest = temp;
+                    idx = j;
+                }
                 if (findSymmetry(rc) != 0) {
-                    int new_dist = RobotPlayer.distSquaredLoc(rc.getLocation(), getSymLoc(rc, readWellLocation(rc, j))) * (1 + isWellCongested(rc, j));
-                    if (new_dist < dists[j-STARTING_WELL_IDX]) {
-                        dists[j-STARTING_WELL_IDX] = new_dist;
-                        locs[j-STARTING_WELL_IDX] = getSymLoc(rc, readWellLocation(rc, j));
+                    int newTemp = rc.getLocation().distanceSquaredTo(getSymLoc(rc, readWellLocation(rc, j)));
+                    if (newTemp < symClosest) {
+                        symClosest = newTemp;
+                        symIdx = j;
                     }
                 }
             }
         }
 
-        int min1 = Math.min(dists[0], dists[1]);
-        int min2 = Math.min(dists[2], dists[3]);
-        int min3 = Math.min(min1, min2);
-        int min = Math.min(min3, dists[4]);
-
-        int wellId = 0;
-        if (min != 7200) {
-            for (int k = 0; k < 5; k++) {
-                if (min == dists[k]) {
-                    wellId = k + STARTING_WELL_IDX;
-                    break;
-                }
-            }
-        } else {
-            System.out.println("imposter!");
-            return null;
+        if (symClosest < closest) {
+            return getSymLoc(rc, readWellLocation(rc, symIdx));
         }
 
-        return readWellLocation(rc, wellId);
+        if (idx != 0) {
+            return readWellLocation(rc, idx);
+        }
 
+        return null;
     }
 
     static boolean isWellWritten(RobotController rc, MapLocation loc) throws GameActionException {
         boolean isWritten = false;
         for (int i = STARTING_WELL_IDX; i < GameConstants.SHARED_ARRAY_LENGTH; i++) {
-            if (rc.readSharedArray(i) != 0) {
-                rc.setIndicatorDot(readWellLocation(rc, i), ((rc.getTeam() == Team.A) ? 1 : 0)*255, 0, ((rc.getTeam() == Team.B) ? 1 : 0)*255);
-            }
+//            if (rc.readSharedArray(i) != 0) {
+//                rc.setIndicatorDot(readWellLocation(rc, i), ((rc.getTeam() == Team.A) ? 1 : 0)*255, 0, ((rc.getTeam() == Team.B) ? 1 : 0)*255);
+//            }
             if (rc.readSharedArray(i) != 0 && loc.equals(readWellLocation(rc, i))) {
                 isWritten = true;
                 break;
@@ -494,13 +460,11 @@ class Communication {
     }
 
     static int findSymmetry(RobotController rc) throws GameActionException {
-        if ((readHQStatus(rc, "x1") + readHQStatus(rc, "x2") + readHQStatus(rc, "x3") + readHQStatus(rc, "x4")) > 0.6*headquarterCount) {
+        if (readHQStatus(rc, "ny")==1 && readHQStatus(rc, "nr")==1) {
             return 1; // symmetry about x
-        } else if ((readHQStatus(rc, "y1") + readHQStatus(rc, "y2") + readHQStatus(rc, "y3") + readHQStatus(rc, "y4")) > 0.6*headquarterCount) {
+        } else if (readHQStatus(rc, "nx")==1 && readHQStatus(rc, "nr")==1) {
             return 2; // symmetry about y
-        } else if ((readHQStatus(rc, "nx") == 1 && readHQStatus(rc, "ny") == 1) ||
-                ((readHQStatus(rc, "x1") == 1 || readHQStatus(rc, "x2") == 1 || readHQStatus(rc, "x3") == 1 || readHQStatus(rc, "x4") == 1)
-                        && (readHQStatus(rc, "y1") == 1 || readHQStatus(rc, "y2") == 1 || readHQStatus(rc, "y3") == 1 || readHQStatus(rc, "y4") == 1))) {
+        } else if (readHQStatus(rc, "nx")==1 && readHQStatus(rc, "ny")==1) {
             return 3; // rotational symmetry
         } else {
             return 0;

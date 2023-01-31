@@ -1,4 +1,4 @@
-package v3beardedreedling;
+package v5anaconda;
 
 import battlecode.common.*;
 
@@ -17,6 +17,7 @@ public strictfp class RobotPlayer {
     static int turnCount = 0;
 
     static Random rng = null;
+    static ResourceType demanded;
 
     static final Direction[] directions = {
         Direction.NORTH,
@@ -30,6 +31,8 @@ public strictfp class RobotPlayer {
     };
 
     static boolean isSmallMap;
+    public static int ISLAND_COUNT = 35;
+    static final int SMALL_MAP_AREA = 900;
 
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
@@ -41,7 +44,28 @@ public strictfp class RobotPlayer {
     @SuppressWarnings("unused")
     public static void run(RobotController rc) throws GameActionException {
         rng = new Random(rc.getID());
-        isSmallMap = rc.getMapWidth() * rc.getMapHeight() < 600;
+        isSmallMap = rc.getMapWidth() * rc.getMapHeight() < SMALL_MAP_AREA;
+        Pathing.leftHanded = rc.getID() % 2 == 0;
+
+        if (turnCount == 1) {
+            ISLAND_COUNT = rc.getIslandCount();
+        }
+        final int START_MANA = isSmallMap ? 20 : 50;
+        if (rc.getRoundNum() < 60) {
+            if ((7*rc.getID()) % 100 > START_MANA) {
+                demanded = ResourceType.MANA;
+            } else {
+                demanded = ResourceType.ADAMANTIUM;
+            }
+        }
+        else {
+            if ((7*rc.getID()) % 100 > 10) {
+                demanded = ResourceType.MANA;
+            } else {
+                demanded = ResourceType.ADAMANTIUM;
+            }
+        }
+	        
         while (true) {
 
             turnCount += 1;  // We have now been alive for one more turn!
@@ -86,8 +110,12 @@ public strictfp class RobotPlayer {
         Direction dir = directions[rng.nextInt(directions.length)];
         if(rc.canMove(dir)) rc.move(dir);
     }
-    static int distSquaredLoc(MapLocation loc1, MapLocation loc2) {
-        return (loc1.x - loc2.x) * (loc1.x - loc2.x) + (loc1.y - loc2.y) * (loc1.y - loc2.y);
+    static MapLocation shiftByAmount(RobotController rc, MapLocation start, Direction dir, int amount) {
+    	MapLocation answer = new MapLocation(start.x, start.y);
+    	for (int i = amount; i >= 0; i--) {
+    		answer = answer.add(dir);
+    	}
+    	return answer;
     }
 
     static int yReflect(RobotController rc, MapLocation loc) {
