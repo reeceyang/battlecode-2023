@@ -13,6 +13,7 @@ public class LauncherStrategy {
 	
 	static boolean bugOverride = false;
 	static final int BUG_OVERRIDE_THRESH = 20;
+    static final int HQ_KITE_THRESHOLD = 100;
     static MapLocation hqLoc;
 	static MapLocation nextLoc;
     static LauncherState state = null;
@@ -145,8 +146,13 @@ public class LauncherStrategy {
             // Prioritize enemies by health and distance, but especially special units
             state = LauncherState.DANGER;
             // kite around the enemy headquarters if there's no other enemies
-            if (enemy.getType() == RobotType.HEADQUARTERS && target == null) {
-                target = enemy;
+            // but only if health is low
+            if (enemy.getType() == RobotType.HEADQUARTERS) {
+                if (target == null && rc.getHealth() < HQ_KITE_THRESHOLD) {
+                    System.out.println(rc.getHealth() + "kiting" + enemy.getLocation());
+                    target = enemy;
+                }
+                continue;
             }
             if (enemy.getType() == RobotType.DESTABILIZER) {
                 target = enemy;

@@ -131,7 +131,7 @@ public class CarrierStrategy {
         RobotInfo target = null;
         if (robots.length > 0) {
             for (RobotInfo robot : robots) {
-                if (robot.getTeam() == opponent) {
+                if (robot.getTeam() == opponent && robot.getType() != RobotType.HEADQUARTERS) {
                     int enemyHealth = robot.getHealth();
                     int enemyDistance = robot.getLocation().distanceSquaredTo(rc.getLocation());
                     if (enemyHealth < lowestHealth && enemyDistance < radiusAct) {
