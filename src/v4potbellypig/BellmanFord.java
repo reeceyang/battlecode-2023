@@ -7,6 +7,7 @@ public class BellmanFord {
         MapLocation bot = rc.getLocation();
         MapLocation pos;
         Direction currentDir;
+        int wellCost;
         boolean open00 = false;
         Direction current00 = null;
         int cost00 = 2147483647;
@@ -15,7 +16,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open00 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost00 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost00 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current00 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -30,7 +32,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open01 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost01 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost01 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current01 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -45,7 +48,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open02 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost02 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost02 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current02 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -60,7 +64,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open03 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost03 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost03 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current03 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -75,7 +80,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open04 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost04 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost04 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current04 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -90,7 +96,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open10 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost10 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost10 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current10 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -105,7 +112,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open11 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost11 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost11 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current11 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -120,7 +128,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open12 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost12 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost12 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current12 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -135,7 +144,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open13 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost13 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost13 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current13 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -150,7 +160,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open14 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost14 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost14 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current14 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -165,7 +176,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open20 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost20 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost20 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current20 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -180,7 +192,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open21 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost21 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost21 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current21 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -193,7 +206,8 @@ public class BellmanFord {
         pos = new MapLocation(bot.x + 0, bot.y + 0);
         open22 = true;
         currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-        cost22 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+        wellCost = rc.senseWell(pos) == null ? 0 : 3;
+        cost22 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
         current22 = currentDir;
         boolean open23 = false;
         Direction current23 = null;
@@ -203,7 +217,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open23 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost23 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost23 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current23 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -218,7 +233,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open24 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost24 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost24 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current24 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -233,7 +249,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open30 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost30 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost30 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current30 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -248,7 +265,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open31 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost31 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost31 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current31 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -263,7 +281,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open32 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost32 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost32 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current32 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -278,7 +297,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open33 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost33 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost33 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current33 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -293,7 +313,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open34 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost34 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost34 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current34 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -308,7 +329,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open40 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost40 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost40 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current40 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -323,7 +345,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open41 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost41 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost41 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current41 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -338,7 +361,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open42 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost42 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost42 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current42 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -353,7 +377,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open43 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost43 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost43 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current43 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {
@@ -368,7 +393,8 @@ public class BellmanFord {
             if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {
                 open44 = true;
                 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-                cost44 = 100 * pos.add(currentDir).distanceSquaredTo(target);
+                wellCost = rc.senseWell(pos) == null ? 0 : 3;
+                cost44 = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
                 current44 = currentDir;
             }
         } else if (rc.onTheMap(pos)) {

@@ -26,7 +26,7 @@ public class Pathing {
         if (!rc.isMovementReady()) {
             return;
         }
-		if (target != previousTarget) {
+		if (!target.equals(previousTarget)) {
 			previousTarget = target;
 			closest = rc.getLocation().distanceSquaredTo(target);
 		}
@@ -36,7 +36,6 @@ public class Pathing {
 		}
 		// apply bug mode override
 		if (bugOverride) bugMode = true;
-		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target + "left" + leftHanded);
 		if (!bugMode) {
 			//int before = Clock.getBytecodesLeft();
 			BellmanFord.doBellmanFord(rc, target, moveTwice);
@@ -47,6 +46,7 @@ public class Pathing {
 				doBugMode(rc, target);
 			}
 		}
+		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target + "left" + leftHanded + currentDirection);
 		int currentDistance = rc.getLocation().distanceSquaredTo(target);
 		if (currentDistance < closest) {
 			closest = currentDistance;

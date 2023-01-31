@@ -7,6 +7,7 @@ SIZE = 5  # size of the grid
 DMIN = -2
 DMAX = 2
 HOME = 2  # center of the grid
+WELL_PENALTY = 3 # better to go around
 
 MAX_V = 2147483647
 
@@ -47,6 +48,7 @@ def def_vars():
     s = """MapLocation bot = rc.getLocation();
 MapLocation pos;
 Direction currentDir;
+int wellCost;
 """
     for dx in range(DMIN, DMAX + 1):
         for dy in range(DMIN, DMAX + 1):
@@ -61,7 +63,8 @@ pos = new MapLocation(bot.x + {dx}, bot.y + {dy});
             if dx == 0 and dy == 0:
                 s += f"""{OPEN}{array_x}{array_y} = true;
 currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-{COST}{array_x}{array_y} = 100 * pos.add(currentDir).distanceSquaredTo(target);
+wellCost = rc.senseWell(pos) == null ? 0 : {WELL_PENALTY};
+{COST}{array_x}{array_y} = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
 {CURR}{array_x}{array_y} = currentDir;
 """
             else:
@@ -69,7 +72,8 @@ currentDir = rc.senseMapInfo(pos).getCurrentDirection();
     if (rc.sensePassability(pos) && !rc.isLocationOccupied(pos)) {{
         {OPEN}{array_x}{array_y} = true;
         currentDir = rc.senseMapInfo(pos).getCurrentDirection();
-        {COST}{array_x}{array_y} = 100 * pos.add(currentDir).distanceSquaredTo(target);
+        wellCost = rc.senseWell(pos) == null ? 0 : {WELL_PENALTY};
+        {COST}{array_x}{array_y} = 100 * (pos.add(currentDir).distanceSquaredTo(target) + wellCost);
         {CURR}{array_x}{array_y} = currentDir;
     }}
 }} else if (rc.onTheMap(pos)) {{
