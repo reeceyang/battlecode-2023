@@ -46,7 +46,7 @@ public class LauncherStrategy {
         } else {
             if (rc.getRoundNum() < 50) state = LauncherState.DEFENSE;
             nextLoc = Pathing.reportAndPlaySafe(rc, robots, 0);
-            if (rc.getRoundNum() > 50) {
+            if (rc.getRoundNum() > 80) {
                 state = LauncherState.OFFENSE;
             }
         }
