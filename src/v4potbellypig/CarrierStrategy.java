@@ -185,7 +185,7 @@ public class CarrierStrategy {
 					} else if (rc.getLocation().equals(wellLoc)) {
 						nextLoc = nextWellLoc(rc, wellLoc);
 					}
-                } else if (total > 38) {
+                } else {
                     //move towards HQ
                     startedCountingTurns = false;
                     nextLoc = hqLoc;
@@ -196,6 +196,7 @@ public class CarrierStrategy {
                     adWellLoc = Communication.getNearestWellOfType(rc, ResourceType.ADAMANTIUM);
                 }
                 nextLoc = Pathing.findManaWell(rc, adWellLoc, hqLoc);
+                rc.setIndicatorString("Trying to find mana well at "+nextLoc);
                 break;
             case REPORT:
                 nextLoc = hqLoc;
@@ -259,7 +260,6 @@ public class CarrierStrategy {
                             case 2: nextLoc = rc.getLocation().add(dir2); break;
                         }
                         if (rc.canSenseLocation(nextLoc) && rc.senseIsland(nextLoc) == -1 || !rc.onTheMap(nextLoc)) {
-                            rc.setIndicatorString("condition 2");
                             if (!rc.onTheMap(nextLoc)) {
                                 switch (rc.getID() % 3) {
                                     case 0: nextLoc = nextLoc.add(dir1).add(dir1); break;
@@ -285,7 +285,7 @@ public class CarrierStrategy {
                 break;
         }
 
-        rc.setIndicatorString(startedCountingTurns + " ");
+//        rc.setIndicatorString(startedCountingTurns + " ");
 
 //        rc.setIndicatorString(state.toString());
 

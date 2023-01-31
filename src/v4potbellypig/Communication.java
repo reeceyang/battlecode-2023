@@ -419,10 +419,15 @@ class Communication {
             }
         }
 
-        if (symClosest < closest) return getSymLoc(rc, readWellLocation(rc, symIdx));
+        if (symClosest < closest) {
+            return getSymLoc(rc, readWellLocation(rc, symIdx));
+        }
 
-        return readWellLocation(rc, idx);
+        if (idx != 0) {
+            return readWellLocation(rc, idx);
+        }
 
+        return null;
     }
 
     static boolean isWellWritten(RobotController rc, MapLocation loc) throws GameActionException {
