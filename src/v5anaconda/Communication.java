@@ -324,19 +324,16 @@ class Communication {
         }
     }
 
-    static MapLocation getClosestEnemy(RobotController rc) {
+    static MapLocation getClosestEnemy(RobotController rc, MapLocation ignoreLoc) throws GameActionException {
+    	// Get closest enemy that is not within 20 units of an ignore location
         MapLocation answer = null;
         for (int i = STARTING_ENEMY_IDX; i < STARTING_WELL_IDX; i++) {
             final int value;
-            try {
-                value = rc.readSharedArray(i);
-                final MapLocation m = intToLocation(rc, value);
-                if (m != null && (answer == null || rc.getLocation().distanceSquaredTo(m) < rc.getLocation().distanceSquaredTo(answer))) {
-                    answer = m;
-                }
-            } catch (GameActionException e) {
-                continue;
-            }
+            value = rc.readSharedArray(i);
+            final MapLocation m = intToLocation(rc, value);
+            if (m != null && (answer == null || rc.getLocation().distanceSquaredTo(m) < rc.getLocation().distanceSquaredTo(answer))) {
+            	if (ignoreLoc == null || !(ignoreLoc.isWithinDistanceSquared(m, 20))) { answer = m; }
+            }	
         }
         return answer;
     }

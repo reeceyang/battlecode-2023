@@ -16,10 +16,13 @@ public class LauncherStrategy {
     static final int HQ_KITE_THRESHOLD = 100;
     static MapLocation hqLoc;
 	static MapLocation nextLoc;
+	static int ignoreCounter = 0;
+	static MapLocation ignoreLoc;
+	static final int IGNORE_TIME = 10;
     static LauncherState state = null;
     static Team opponent;
     static final int ACTION_RADIUS = 16;
-
+    
     /**
      * Run a single turn for a Launcher.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
@@ -55,7 +58,25 @@ public class LauncherStrategy {
         }
 
         // MOVING
-        boolean foundObsoleteEnemyOnly = Communication.clearObsoleteEnemies(rc); // used to ignore obsolete enemies
+        if (target == null && Communication.clearObsoleteEnemies(rc)) {
+        	// No enemies seen, and an obsolete enemy location visible
+        	ignoreCounter += 1;
+        } else {
+        	// either see an enemy or not by an obsolete location
+        	ignoreCounter = 0;
+        }
+        if (ignoreLoc != null) {
+        	// already ignored a location
+        	ignoreCounter -= 1;
+        }
+        if (ignoreCounter > 10) {
+        	// set an ignore location
+        	ignoreLoc = rc.getLocation();
+        }
+        if (ignoreCounter < -20) {
+        	// clear ignore location
+        	ignoreLoc = null;
+        }      
 
         switch (state) {
             case DEFAULT:
@@ -86,8 +107,8 @@ public class LauncherStrategy {
                     if (closestIslandLoc != null) {
                         nextLoc = closestIslandLoc;
                     }
-                    MapLocation closestEnemyLoc = Communication.getClosestEnemy(rc);
-                    if (closestEnemyLoc != null && !foundObsoleteEnemyOnly) {
+                    MapLocation closestEnemyLoc = Communication.getClosestEnemy(rc, ignoreLoc);
+                    if (closestEnemyLoc != null) {
                         nextLoc = closestEnemyLoc;
                     }
                 }
@@ -125,6 +146,10 @@ public class LauncherStrategy {
                 }
                 if (targetCloud != null) shootCloud(rc, targetCloud);
             }
+        }
+        
+        if (ignoreLoc != null) {
+        	rc.setIndicatorString("Ignoring: " + ignoreLoc);
         }
     }
     

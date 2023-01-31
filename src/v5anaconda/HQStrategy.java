@@ -168,7 +168,7 @@ public class HQStrategy {
 			}
 
 			// If we've made launchers, make one amplifier
-			if (launcherClustersMade > 2) {
+			if (launcherClustersMade > 2 && rc.getRoundNum() < 500 || launcherClustersMade > 3 && rc.getRoundNum() > 500) {
 				if (rc.canBuildRobot(RobotType.AMPLIFIER, newLoc)) {
 					rc.buildRobot(RobotType.AMPLIFIER, newLoc);
 					AdSpent += 30;
