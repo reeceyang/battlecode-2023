@@ -228,39 +228,27 @@ public class Pathing {
     	return answer;
     }
     
-    static MapLocation findManaWell(RobotController rc, MapLocation adWell, MapLocation hqLoc) throws GameActionException {
+    static MapLocation fanOut(RobotController rc, MapLocation adWell, MapLocation hqLoc) throws GameActionException {
 		if (adWell == null) {
 			return null;
 		}
-    	if (rc.getLocation().distanceSquaredTo(adWell) > 36) {
-			rc.setIndicatorString("Going towards Ad well "+adWell);
-			return adWell;
-		} else {
-			Direction d = hqLoc.directionTo(adWell);
-			switch (7 * rc.getID() % 5) {
-				case 0:
-					d = d.rotateLeft();
-					break;
-				case 1:
-					break;
-				case 2:
-					d = d.rotateRight();
-					break;
-				case 3:
-					d = d.rotateLeft().rotateLeft();
-					break;
-				case 4:
-					d = d.rotateRight().rotateRight();
-					break;
-			}
-			return RobotPlayer.shiftByAmount(rc, rc.getLocation(), d, 5) ;
-//			MapLocation[] nearbyClouds = rc.senseNearbyCloudLocations(adWell, 100);
-//			if (nearbyClouds.length > 0) {
-//				rc.setIndicatorString("Going towards cloud "+nearbyClouds[0]);
-//				return nearbyClouds[0]; // need better strategy so it doesn't get stuck in a cloud forever ;-;
-//			} else {
-//				rc.setIndicatorString("Going around Ad well "+adWell);
-//			}
+		Direction d = hqLoc.directionTo(adWell);
+		switch (7 * rc.getID() % 5) {
+			case 0:
+				d = d.rotateLeft();
+				break;
+			case 1:
+				break;
+			case 2:
+				d = d.rotateRight();
+				break;
+			case 3:
+				d = d.rotateLeft().rotateLeft();
+				break;
+			case 4:
+				d = d.rotateRight().rotateRight();
+				break;
 		}
+		return RobotPlayer.shiftByAmount(rc, rc.getLocation(), d, 5) ;
 	}
 }

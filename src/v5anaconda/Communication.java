@@ -339,8 +339,9 @@ class Communication {
     }
 
     static void addWell(RobotController rc, ResourceType r, MapLocation loc) throws GameActionException {
+    	MapLocation symLoc = Communication.getSymLoc(rc, loc);
         for (int i=STARTING_WELL_IDX; i < GameConstants.SHARED_ARRAY_LENGTH; i++) {
-            if (rc.readSharedArray(i) == 0 && !isWellWritten(rc, loc) && (getSymLocInt(rc, loc)==0 || !isWellWritten(rc, Communication.intToLocation(rc, getSymLocInt(rc, loc))))) {
+            if (rc.readSharedArray(i) == 0 && !isWellWritten(rc, loc) && !isWellWritten(rc, symLoc)) {
                 int val = 0;
                 switch (r) {
                     case ADAMANTIUM: val = 0; break;
@@ -429,6 +430,9 @@ class Communication {
 
     static boolean isWellWritten(RobotController rc, MapLocation loc) throws GameActionException {
         boolean isWritten = false;
+        if (loc == null) {
+        	return false;
+        }
         for (int i = STARTING_WELL_IDX; i < GameConstants.SHARED_ARRAY_LENGTH; i++) {
 //            if (rc.readSharedArray(i) != 0) {
 //                rc.setIndicatorDot(readWellLocation(rc, i), ((rc.getTeam() == Team.A) ? 1 : 0)*255, 0, ((rc.getTeam() == Team.B) ? 1 : 0)*255);
@@ -470,6 +474,7 @@ class Communication {
 
     static int getSymLocInt(RobotController rc, MapLocation loc) throws GameActionException {
         switch (findSymmetry(rc)){
+        	case 0: return 0;
             case 1: return RobotPlayer.xReflect(rc, loc);
             case 2: return RobotPlayer.yReflect(rc, loc);
             case 3: return RobotPlayer.diagReflect(rc, loc);
@@ -479,6 +484,7 @@ class Communication {
 
     static MapLocation getSymLoc(RobotController rc, MapLocation loc) throws GameActionException {
         switch (findSymmetry(rc)){
+        	case 0: return null;
             case 1: return intToLocation(rc, RobotPlayer.xReflect(rc, loc));
             case 2: return intToLocation(rc, RobotPlayer.yReflect(rc, loc));
             case 3: return intToLocation(rc, RobotPlayer.diagReflect(rc, loc));
