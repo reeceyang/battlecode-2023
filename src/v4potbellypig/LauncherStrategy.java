@@ -109,6 +109,18 @@ public class LauncherStrategy {
             if (target != null) {
                 shootTarget(rc, target);
                 rc.setIndicatorString("move shooting" + target.getLocation());
+            } else {
+                int closestCloudDist = 7200;
+                MapLocation targetCloud = null;
+                MapLocation[] nearbyClouds = rc.senseNearbyCloudLocations(16);
+                for (MapLocation cloud : nearbyClouds) {
+                    int tempDist = rc.getLocation().distanceSquaredTo(cloud);
+                    if (tempDist < closestCloudDist) {
+                        closestCloudDist = tempDist;
+                        targetCloud = cloud;
+                    }
+                }
+                if (targetCloud != null) shootTargetLoc(rc, targetCloud);
             }
         }
     }
@@ -177,5 +189,19 @@ public class LauncherStrategy {
             Direction d = targetLoc.directionTo(rc.getLocation());
             nextLoc = rc.getLocation().add(d).add(d);
         }
+    }
+
+    static void shootTargetLoc(RobotController rc, MapLocation target) throws GameActionException {
+        if (rc.canAttack(target)) {
+            rc.attack(target);
+        } else {
+            rc.setIndicatorString("Failed to attack");
+        }
+
+        if (target.distanceSquaredTo(rc.getLocation()) <= 20) {
+            Direction d = target.directionTo(rc.getLocation());
+            nextLoc = rc.getLocation().add(d).add(d);
+        }
+
     }
 }

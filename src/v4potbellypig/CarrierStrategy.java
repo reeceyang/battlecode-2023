@@ -171,10 +171,11 @@ public class CarrierStrategy {
         // MODE-BASED ACTIONS
         switch (state) {
             case DEFAULT:
-                if (total < 39 && (rc.getRoundNum() - wellStart > 30) && rc.getLocation().isWithinDistanceSquared(locStart, 40) && !rc.canCollectResource(wellLoc, -1)) {
+                if (total < 39 && (rc.getRoundNum() - wellStart > 20) && rc.getLocation().isWithinDistanceSquared(locStart, 40) && !rc.canCollectResource(wellLoc, -1)) {
                     badWell = wellLoc;
                     findNewWell = true;
                     startedCountingTurns = false;
+                    rc.setIndicatorString("trying to find new well");
                 }
                 if (total < 39) {
                     //move towards well or search for well
@@ -405,7 +406,7 @@ public class CarrierStrategy {
         int index = 0;
 
         for (Direction d : RobotPlayer.directions) {
-            if (!rc.isLocationOccupied(wellLoc.add(d)) && rc.sensePassability(wellLoc.add(d))) {
+            if (!rc.isLocationOccupied(wellLoc.add(d)) && rc.sensePassability(wellLoc.add(d)) && rc.onTheMap(wellLoc.add(d))) {
                 adjacentPositions[index] = wellLoc.add(d);
                 index++;
             }
