@@ -288,9 +288,9 @@ public class CarrierStrategy {
 
 //        rc.setIndicatorString(startedCountingTurns + " ");
 
-        rc.setIndicatorString(state.toString());
+//        rc.setIndicatorString(state.toString());
 
-        boolean shouldMoveTwice = (state == CarrierState.DEFAULT && !collectedResource) || state == CarrierState.REPORT || state == CarrierState.SEARCH || state == CarrierState.DANGER;
+        boolean shouldMoveTwice = getTotalResources(rc) <= 15;
         // PERFORM MOVEMENT
         if (nextLoc == null) {
             RobotPlayer.moveRandom(rc);

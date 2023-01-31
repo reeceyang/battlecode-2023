@@ -45,7 +45,7 @@ public class Pathing {
 			} else {
 				BellmanFord.doCheapestBellmanFord(rc, target, moveTwice);
 			}
-//			rc.setIndicatorString("bellman ford used " + (before - Clock.getBytecodesLeft()));
+//			rc.setIndicatorString("bellman ford used " + (bytecodesLeft - Clock.getBytecodesLeft()));
 		} else {
 			doBugMode(rc, target);
 			if (moveTwice && !rc.getLocation().equals(target) && rc.isMovementReady()) {
