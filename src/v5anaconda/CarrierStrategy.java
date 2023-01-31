@@ -9,7 +9,7 @@ public class CarrierStrategy {
         MAKE_ELIXIR,
         SEARCH,
         REPORT,
-        DANGER,
+        DANGER,	
         ANCHOR;
     }
 
@@ -28,6 +28,7 @@ public class CarrierStrategy {
 
     static MapLocation wellLoc;
     static MapLocation adWellLoc;
+    static boolean hasHitAdWell = false;
     static MapLocation[] wellLocs = new MapLocation[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
     static ResourceType[] wellTypes = new ResourceType[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};
     static final int WELLLOC_MAX_IDX = wellLocs.length - 1; // change this if length of wellLocs is changed
@@ -99,7 +100,7 @@ public class CarrierStrategy {
 
         // If novel well, turn on reporting mode (sends carrier back to HQ to report finding)
         for (int i = WELLLOC_MAX_IDX; i >= 0; i--) {
-            if (wellLocs[i] != null && !Communication.isWellWritten(rc, wellLocs[i])) { // if any location is not written, turn on reportMode to go back to hq
+            if (wellLocs[i] != null && !Communication.isWellWritten(rc, wellLocs[i]) && !Communication.isWellWritten(rc, Communication.getSymLoc(rc, wellLocs[i]))) { // if any location is not written, turn on reportMode to go back to hq
                 if (rc.readSharedArray(63) == 0) {
                     state = CarrierState.REPORT;
                 } else {
@@ -193,10 +194,18 @@ public class CarrierStrategy {
                 }
                 break;
             case SEARCH:
-                if (adWellLoc != null) {
+                if (adWellLoc == null) {
                     adWellLoc = Communication.getNearestWellOfType(rc, ResourceType.ADAMANTIUM);
                 }
-                nextLoc = Pathing.findManaWell(rc, adWellLoc, hqLoc);
+                if (adWellLoc != null && !hasHitAdWell) {
+                	// We have not yet hit a well, and we know of an Ad well to go to
+                	hasHitAdWell = rc.getLocation().isWithinDistanceSquared(adWellLoc, 36);
+                	nextLoc = adWellLoc;
+                } else if (hasHitAdWell) {
+                	// We've hit an Ad well before
+                	nextLoc = Pathing.fanOut(rc, adWellLoc, hqLoc);
+                }
+                
                 rc.setIndicatorString("Trying to find mana well at "+nextLoc);
                 break;
             case REPORT:
