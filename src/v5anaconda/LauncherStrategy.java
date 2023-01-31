@@ -40,11 +40,11 @@ public class LauncherStrategy {
 
         state = LauncherState.DEFAULT;
 
-        if (RobotPlayer.isSmallMap) {
+        if (RobotPlayer.isSmallMap && rc.getRoundNum() < 80) {
             nextLoc = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
         } else {
             nextLoc = Pathing.reportAndPlaySafe(rc, robots, 0);
-            if (rc.getRoundNum() > 50) {
+            if (rc.getRoundNum() > 80) {
                 state = LauncherState.OFFENSE;
             }
         }
