@@ -58,6 +58,13 @@ public class HQStrategy {
 			Communication.updateHeadquarterInfo(rc);
 			selfidx = Communication.getIdxHQbyLocation(rc, rc.getLocation());
 		}
+
+		if (RobotPlayer.turnCount == 100) {
+			for (int i = Communication.STARTING_WELL_IDX; i < GameConstants.SHARED_ARRAY_LENGTH; i++) {
+				System.out.println(Communication.readWellLocation(rc, i));
+			}
+		}
+
 		// TRAFFIC MANAGEMENT
 		// Check number of ally robots every 10 turns
 		if (RobotPlayer.turnCount % 10 == 0) {
@@ -91,56 +98,6 @@ public class HQStrategy {
 			if (rc.readSharedArray(wellIdx) != 0) rc.setIndicatorDot(Communication.readWellLocation(rc, wellIdx), 0, 255*(rc.getTeam()==Team.A ? 1 : 0), 0);
 		}
 
-		// ELIXIR CONVERSION MANAGEMENT
-//		if (rc.getRoundNum() == ELIXIR_START_TURN) {
-//			checkAllKnownWells(rc); // update known well locations and types
-//			if (elixir_loc == null) {
-//				System.out.println("Looking to set elixir target");
-//				// find close duplicate wells
-//				int[] duplicate_idx = new int[4];
-//				int[] distances = new int[] {7200, 7200, 7200, 7200}; // first 2: ad, second 2: mana
-//				for (int i = 9; i >= 0; i--) {
-//					int idx = Communication.getIdxFromWellLocation(rc, known_wells[i]);
-//					if (idx == -1) { continue; }
-//					else {
-//						int dist = rc.getLocation().distanceSquaredTo(Communication.readWellLocation(rc, idx));
-//						switch (Communication.getWellType(rc, idx)) {
-//							case ADAMANTIUM:
-//								if (dist < distances[0]) {
-//									distances[0] = dist;
-//									duplicate_idx[0] = idx;
-//								} else if (dist < distances[1]) {
-//									distances[1] = dist;
-//									duplicate_idx[1] = idx;
-//								}
-//								break;
-//							case MANA:
-//								if (dist < distances[2]) {
-//									distances[2] = dist;
-//									duplicate_idx[2] = idx;
-//								} else if (dist < distances[1]) {
-//									distances[3] = dist;
-//									duplicate_idx[3] = idx;
-//								}
-//								break;
-//							case ELIXIR:
-//								elixir_loc = Communication.readWellLocation(rc, idx);
-//								break;
-//							case NO_RESOURCE:
-//								break;
-//						}
-//					}
-//				}
-//				// check for duplicates that are close enough, prioritize converting a mana well if possible
-//				if (distances[3] < ELIXIR_RADIUS) {
-//					Communication.setElixirTargetStatus(rc, duplicate_idx[2]);
-//					System.out.println("Successfully set elixir target");
-//				} else if (distances[1] < ELIXIR_RADIUS) {
-//					Communication.setElixirTargetStatus(rc, duplicate_idx[0]);
-//					System.out.println("Successfully set elixir target");
-//				}
-//			}
-//		}
 		if (!symmetryFound && Communication.findSymmetry(rc) != 0) {
 			System.out.println("Symmetry found: "+Communication.findSymmetry(rc));
 			symmetryFound = true;
@@ -166,8 +123,8 @@ public class HQStrategy {
 		}
 		
 		// Bait launchers out into the world
-		if (RobotPlayer.turnCount < 100 && RobotPlayer.turnCount % 30 == 0 || RobotPlayer.isSmallMap && RobotPlayer.turnCount == 3) {
-			baitFriendlyLaunchers(rc);
+		if (RobotPlayer.turnCount < 200 && RobotPlayer.turnCount % 50 == 0 || RobotPlayer.isSmallMap && RobotPlayer.turnCount == 10) {
+			baitFriendlyLaunchers2(rc);
 		}
 				
 		Communication.tryWriteMessages(rc);
@@ -279,5 +236,18 @@ public class HQStrategy {
 		if (rc.onTheMap(target1)) { Communication.reportEnemy(rc, target1); }
 		if (rc.onTheMap(target3)) { Communication.reportEnemy(rc, target3); }
 		if (rc.onTheMap(target2)) { Communication.reportEnemy(rc, target2); }	
+	}
+
+	static void baitFriendlyLaunchers2(RobotController rc) throws GameActionException {
+		if (Communication.findSymmetry(rc) == 0) {
+			MapLocation target1 = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, rc.getLocation()));
+			MapLocation target2 = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, rc.getLocation()));
+			MapLocation target3 = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, rc.getLocation()));
+			if (Communication.readHQStatus(rc, "nx") == 0) Communication.reportEnemy(rc, target1);
+			if (Communication.readHQStatus(rc, "ny") == 0) Communication.reportEnemy(rc, target2);
+			if (Communication.readHQStatus(rc, "nr") == 0) Communication.reportEnemy(rc, target3);
+		} else {
+			Communication.reportEnemy(rc, Communication.getSymLoc(rc, rc.getLocation()));
+		}
 	}
 }
