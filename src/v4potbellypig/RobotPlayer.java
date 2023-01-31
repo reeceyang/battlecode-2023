@@ -32,6 +32,7 @@ public strictfp class RobotPlayer {
 
     static boolean isSmallMap;
     public static int ISLAND_COUNT = 35;
+    static final int SMALL_MAP_AREA = 900;
 
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
@@ -43,14 +44,15 @@ public strictfp class RobotPlayer {
     @SuppressWarnings("unused")
     public static void run(RobotController rc) throws GameActionException {
         rng = new Random(rc.getID());
-        isSmallMap = rc.getMapWidth() * rc.getMapHeight() < 600;
+        isSmallMap = rc.getMapWidth() * rc.getMapHeight() < SMALL_MAP_AREA;
         Pathing.leftHanded = rc.getID() % 2 == 0;
 
         if (turnCount == 1) {
             ISLAND_COUNT = rc.getIslandCount();
         }
+        final int START_MANA = isSmallMap ? 20 : 50;
         if (rc.getRoundNum() < 60) {
-            if ((7*rc.getID()) % 100 > 50) {
+            if ((7*rc.getID()) % 100 > START_MANA) {
                 demanded = ResourceType.MANA;
             } else {
                 demanded = ResourceType.ADAMANTIUM;
