@@ -93,7 +93,9 @@ def relax_graph(iterations):
     for _ in range(iterations):
         for x in range(SIZE):
             for y in range(SIZE):
-                s += f'minCost = {COST}{x}{y};\n'
+                s += f"""if ({OPEN}{x}{y}) {{
+    minCost = {COST}{x}{y};
+"""
                 for dir in DIRS:
                     dx, dy = DIR_TO_D[dir]
                     neigh_x = x + dx
@@ -104,7 +106,7 @@ def relax_graph(iterations):
     minCost = Math.min(minCost, {COST}{neigh_x}{neigh_y} + 1);
 }}
 """
-                s += f'new{COST}{x}{y} = minCost;\n'
+                s += f'new{COST}{x}{y} = minCost;\n}}\n'
 
         # swap the costs with the new costs at the end of the iteration
         for x in range(SIZE):
@@ -203,8 +205,46 @@ public static boolean doBellmanFord(RobotController rc, MapLocation target, bool
     }}
     return false;
 }}
+public static boolean doCheapBellmanFord(RobotController rc, MapLocation target, boolean moveTwice) throws GameActionException {{
+    {def_vars()}
+    {relax_graph(2)}
+    {choose_best_dir()}
+    
+    if (rc.canMove(bestDir)) {{
+        MapLocation next = rc.getLocation().add(bestDir);
+        Direction current = Direction.CENTER;
+        {get_current_from_bestdir()}
+        if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {{
+            rc.move(bestDir);
+        }}
+    }}
+    
+    if (rc.isMovementReady() && moveTwice) {{
+        {move_again()}
+    }}
+    return false;
+}}
+public static boolean doCheapestBellmanFord(RobotController rc, MapLocation target, boolean moveTwice) throws GameActionException {{
+    {def_vars()}
+    {relax_graph(1)}
+    {choose_best_dir()}
+    
+    if (rc.canMove(bestDir)) {{
+        MapLocation next = rc.getLocation().add(bestDir);
+        Direction current = Direction.CENTER;
+        {get_current_from_bestdir()}
+        if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {{
+            rc.move(bestDir);
+        }}
+    }}
+    
+    if (rc.isMovementReady() && moveTwice) {{
+        {move_again()}
+    }}
+    return false;
+}}
 }}
 """
 
 
-print(make_method('v4potbellypig'))
+print(make_method('5anaconda'))

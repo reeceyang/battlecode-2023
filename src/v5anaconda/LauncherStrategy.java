@@ -83,6 +83,10 @@ public class LauncherStrategy {
 
         switch (state) {
             case DEFAULT:
+            case DANGER:
+                break;
+            case SHOOT_MOVE:
+                if (target != null) shootTarget(rc, target);
                 break;
             case DEFENSE:
                 // fan out from home HQ in the directions of potential enemy HQs; stay within radius of 200
@@ -122,7 +126,7 @@ public class LauncherStrategy {
                             attackingIsland = true;
                         }
                     }
-                    rc.setIndicatorString("sensed " + id);
+//                    rc.setIndicatorString("sensed " + id);
                     Communication.updateIslandInfo(rc, id);
                 }
                 if (!attackingIsland) {
@@ -136,14 +140,10 @@ public class LauncherStrategy {
                     }
                 }
                 break;
-            case DANGER:
-                break;
-            case SHOOT_MOVE:
-                if (target != null) shootTarget(rc, target);
-                break;
         }
 
         Communication.tryWriteMessages(rc);
+        rc.setIndicatorString(state.toString());
         
         // Execute Movement
         if (nextLoc == null) {
