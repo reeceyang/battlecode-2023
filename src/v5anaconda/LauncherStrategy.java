@@ -6,6 +6,7 @@ public class LauncherStrategy {
 
     enum LauncherState {
         DEFAULT,
+        DEFENSE,
         OFFENSE,
         DANGER,
         SHOOT_MOVE,
@@ -40,11 +41,12 @@ public class LauncherStrategy {
 
         state = LauncherState.DEFAULT;
 
-        if (RobotPlayer.isSmallMap) {
+        if (RobotPlayer.isSmallMap && rc.getRoundNum() < 80) {
             nextLoc = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
         } else {
+            if (rc.getRoundNum() < 50) state = LauncherState.DEFENSE;
             nextLoc = Pathing.reportAndPlaySafe(rc, robots, 0);
-            if (rc.getRoundNum() > 50) {
+            if (rc.getRoundNum() > 80) {
                 state = LauncherState.OFFENSE;
             }
         }
@@ -85,6 +87,30 @@ public class LauncherStrategy {
             case SHOOT_MOVE:
                 if (target != null) shootTarget(rc, target);
                 break;
+            case DEFENSE:
+                // fan out from home HQ in the directions of potential enemy HQs; stay within radius of 200
+                if (Communication.findSymmetry(rc) == 0) {
+                    Direction dir_x = rc.getLocation().directionTo(Communication.intToLocation(rc, RobotPlayer.xReflect(rc, rc.getLocation())));
+                    Direction dir_y = rc.getLocation().directionTo(Communication.intToLocation(rc, RobotPlayer.yReflect(rc, rc.getLocation())));
+                    Direction dir_r = rc.getLocation().directionTo(Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, rc.getLocation())));
+
+                    if (Communication.readHQStatus(rc, "nr") == 0) {
+                        nextLoc = rc.getLocation().add(dir_r);
+                    } else if (Communication.readHQStatus(rc, "nx") == 0) {
+                        nextLoc = rc.getLocation().add(dir_x);
+                    } else if (Communication.readHQStatus(rc, "ny") == 0) {
+                        nextLoc = rc.getLocation().add(dir_y);
+                    }
+
+                    if (!nextLoc.isWithinDistanceSquared(hqLoc, 50)) {
+                        nextLoc = rc.getLocation();
+                    }
+
+                    rc.setIndicatorString("defending at "+nextLoc);
+
+                } else {
+                    Communication.reportEnemy(rc, Communication.getSymLoc(rc, rc.getLocation()));
+                }
             case OFFENSE:
                 // go to nearest island, with priority for visible enemy island
                 // Sense nearby islands and see if there are any visible squares on that island
