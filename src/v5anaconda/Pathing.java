@@ -37,8 +37,14 @@ public class Pathing {
 		// apply bug mode override
 		if (bugOverride) bugMode = true;
 		if (!bugMode) {
-			//int before = Clock.getBytecodesLeft();
-			BellmanFord.doBellmanFord(rc, target, moveTwice);
+			int bytecodesLeft = Clock.getBytecodesLeft();
+			if (bytecodesLeft > 7000) {
+				BellmanFord.doBellmanFord(rc, target, moveTwice);
+			} else if (bytecodesLeft > 6000) {
+				BellmanFord.doCheapBellmanFord(rc, target, moveTwice);
+			} else {
+				BellmanFord.doCheapestBellmanFord(rc, target, moveTwice);
+			}
 //			rc.setIndicatorString("bellman ford used " + (before - Clock.getBytecodesLeft()));
 		} else {
 			doBugMode(rc, target);
@@ -46,7 +52,7 @@ public class Pathing {
 				doBugMode(rc, target);
 			}
 		}
-//		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target + "left" + leftHanded + currentDirection);
+		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target + "left" + leftHanded + currentDirection);
 		int currentDistance = rc.getLocation().distanceSquaredTo(target);
 		if (currentDistance < closest) {
 			closest = currentDistance;

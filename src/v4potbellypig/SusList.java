@@ -35,7 +35,7 @@ public class SusList {
                 return;
             }
         }
-        System.out.println("WARNING: failed to write message " + m + " because queue full");
+//        System.out.println("WARNING: failed to write message " + m + " because queue full");
     }
 
     public void addMany(Message[] ms) {
