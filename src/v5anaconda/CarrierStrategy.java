@@ -296,7 +296,7 @@ public class CarrierStrategy {
             RobotPlayer.moveRandom(rc);
         } else {
             Pathing.moveTowards(rc, nextLoc, bugOverride, shouldMoveTwice);
-//            rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 0, 255);
+            rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 0, 255);
         }
 
     }

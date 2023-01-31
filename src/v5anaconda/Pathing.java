@@ -237,7 +237,7 @@ public class Pathing {
 			return adWell;
 		} else {
 			Direction d = hqLoc.directionTo(adWell);
-			switch (rc.getID() % 3) {
+			switch (7 * rc.getID() % 5) {
 				case 0:
 					d = d.rotateLeft();
 					break;
@@ -246,8 +246,14 @@ public class Pathing {
 				case 2:
 					d = d.rotateRight();
 					break;
+				case 3:
+					d = d.rotateLeft().rotateLeft();
+					break;
+				case 4:
+					d = d.rotateRight().rotateRight();
+					break;
 			}
-			return rc.getLocation().add(d);
+			return RobotPlayer.shiftByAmount(rc, rc.getLocation(), d, 5) ;
 //			MapLocation[] nearbyClouds = rc.senseNearbyCloudLocations(adWell, 100);
 //			if (nearbyClouds.length > 0) {
 //				rc.setIndicatorString("Going towards cloud "+nearbyClouds[0]);
