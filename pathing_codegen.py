@@ -138,6 +138,7 @@ def move_again():
         y = HOME + dy
         s += f"""if (bestDir == {dir}) {{
     bestDir = Direction.CENTER;
+    Direction current = Direction.CENTER;
 """
         for next_dir in DIRS:
             neigh_x = x + dx
@@ -146,18 +147,32 @@ def move_again():
     if ({COST}{neigh_x}{neigh_y} < bestCost) {{
         bestCost = {COST}{neigh_x}{neigh_y};
         bestDir = {dir};
+        if ({CURR}{neigh_x}{neigh_y} != null) current = {CURR}{neigh_x}{neigh_y};
     }}
 }}
 """
         s += f"""if (rc.canMove(bestDir)) {{
-        rc.move(bestDir);
-        return true;
+        MapLocation next = rc.getLocation().add(bestDir);
+        if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {{
+            rc.move(bestDir);
+            return true;
+        }}
     }}
     return false;
 }}\n"""
 
     return s
 
+
+def get_current_from_bestdir():
+    s = ""
+    for dir in DIRS:
+        dx, dy = DIR_TO_D[dir]
+        s += f"""if (bestDir == {dir}) {{
+    current = {CURR}{HOME + dx}{HOME + dy};
+}}
+"""
+    return s
 
 def make_method(package):
     return f"""package {package};
@@ -171,7 +186,12 @@ public static boolean doBellmanFord(RobotController rc, MapLocation target, bool
     {choose_best_dir()}
     
     if (rc.canMove(bestDir)) {{
-        rc.move(bestDir);
+        MapLocation next = rc.getLocation().add(bestDir);
+        Direction current = Direction.CENTER;
+        {get_current_from_bestdir()}
+        if (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target))) {{
+            rc.move(bestDir);
+        }}
     }}
     
     if (rc.isMovementReady() && moveTwice) {{

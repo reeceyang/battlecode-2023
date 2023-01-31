@@ -36,7 +36,7 @@ public class Pathing {
 		}
 		// apply bug mode override
 		if (bugOverride) bugMode = true;
-		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target);
+		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target + "left" + leftHanded);
 		if (!bugMode) {
 			//int before = Clock.getBytecodesLeft();
 			BellmanFord.doBellmanFord(rc, target, moveTwice);
@@ -67,7 +67,10 @@ public class Pathing {
 		Direction current = null;
 		if (rc.canSenseLocation(next)) current = rc.senseMapInfo(next).getCurrentDirection();
 		// don't move into an opposing current
-		if (rc.canMove(d) && current != d.opposite()) {
+		// only start moving towards the target again if we've actually gotten closer
+		if (rc.canMove(d)
+				&& current != d.opposite()
+				&& next.distanceSquaredTo(target) < closest) {
 			rc.move(d);
 			currentDirection = null; // there is no obstacle we're going around
 		} else {
@@ -80,9 +83,14 @@ public class Pathing {
 			// Try to move in a way that keeps the obstacle on our right or left
 			for (int i = 0; i < 8; i++) {
 				// currentDirection is the direction we are considering going to, not the direction of the current!
-				current = null;
+				current = Direction.CENTER;
+				next = rc.getLocation().add(currentDirection);
 				if (rc.canSenseLocation(next)) current = rc.senseMapInfo(next).getCurrentDirection();
-				if (rc.canMove(currentDirection) && current != currentDirection.opposite()) {
+				// if we're adjacent to the target then we can only move to a location that is also adjacent
+				// if we're adjacent to the target we also should not move onto a current that would make us not adjacent
+				if (rc.canMove(currentDirection)
+						&& current != currentDirection.opposite()
+						&& (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target)))) {
 					rc.move(currentDirection);
 					if (leftHanded) {
 						currentDirection = currentDirection.rotateRight();
