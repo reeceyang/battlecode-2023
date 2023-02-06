@@ -2,6 +2,20 @@ package v5anaconda;
 
 import battlecode.common.*;
 
+enum PathingMode {
+	REPOSITIONING,
+	RUNNING_AWAY,
+	GROUPING_UP
+
+}
+
+class Report {
+	public MapLocation nextLoc;
+	public PathingMode pathingMode;
+	public int nEnemy;
+	public int nFriendly;
+}
+
 public class Pathing {
 	
 	static final int baseExclusionRadius = 16;
@@ -12,7 +26,7 @@ public class Pathing {
 
     static Direction currentDirection = null;
 	static MapLocation previousTarget = null;
-	static final int TIME_LIMIT = 5;
+	static final int TIME_LIMIT = 3;
 	static int progressCountdown = TIME_LIMIT;
 	static int closest = Integer.MAX_VALUE;
 	static boolean bugMode = false;
@@ -21,6 +35,8 @@ public class Pathing {
     static void moveTowards(RobotController rc, MapLocation target, boolean bugOverride, boolean moveTwice) throws GameActionException {
 
         if (rc.getLocation().equals(target)) {
+			bugMode = false;
+			progressCountdown = TIME_LIMIT;
             return;
         }
         if (!rc.isMovementReady()) {
@@ -47,12 +63,12 @@ public class Pathing {
 			}
 //			rc.setIndicatorString("bellman ford used " + (bytecodesLeft - Clock.getBytecodesLeft()));
 		} else {
-			doBugMode(rc, target);
+			doBugMode(rc, target, moveTwice);
 			if (moveTwice && !rc.getLocation().equals(target) && rc.isMovementReady()) {
-				doBugMode(rc, target);
+				doBugMode(rc, target, moveTwice);
 			}
 		}
-		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target + "left" + leftHanded + currentDirection);
+		rc.setIndicatorString("bugmode" + bugMode + " " + progressCountdown + " " + target + "left" + leftHanded + currentDirection + closest + " " +rc.getLocation().distanceSquaredTo(target));
 		int currentDistance = rc.getLocation().distanceSquaredTo(target);
 		if (currentDistance < closest) {
 			closest = currentDistance;
@@ -65,7 +81,7 @@ public class Pathing {
 		}
 	}
 
-	static void doBugMode(RobotController rc, MapLocation target) throws GameActionException {
+	static void doBugMode(RobotController rc, MapLocation target, boolean moveTwice) throws GameActionException {
 //rc.setIndicatorString("bug mode " + progressCountdown + " left");
 		Direction d = rc.getLocation().directionTo(target);
 		// this is the direction of the current on the next location
@@ -74,8 +90,18 @@ public class Pathing {
 		if (rc.canSenseLocation(next)) current = rc.senseMapInfo(next).getCurrentDirection();
 		// don't move into an opposing current
 		// only start moving towards the target again if we've actually gotten closer
+		// also don't go into a current if we can just move into the direction it's pointing in
+		boolean canGoCurrent = current != d.opposite()
+				&& (current != d.opposite().rotateLeft() || rc.canMove(d.rotateRight().rotateRight()))
+				&& (current != d.opposite().rotateRight() || rc.canMove(d.rotateLeft().rotateLeft()))
+				&& (current != d.opposite().rotateLeft().rotateLeft() || rc.canMove(d.rotateRight()))
+				&& (current != d.opposite().rotateRight().rotateRight() || rc.canMove(d.rotateLeft()));
 		if (rc.canMove(d)
-				&& current != d.opposite()
+//				&& (!avoidCurrents || current == Direction.CENTER
+//					|| current == rc.getLocation().directionTo(target)
+//					|| current == rc.getLocation().directionTo(target).rotateLeft()
+//					|| current == rc.getLocation().directionTo(target).rotateRight())
+				&& (moveTwice || canGoCurrent)
 				&& next.distanceSquaredTo(target) < closest) {
 			rc.move(d);
 			currentDirection = null; // there is no obstacle we're going around
@@ -94,8 +120,14 @@ public class Pathing {
 				if (rc.canSenseLocation(next)) current = rc.senseMapInfo(next).getCurrentDirection();
 				// if we're adjacent to the target then we can only move to a location that is also adjacent
 				// if we're adjacent to the target we also should not move onto a current that would make us not adjacent
+				canGoCurrent = current != currentDirection.opposite()
+						&& (current != currentDirection.opposite().rotateLeft() || rc.canMove(currentDirection.rotateRight().rotateRight()))
+						&& (current != currentDirection.opposite().rotateRight() || rc.canMove(currentDirection.rotateLeft().rotateLeft()))
+						&& (current != currentDirection.opposite().rotateLeft().rotateLeft() || rc.canMove(currentDirection.rotateRight()))
+						&& (current != currentDirection.opposite().rotateRight().rotateRight() || rc.canMove(currentDirection.rotateLeft()));
 				if (rc.canMove(currentDirection)
-						&& current != currentDirection.opposite()
+//						&& current != currentDirection.opposite()
+						&& (moveTwice || canGoCurrent)
 						&& (!rc.getLocation().isAdjacentTo(target) || (next.isAdjacentTo(target) && next.add(current).isAdjacentTo(target)))) {
 					rc.move(currentDirection);
 					if (leftHanded) {
@@ -117,7 +149,7 @@ public class Pathing {
 
 
     // COMBAT MICRO
-    static MapLocation reportAndPlaySafe(RobotController rc, RobotInfo[] robots, int safetyLevel) throws GameActionException {
+    static Report reportAndPlaySafe(RobotController rc, RobotInfo[] robots, int safetyLevel) throws GameActionException {
     	// In combat, return a move away from enemies and toward friendlies. As a side effect, also scans and reports enemies.
     	// Safety level: 0 = run if outnumbered   1 = stay near friendlies   2 = run away from any enemies
     	MapLocation enemyAvg = null;
@@ -154,20 +186,29 @@ public class Pathing {
         	outnumbered = nEnemy > nFriendly;
         }   
         if (nFriendly != 0) { friendlyAvg = new MapLocation(xFriendlyAvg / nFriendly, yFriendlyAvg / nFriendly); }
+		Report report = new Report();
+		report.nEnemy = nEnemy;
+		report.nFriendly = nFriendly;
         if (enemyAvg != null && friendlyAvg != null) {
         	// Reposition behind friendlies
         	Direction d = enemyAvg.directionTo(friendlyAvg);
         	rc.setIndicatorString("Repositioning");
-        	return rc.getLocation().add(d).add(d);
+			report.nextLoc = rc.getLocation().add(d).add(d);
+			report.pathingMode = PathingMode.REPOSITIONING;
+			return report;
         } else if (safetyLevel > 0 && nEnemy > 1 || outnumbered) {
         	// Run from enemies
         	Direction d = enemyAvg.directionTo(rc.getLocation());
         	rc.setIndicatorString("Running away");
-        	return rc.getLocation().add(d).add(d); 	
+			report.nextLoc = rc.getLocation().add(d).add(d);
+			report.pathingMode = PathingMode.RUNNING_AWAY;
+			return report;
         } else if (safetyLevel < 2 && friendlyAvg != null) {
         	// Reposition to friendlies
         	rc.setIndicatorString("Grouping up");
-        	return friendlyAvg;
+			report.nextLoc = friendlyAvg;
+			report.pathingMode = PathingMode.RUNNING_AWAY;
+        	return report;
         } else {
         	// Nothing is happening
         	return null;

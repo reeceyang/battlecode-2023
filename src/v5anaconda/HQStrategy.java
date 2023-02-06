@@ -123,8 +123,13 @@ public class HQStrategy {
 		}
 		
 		// Bait launchers out into the world
-		if ((RobotPlayer.turnCount < 200 && RobotPlayer.turnCount % 50 == 0) || (RobotPlayer.isSmallMap && RobotPlayer.turnCount == 10) || (RobotPlayer.turnCount >= 200 && RobotPlayer.turnCount % 150 == 0) ) {
+		if ((RobotPlayer.turnCount < 200 && RobotPlayer.turnCount % 50 == 0)
+				|| (RobotPlayer.isSmallMap && RobotPlayer.turnCount == 10)
+				|| (RobotPlayer.turnCount >= 200 && RobotPlayer.turnCount % 150 == 0) ) {
 			baitFriendlyLaunchers2(rc);
+		}
+		if (RobotPlayer.isSmallMap && rc.getRobotCount() < rc.getMapWidth() * rc.getMapHeight() * ANCHOR_MAP_FRAC) {
+			baitToMiddle(rc);
 		}
 				
 		Communication.tryWriteMessages(rc);
@@ -161,7 +166,7 @@ public class HQStrategy {
 		turns_since_anchor++;
 		boolean launcherCluster = (rc.getResourceAmount(ResourceType.MANA) > 179) || (RobotPlayer.turnCount < 2 && !RobotPlayer.isSmallMap); // whether we can make 4+ launchers
 		boolean saveForAnchor = rc.getNumAnchors(Anchor.STANDARD) < ANCHOR_LIMIT && (turns_since_anchor > TURNS_PER_ANCHOR)
-				&& (RobotPlayer.turnCount > 1000 || rc.getRobotCount() > rc.getMapWidth() * rc.getMapHeight() * ANCHOR_MAP_FRAC);
+				&& (RobotPlayer.turnCount > 500 || rc.getRobotCount() > rc.getMapWidth() * rc.getMapHeight() * ANCHOR_MAP_FRAC);
 		for (MapLocation newLoc : newLocs) {
 			if (newLoc == null) {
 				continue;
@@ -243,11 +248,17 @@ public class HQStrategy {
 			MapLocation target1 = Communication.intToLocation(rc, RobotPlayer.xReflect(rc, rc.getLocation()));
 			MapLocation target2 = Communication.intToLocation(rc, RobotPlayer.yReflect(rc, rc.getLocation()));
 			MapLocation target3 = Communication.intToLocation(rc, RobotPlayer.diagReflect(rc, rc.getLocation()));
-			if (Communication.readHQStatus(rc, "nx") == 0) Communication.reportEnemy(rc, target1);
-			if (Communication.readHQStatus(rc, "ny") == 0) Communication.reportEnemy(rc, target2);
-			if (Communication.readHQStatus(rc, "nr") == 0) Communication.reportEnemy(rc, target3);
+			if (Communication.readHQStatus(rc, "nr") == 0 && target3 != null && !target3.isAdjacentTo(rc.getLocation())) Communication.reportEnemy(rc, target3);
+			else {
+				if (Communication.readHQStatus(rc, "nx") == 0 && target1 != null && !target1.isAdjacentTo(rc.getLocation())) { Communication.reportEnemy(rc, target1); }
+				if (Communication.readHQStatus(rc, "ny") == 0 && target2 != null && !target2.isAdjacentTo(rc.getLocation())) Communication.reportEnemy(rc, target2);
+			}
 		} else {
 			Communication.reportEnemy(rc, Communication.getSymLoc(rc, rc.getLocation()));
 		}
+	}
+
+	static void baitToMiddle(RobotController rc) throws  GameActionException {
+		Communication.reportEnemy(rc, new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2));
 	}
 }

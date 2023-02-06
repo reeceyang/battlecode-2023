@@ -145,7 +145,9 @@ public class CarrierStrategy {
                             smallestDistance = enemyDistance;
                         }
                     }
-                    state = CarrierState.DANGER;
+                    if (robot.getType() == RobotType.LAUNCHER || robot.getType() == RobotType.DESTABILIZER) {
+                        state = CarrierState.DANGER;
+                    }
                 }
             }
             if (robots.length > BUG_OVERRIDE_THRESH) {
@@ -164,10 +166,8 @@ public class CarrierStrategy {
             state = CarrierState.ANCHOR;
         }
         int total = getTotalResources(rc);
-        boolean collectedResource = false;
         if (wellLoc != null && rc.canCollectResource(wellLoc, -1)) {
             rc.collectResource(wellLoc, -1);
-            collectedResource = true;
         }
         // MODE-BASED ACTIONS
         switch (state) {
@@ -219,7 +219,8 @@ public class CarrierStrategy {
                         rc.setIndicatorString("AHHHHH");
                     }
                 }
-                nextLoc = Pathing.reportAndPlaySafe(rc, robots, 2);
+                Report report = Pathing.reportAndPlaySafe(rc, robots, 2);
+                nextLoc = report != null ? report.nextLoc : null;
                 if (rc.getLocation().isWithinDistanceSquared(hqLoc, DANGER_HQ_PROX_OVERRIDE_RADIUS)) {
                 	nextLoc = hqLoc;
                 }
@@ -297,7 +298,7 @@ public class CarrierStrategy {
 
 //        rc.setIndicatorString(startedCountingTurns + " ");
 
-//        rc.setIndicatorString(state.toString());
+        rc.setIndicatorString(state.toString());
 
         boolean shouldMoveTwice = getTotalResources(rc) <= 15;
         // PERFORM MOVEMENT

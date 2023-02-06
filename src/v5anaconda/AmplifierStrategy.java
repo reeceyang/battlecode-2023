@@ -28,7 +28,8 @@ public class AmplifierStrategy {
 
         RobotInfo[] robots = rc.senseNearbyRobots();
         // report any enemies, and either follow friendlies or avoid enemies
-        nextLoc = Pathing.reportAndPlaySafe(rc, robots, 1);
+        Report report = Pathing.reportAndPlaySafe(rc, robots, 1);
+        nextLoc = report != null ? report.nextLoc : null;
 
         if (nextLoc == null) {
             // go patrol a nearby well or island

@@ -23,7 +23,9 @@ public class LauncherStrategy {
     static LauncherState state = null;
     static Team opponent;
     static final int ACTION_RADIUS = 16;
-    
+    static int roundsSinceLastSeenEnemy = 2000;
+    static RobotInfo previousTarget = null;
+
     /**
      * Run a single turn for a Launcher.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
@@ -40,12 +42,14 @@ public class LauncherStrategy {
         }
 
         state = LauncherState.DEFAULT;
+        Report report = null;
 
-        if (RobotPlayer.isSmallMap && rc.getRoundNum() < 80) {
+        if (RobotPlayer.isSmallMap && rc.getRobotCount() < rc.getMapWidth() * rc.getMapHeight() * HQStrategy.ANCHOR_MAP_FRAC) {
             nextLoc = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
         } else {
             if (rc.getRoundNum() < 50) state = LauncherState.DEFENSE;
-            nextLoc = Pathing.reportAndPlaySafe(rc, robots, 0);
+            report = Pathing.reportAndPlaySafe(rc, robots, 0);
+            nextLoc = report != null ? report.nextLoc : null;
             if (rc.getRoundNum() > 80) {
                 state = LauncherState.OFFENSE;
             }
@@ -57,6 +61,7 @@ public class LauncherStrategy {
         // only shoot move if the target is within action radius
         if (target != null && target.getLocation().distanceSquaredTo(rc.getLocation()) <= ACTION_RADIUS) {
             state = LauncherState.SHOOT_MOVE;
+            roundsSinceLastSeenEnemy = 0;
         }
 
         // MOVING
@@ -85,7 +90,10 @@ public class LauncherStrategy {
             case DANGER:
                 break;
             case SHOOT_MOVE:
-                if (target != null) shootTarget(rc, target);
+                if (target != null) {
+                    shootTarget(rc, target);
+                    previousTarget = target;
+                }
                 break;
             case DEFENSE:
                 // fan out from home HQ in the directions of potential enemy HQs; stay within radius of 200
@@ -115,6 +123,7 @@ public class LauncherStrategy {
                 // go to nearest island, with priority for visible enemy island
                 // Sense nearby islands and see if there are any visible squares on that island
                 // If we don't sense an island nearby, check communications for islands
+//                if (report != null && report.nFriendly == 0) break;
                 boolean attackingIsland = false;
                 int[] ids = rc.senseNearbyIslands();
                 for (int id : ids) {
@@ -131,10 +140,12 @@ public class LauncherStrategy {
                 if (!attackingIsland) {
                     MapLocation closestIslandLoc = Communication.getClosestIsland(rc);
                     if (closestIslandLoc != null) {
+                        rc.setIndicatorString("going to closest island");
                         nextLoc = closestIslandLoc;
                     }
                     MapLocation closestEnemyLoc = Communication.getClosestEnemy(rc, ignoreLoc);
                     if (closestEnemyLoc != null) {
+                        rc.setIndicatorString("going to closest enemy");
                         nextLoc = closestEnemyLoc;
                     }
                 }
@@ -142,23 +153,27 @@ public class LauncherStrategy {
         }
 
         Communication.tryWriteMessages(rc);
-        rc.setIndicatorString(state.toString());
-        
+//        rc.setIndicatorString(state.toString());
         // Execute Movement
         if (nextLoc == null) {
-        	RobotPlayer.moveRandom(rc);
+            RobotPlayer.moveRandom(rc);
         } else {
-        	Pathing.moveTowards(rc, nextLoc, bugOverride, false);
-        	rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 255, 0);
+            Pathing.moveTowards(rc, nextLoc, bugOverride, false);
+            rc.setIndicatorLine(rc.getLocation(), nextLoc, 0, 255, 0);
 //            rc.setIndicatorString(nextLoc + " " + rc.getLocation());
         }
+        roundsSinceLastSeenEnemy += 1;
 
         if (rc.isActionReady()) {
             robots = rc.senseNearbyRobots();
             target = getTargetSetDanger(rc, robots);
             if (target != null) {
                 shootTarget(rc, target);
+                roundsSinceLastSeenEnemy = 0;
                 rc.setIndicatorString("move shooting" + target.getLocation());
+                previousTarget = target;
+            } else if (previousTarget != null && rc.senseCloud(rc.getLocation())) {
+                shootTarget(rc, previousTarget);
             } else {
                 int closestCloudDist = 7200;
                 MapLocation targetCloud = null;
@@ -178,6 +193,7 @@ public class LauncherStrategy {
 
                 if (targetCloud != null) shootCloud(rc, targetCloud);
             }
+
         }
         
         if (ignoreLoc != null) {
@@ -263,6 +279,11 @@ public class LauncherStrategy {
         if (targetLoc.distanceSquaredTo(rc.getLocation()) <= ACTION_RADIUS) {
             Direction d = targetLoc.directionTo(rc.getLocation());
             nextLoc = rc.getLocation().add(d).add(d);
+//            if (d == Direction.NORTH || d == Direction.EAST || d == Direction.SOUTH || d == Direction.WEST) {
+//                nextLoc = rc.getLocation().add(d).add(d);
+//            } else {
+//                nextLoc = rc.getLocation().add(d.rotateLeft()).add(d.rotateLeft());
+//            }
         }
     }
 
